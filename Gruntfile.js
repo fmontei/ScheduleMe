@@ -8,7 +8,19 @@ module.exports = function(grunt) {
                     packageSpecific: {
                         bootstrap: {
                             stripGlobBase: true,
-                            files: [ 'dist/css/*', 'dist/js/*', 'dist/fonts/*' ],
+                            files: [
+                                'dist/css/bootstrap.css',
+                                'dist/css/bootstrap.css.map',
+                                'dist/css/bootstrap-theme.css',
+                                'dist/css/bootstrap-theme.css.map',
+                                'dist/js/bootstrap.js',
+                                'dist/js/npm.js',
+                                'dist/fonts/glyphicons-halflings-regular.eot',
+                                'dist/fonts/glyphicons-halflings-regular.svg',
+                                'dist/fonts/glyphicons-halflings-regular.ttf',
+                                'dist/fonts/glyphicons-halflings-regular.woff',
+                                'dist/fonts/glyphicons-halflings-regular.woff2',
+                            ],
                             dest: 'public/lib/bootstrap',
                             css_dest: 'public/lib/bootstrap/css',
                             map_dest: 'public/lib/bootstrap/css',
@@ -17,7 +29,7 @@ module.exports = function(grunt) {
                         },
                         jquery: {
                             stripGlobBase: true,
-                            files: [ 'dist/*' ],
+                            files: [ 'dist/jquery.js' ],
                             dest: 'public/lib/jquery'
                         },
                         angular: {
