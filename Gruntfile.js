@@ -5,9 +5,10 @@ module.exports = function(grunt) {
             dev: {
                 dest: 'public/lib',
                 options: {
+                    expand: true,
+                    keepExpandedHierarchy: false,
                     packageSpecific: {
                         bootstrap: {
-                            stripGlobBase: true,
                             files: [
                                 'dist/css/bootstrap.css',
                                 'dist/css/bootstrap.css.map',
@@ -20,20 +21,10 @@ module.exports = function(grunt) {
                                 'dist/fonts/glyphicons-halflings-regular.ttf',
                                 'dist/fonts/glyphicons-halflings-regular.woff',
                                 'dist/fonts/glyphicons-halflings-regular.woff2',
-                            ],
-                            dest: 'public/lib/bootstrap',
-                            css_dest: 'public/lib/bootstrap/css',
-                            map_dest: 'public/lib/bootstrap/css',
-                            js_dest: 'public/lib/bootstrap/js',
-                            fonts_dest: 'public/lib/bootstrap/fonts'
+                            ]
                         },
                         jquery: {
-                            stripGlobBase: true,
-                            files: [ 'dist/jquery.js' ],
-                            dest: 'public/lib/jquery'
-                        },
-                        angular: {
-                            dest: 'public/lib/angular'
+                            files: [ 'dist/jquery.js' ]
                         }
                     }
                 }
