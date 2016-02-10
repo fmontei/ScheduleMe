@@ -1,0 +1,24 @@
+{
+  "name": "scheduleme",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.gatech.edu:swilliams302/ScheduleMe.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.4",
+    "express-handlebars": "^3.0.0",
+    "handlebars": "^4.0.5"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-bower": "^0.21.0"
+  }
+}
