@@ -35,4 +35,4 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-bower');
 
     grunt.registerTask('default', [ 'bower' ]);
-};
+}
