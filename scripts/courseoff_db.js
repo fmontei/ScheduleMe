@@ -103,6 +103,9 @@ function getCourses(semesters) {
     return courses;
 }
 
+/* Grabs all specific course info per course, including timeslots
+ * associated with each course.
+ */
 function getCourseSectionsForCourse(term, course) {
     var major = course['major'];
     var courseId = course['number'];
@@ -142,13 +145,27 @@ function getCourseSectionsForCourse(term, course) {
     return sections;
 }
 
+/* Helper method that converts time from minutes to 24-hour formatted
+ * time. (CourseOff stores time in minutes.)
+ */
 function formatTime(time) {
     formatted = "";
-    if (time.length == 3) {
-        formatted = time.substring(0, 1) + ":" + time.substring(1, 3);
-    } else if (time.length == 4) {
-        formatted = time.substring(0, 2) + ":" + time.substring(2, 4);
+    
+    var hours = Math.floor(time / 60);
+    var minutes = time % 60;
+    
+    hours = hours.toString();
+    minutes = minutes.toString();
+    
+    if (hours.length == 1) {
+        hours = "0" + hours; 
+    } 
+    if (minutes.length == 1) {
+        minutes = "0" + minutes;
     }
+    
+    formatted = hours + ":" + minutes;
+    
     return formatted;
 }
 
