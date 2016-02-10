@@ -1,5 +1,10 @@
 var semesters = getSemesters(true);
 var courses = getCourses(semesters);
+var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
+var sections = sectionsAndTimeslots[0];
+var timeslots = sectionsAndTimeslots[1];
+
+console.log(JSON.stringify(courses));
 
 /* Get array of semesters. 
  * Each semester includes: year, term (Spring/Summer/Fall), and all course ids
@@ -49,6 +54,50 @@ function getSemesters(useCurrentTerm) {
 	return semesters;
 }
 
+/* Get all course information for each course contained in each semester. */
+function getCourses(semesters) {
+    courses = [];
+    
+    for (var i = 0; i < semesters.length; i++) {
+        var courses = semesters[i]['courses'];
+        for (var j = 0; j < courses.length; j++) {
+            var term = semesters[i]['courseOffTerm'];
+            var sections = getCourseSectionsForCourse(term, courses[j]);
+            courses[j]['sections'] = sections;
+        }
+    }
+    
+    return courses;
+}
+
+function extractSectionsAndTimeslotsFromCourses(courses) {
+    var sections = [];
+    var timeslots = [];
+    
+    for (var i = 0; i < courses.length; i++) {
+        var sections = courses[i]['sections'];
+        for (var j = 0; j < sections.length; j++) {
+            var section = sections[j];
+            if (sections.indexOf(section) === -1) {
+                sections.push(section);
+            }
+        }
+    }
+    
+    for (var i = 0; i < sections.length; i++) {
+        var section = sections[i];
+        for (var j = 0; j < section['timeslots'].length; j++) {
+            var timeslot = section['timeslots'][j];
+            if (timeslots.indexOf(timeslot) === -1) {
+                timeslots.push(timeslot);
+            }
+        }
+        delete section['timeslots'];
+    }
+    
+    return [sections, timeslots];
+}
+
 /* Helper function for getSemesters().
  * Gets all majors by term. 
  * Accepted terms are of form "201601" for example.
@@ -60,7 +109,7 @@ function getMajorsByTerm(term) {
 	for (var i = 0; i < jsonResponse.length; i++) {
 		var major = jsonResponse[i];
 		var majorAbbreviation = major['ident'];
-		majors[i] = majorAbbreviation;
+		majors.push(majorAbbreviation);
 	}
 	return majors;
 }
@@ -81,23 +130,7 @@ function getCoursesByTermAndMajor(term, major) {
         course['number'] = jsonResponse[i]['ident'];
         course['name'] = jsonResponse[i]['name'];
         course['major'] = major; 
-        courses[i] = course;
-    }
-    
-    return courses;
-}
-
-/* Get all course information for each course contained in each semester. */
-function getCourses(semesters) {
-    courses = [];
-    
-    for (var i = 0; i < semesters.length; i++) {
-        var courses = semesters[i]['courses'];
-        for (var j = 0; j < courses.length; j++) {
-            var term = semesters[i]['courseOffTerm'];
-            var sections = getCourseSectionsForCourse(term, courses[j]);
-            courses[j]['sections'] = sections;
-        }
+        courses.push(course);
     }
     
     return courses;
@@ -136,10 +169,10 @@ function getCourseSectionsForCourse(term, course) {
             timeslotFinal['start_time'] = formatTime(timeslot['start_time']);
             timeslotFinal['end_time'] = formatTime(timeslot['end_time']);
             timeslotFinal['day_of_week'] = timeslot['day']; 
-            timeslots[j] = timeslotFinal;
+            timeslots.push(timeslotFinal);
         }
         sectionFinal['timeslots'] = timeslots;
-        sections[i] = sectionFinal;
+        sections.push(sectionFinal);
     }
     
     return sections;
@@ -153,13 +186,13 @@ function formatTime(time) {
     
     var hours = Math.floor(time / 60);
     var minutes = time % 60;
-    
     hours = hours.toString();
     minutes = minutes.toString();
     
     if (hours.length == 1) {
         hours = "0" + hours; 
-    } 
+    }
+    
     if (minutes.length == 1) {
         minutes = "0" + minutes;
     }
