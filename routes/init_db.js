@@ -9,52 +9,140 @@ var db = new sqlite3.Database('scheduleme.db');
 router.use(function(req, res, next) {
     db.serialize(function() {
         console.log('Serializing DB.');
-
-        db.run("CREATE TABLE if not exists SEMESTERS (" +
+        
+        db.run("CREATE TABLE if not exists USER(" + 
+            "user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "username VARCHAR(30));")
+          .run("CREATE TABLE if not exists SCHEDULE(" +
+            "schedule_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "user_id INTEGER," +
+            "date VARCHAR(30)," +
+            "foreign key (user_id) references USER(user_id));")
+          .run("CREATE TABLE if not exists SEMESTER(" +
             "semester_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "year INTEGER NOT NULL," +
-            "term VARCHAR(8) NOT NULL);");
-          /*var stmt = db.prepare("INSERT INTO user_info VALUES (?)");
-          for (var i = 0; i < 10; i++) {
-              stmt.run("Ipsum " + i);
-          }
-          stmt.finalize();
+            "term VARCHAR(8) NOT NULL);")
+          .run("CREATE TABLE if not exists CLASS(" +
+            "class_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "name VARCHAR(255)," +
+            "department VARCHAR(10)," +
+            "course_number INTEGER," +
+            "credits INTEGER," +
+            "semester_id INTEGER," +
+            "foreign key (semester_id) references SEMESTER(semeter_id));")
+          .run("CREATE TABLE if not exists SECTION(" +
+            "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "crn INTEGER," +
+            "professor VARCHAR(255)," +
+            "schedule_id INTEGER," +
+            "class_id INTEGER," +
+            "foreign key (schedule_id) references SCHEDULE(schedule_id)," + 
+            "foreign key (class_id) references CLASS(class_id));")
+          .run("CREATE TABLE if not exists TIMESLOT(" +
+            "timeslot_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "location VARCHAR(255)," +
+            "start_time VARCHAR(30)," +
+            "end_time VARCHAR(30)," +
+            "day_of_week VARCHAR(10)," +
+            "section_id INTEGER," +
+            "foreign key (section_id) references SECTION(section_id));");
+    });
+    
+    var semesters = [];
+    var courses = [];
+    var sections;
+    var timeslots;
 
-          db.each("SELECT rowid AS id, info FROM user_info", function(err, row) {
-              console.log(row.id + ": " + row.info);
-          });*/
-          
-        var semesters = [];
-        var courses = [];
-        var sections;
-        var timeslots;
-
-        getSemesters(true).then(function(semestersResponse) {
-            semesters = semestersResponse;
-            getCourses(semesters).then(function(coursesResponse) {
-                courses = coursesResponse;
-                console.log(courses[0]);
-                console.log(courses[1]);
-                var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
-                sections = sectionsAndTimeslots[0];
-                timeslots = sectionsAndTimeslots[1];
-                insertIntoDB(semesters, courses, sections, timeslots);
-                cleanUp();
-            });
+    getSemesters(true).then(function(semestersResponse) {
+        semesters = semestersResponse;
+        console.log('Retrieved semesters.');
+        getCourses(semesters).then(function(coursesResponse) {
+            courses = coursesResponse;
+            console.log('Retrieved courses.');
+            var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
+            console.log('Retrieved sections/timeslots.');
+            sections = sectionsAndTimeslots[0];
+            timeslots = sectionsAndTimeslots[1];
+            insertIntoDB(semesters, courses, sections, timeslots);
+            cleanUp();
         });
     });
 });
 
 module.exports = router;
 
-function insertIntoDB(semesters, courses, sections, timeslots) {
-    console.log('SECTIONS');
-    console.log(sections);
-    console.log('TIMESLOTS');
-    console.log(timeslots);
+function insertIntoDB(semesters, courses, sections, timeslots) {    
+    var query = db.prepare("INSERT INTO semester(year, term) values(?, ?);");
+    for (var i = 0; i < semesters.length; i++) {
+        var semester = semesters[i];
+        query.run([semester['year'], semester['term']]);
+    }
+    query.finalize();
+    
+    query = db.prepare("INSERT INTO class(name, department, course_number, " + 
+        "credits, semester_id) VALUES(?, ?, ?, ?, ?);");
+    var innerQuery = "";
+    for (var i = 0; i < courses.length; i++) {
+        var course = courses[i];
+        var innerQuery = "SELECT semester_id FROM semester WHERE year = '" +
+            course["semester"]["year"] + "' AND term = '" + 
+            course["semester"]["term"] + "' LIMIT 1;";
+    
+        var semesterID = "null";
+        db.each(innerQuery, function(err, row) {
+            if (row.semester_id !== undefined) semesterID = row.semester_id;
+        });
+        
+        query.run([
+            course['name'], course['major'], course['number'], course['credits'],
+            semesterID
+        ]);
+    }
+    query.finalize();
+    
+    query = db.prepare("INSERT INTO section(crn, professor, class_id) VALUES(?, ?, ?);");
+    for (var i = 0; i < sections.length; i++) {
+        var section = sections[i];
+        var innerQuery = "SELECT class_id FROM class where course_number = '" +
+            section['course_number'] + "' LIMIT 1;";
+    
+        var classID = "null";
+        db.each(innerQuery, function(err, row) {
+            if (row.class_id !== undefined) classID = row.class_id;
+        });
+        
+        query.run([
+            section['crn'], section['professor'], classID
+        ]);
+    }
+    query.finalize();
+    
+    query = db.prepare("INSERT INTO timeslot(location, start_time, end_time, day_of_week, " +
+        "section_id) VALUES(?, ?, ?, ?, ?);");
+    for (var i = 0; i < timeslots.length; i++) {
+        var timeslot = timeslots[i];
+        var innerQuery = "SELECT section_id FROM section where crn = '" +
+            timeslot['section_crn'] + "' LIMIT 1;";
+
+        var sectionID = "null";
+        db.each(innerQuery, function(err, row) {
+            if (row.section_id !== undefined) sectionID = row.section_id;
+            console.log(row);
+        });
+        console.log(sectionID);
+        
+        var location = timeslot['location'];
+        var startTime = timeslot['start_time'];
+        var endTime = timeslot['end_time'];
+        var dayOfWeek = timeslot['day_of_week'];
+        
+        query.run(location, startTime, endTime, dayOfWeek, sectionID);
+    }
+    query.finalize();
 }
 
 function cleanUp() {
+    db.close();
     console.log('Done');
     res.redirect(req.header('Referer') || '/');
 }
@@ -174,16 +262,18 @@ function getCourses(semesters) {
     var coursePromises = [];
     
     for (var i = 0; i < semesters.length; i++) {
-        var coursesBySemester = semesters[i]['courses'];
-        var term = semesters[i]['courseOffTerm'];
-        var promise = courseCallback(term, coursesBySemester).then(function(course) {
-            finalCourses.push(course);
+        var promise = courseCallback(semesters[i]).then(
+            function(courseResponse) {
+            finalCourses.push(courseResponse);
         });
         coursePromises.push(promise);
+        delete semesters[i]['courses'];
     }
     
-    function courseCallback(term, coursesBySemester) {
+    function courseCallback(semester) {
         var innerDiffer = Q.defer();
+        var coursesBySemester = semester['courses'];
+        var term = semester['courseOffTerm'];
         var innerCourses = [];
         var innerPromises = [];
         
@@ -191,6 +281,7 @@ function getCourses(semesters) {
             var course = coursesBySemester[j];
             var innerPromise = getCourseSectionsForCourse(term, course).then(
                 function(courseWithSections) {
+                courseWithSections['semester'] = semester;
                 innerCourses.push(courseWithSections);
             });
             innerPromises.push(innerPromise);
@@ -204,38 +295,40 @@ function getCourses(semesters) {
     }
     
     Q.all(coursePromises).then(function() {
-       defer.resolve(finalCourses); 
+        defer.resolve(finalCourses); 
     });
     
     return defer.promise;
 };
 
 function extractSectionsAndTimeslotsFromCourses(courses) {
-    var sections = [];
-    var timeslots = [];
+    var finalSections = [];
+    var finalTimeslots = [];
     
     for (var i = 0; i < courses.length; i++) {
         var sections = courses[i]['sections'];
         for (var j = 0; j < sections.length; j++) {
             var section = sections[j];
-            if (sections.indexOf(section) === -1) {
-                sections.push(section);
+            section['course_number'] = courses[i]['number'];
+            if (finalSections.indexOf(section) === -1) {
+                finalSections.push(section);
             }
         }
     }
     
-    for (var i = 0; i < sections.length; i++) {
-        var section = sections[i];
-        for (var j = 0; j < section['timeslots'].length; j++) {
-            var timeslot = section['timeslots'][j];
-            if (timeslots.indexOf(timeslot) === -1) {
-                timeslots.push(timeslot);
+    for (var i = 0; i < finalSections.length; i++) {
+        var timeslots = finalSections[i]['timeslots'];
+        for (var j = 0; j < timeslots.length; j++) {
+            var timeslot = timeslots[j];
+            timeslot['section_crn'] = finalSections[j]['crn'];
+            if (finalTimeslots.indexOf(timeslot) === -1) {
+                finalTimeslots.push(timeslot);
             }
         }
-        delete section['timeslots'];
+        delete finalSections[i]['timeslots'];
     }
     
-    return [sections, timeslots];
+    return [finalSections, finalTimeslots];
 };
 
 /* Helper function for getSemesters().
