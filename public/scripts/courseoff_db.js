@@ -1,10 +1,8 @@
-var semesters = getSemesters(true);
-var courses = getCourses(semesters);
-var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
-var sections = sectionsAndTimeslots[0];
-var timeslots = sectionsAndTimeslots[1];
-
-console.log(JSON.stringify(courses));
+//var semesters = getSemesters(true);
+//var courses = getCourses(semesters);
+//var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
+//var sections = sectionsAndTimeslots[0];
+//var timeslots = sectionsAndTimeslots[1];
 
 /* Get array of semesters. 
  * Each semester includes: year, term (Spring/Summer/Fall), and all course ids
