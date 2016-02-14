@@ -3,6 +3,7 @@ var ehb = require('express-handlebars');
 
 var cas = require('./routes/cas');
 var init_db = require('./routes/init_db');
+var select_db = require('./routes/select_db');
 
 var app = express();
 
@@ -31,7 +32,11 @@ app.get('/courseoff', function(req, res) {
     res.render('courseoff');
 });
 
+// Init database
 app.use('/init', init_db);
+
+// Test database
+app.use('/select', select_db);
 
 app.listen(3000, function() {
     console.log("listening on port 3000");
