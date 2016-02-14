@@ -90,7 +90,6 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
             console.log('Done inserting sections into DB.');
             return getFKsForTimeslots(timeslots);
         }).then(function(finalTimeslots) {
-            console.log('saving timeslots');
             return saveTimeslots(finalTimeslots);
         }).then(function() {
            console.log('Done inserting timeslots into DB.');
@@ -98,11 +97,11 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         });
     });
     
-    function wait(deferred) {
+    function waitForAllRecordsToSave(deferred) {
         if (deferredCount === 0) {
             deferred.resolve();
         } else {
-            setTimeout(wait, 100, deferred);
+            setTimeout(waitForAllRecordsToSave, 100, deferred);
         }
     };
     
@@ -120,7 +119,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
             });
         }
         
-        wait(deferred);
+        waitForAllRecordsToSave(deferred);
         return deferred.promise;
     };
 
@@ -164,7 +163,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
             });
         }
         
-        wait(deferred);
+        waitForAllRecordsToSave(deferred);
         return deferred.promise;
     };
     
@@ -206,7 +205,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
             });
         }
         
-        wait(deferred);
+        waitForAllRecordsToSave(deferred);
         return deferred.promise; 
     };
     
@@ -253,7 +252,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
             });
         }
         
-        wait(deferred);
+        waitForAllRecordsToSave(deferred);
         return deferred.promise;
     };
 
@@ -462,7 +461,7 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
         var timeslots = finalSections[i]['timeslots'];
         for (var j = 0; j < timeslots.length; j++) {
             var timeslot = timeslots[j];
-            timeslot['section_crn'] = finalSections[j]['crn'];
+            timeslot['section_crn'] = finalSections[i]['crn'];
             if (finalTimeslots.indexOf(timeslot) === -1) {
                 finalTimeslots.push(timeslot);
             }
