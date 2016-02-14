@@ -4,6 +4,14 @@
         <div class="col col-md-12">
             <h1>CourseOff Script</h1>
             <a class="btn btn-primary" href="/init">Scrape data</a>
+            <br /><br />
+            
+            <div class="alert alert-info">
+                Scrape data takes about a minute to run. Even after it has run,
+                it takes a while for sqlite to insert all the records into the 
+                database. So, clicking on buttons like "Select all semesters"
+                will only work after all the initial insertions are complete.
+            </div>
             
             <div class="btn-group">
                 <a class="btn btn-default" id="select-semester-btn" 
@@ -15,11 +23,11 @@
                     Select all classes
                 </a>
                 <a class="btn btn-default" id="select-section-btn" 
-                    href="javascript:void" data-query="select * from section;">
+                    href="javascript:void" data-query="select * from section order by class_id;">
                     Select all sections
                 </a>
                 <a class="btn btn-default" id="select-timeslot-btn" 
-                    href="javascript:void" data-query="select * from timeslot;">
+                    href="javascript:void" data-query="select * from timeslot order by section_id;">
                     Select all timeslots
                 </a>
             </div>
