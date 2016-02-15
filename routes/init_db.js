@@ -10,40 +10,46 @@ router.use(function(req, res, next) {
     db.serialize(function() {
         db.run("CREATE TABLE if not exists USER(" + 
             "user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "username VARCHAR(30));")
+            "username VARCHAR(30) NOT NULL UNIQUE ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists SCHEDULE(" +
             "schedule_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "user_id INTEGER," +
+            "user_id INTEGER NOT NULL," +
             "date VARCHAR(30)," +
             "foreign key (user_id) references USER(user_id));")
           .run("CREATE TABLE if not exists SEMESTER(" +
             "semester_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "year INTEGER NOT NULL," +
-            "term VARCHAR(8) NOT NULL);")
+            "term VARCHAR(8) NOT NULL," +
+            "UNIQUE(year, term) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists CLASS(" +
             "class_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "name VARCHAR(255)," +
-            "department VARCHAR(10)," +
-            "course_number INTEGER," +
+            "name VARCHAR(255) NOT NULL," +
+            "department VARCHAR(10) NOT NULL," +
+            "course_number INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
             "credits INTEGER," +
-            "semester_id INTEGER," +
+            "semester_id INTEGER NOT NULL," +
             "foreign key (semester_id) references SEMESTER(semeter_id));")
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "crn INTEGER," +
+            "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
             "professor VARCHAR(255)," +
-            "schedule_id INTEGER," +
-            "class_id INTEGER," +
-            "foreign key (schedule_id) references SCHEDULE(schedule_id)," + 
+            "class_id INTEGER NOT NULL," +
             "foreign key (class_id) references CLASS(class_id));")
+          .run("CREATE TABLE if not exists SECTIONSCHEDULE(" +
+            "section_schedule_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "schedule_id INTEGER NOT NULL," +
+            "section_id INTEGER NOT NULL," +
+            "foreign key (schedule_id) references SCHEDULE(schedule_id)," + 
+            "foreign key (section_id) references SECTION(section_id));")
           .run("CREATE TABLE if not exists TIMESLOT(" +
             "timeslot_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "location VARCHAR(255)," +
             "start_time VARCHAR(30)," +
             "end_time VARCHAR(30)," +
             "day_of_week VARCHAR(10)," +
-            "section_id INTEGER," +
-            "foreign key (section_id) references SECTION(section_id));");
+            "section_id INTEGER NOT NULL," +
+            "foreign key (section_id) references SECTION(section_id)," +
+            "UNIQUE(location, start_time, end_time, day_of_week) ON CONFLICT IGNORE);");
     });
     
     var semesters = [];
@@ -257,7 +263,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
     };
 
     return mainDefer.promise;
-}
+};
 
 function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
     var deferred = Q.defer();
@@ -279,13 +285,13 @@ function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
     });
     
     return deferred.promise;
-}
+};
 
 function cleanUp(res) {
     console.log('Done');
     res.writeHead(302, {'Location': '/courseoff'});
     res.end();
-}
+};
 
 function getSemesters(useCurrentTerm) {
 	var CURRENT_TERM = "201601";
@@ -349,7 +355,7 @@ function getSemesters(useCurrentTerm) {
         });
         
         return innerDefer.promise;
-    }
+    };
     
     function combineCoursesWithSemestersCallback(semesters, majors) {
         var innerDefer = Q.defer();
@@ -387,10 +393,10 @@ function getSemesters(useCurrentTerm) {
             });
             
             return subDefer.promise;
-        }
+        };
         
         return innerDefer.promise;
-    }
+    };
     
     return deferred.promise;
 };
@@ -432,7 +438,7 @@ function getCourses(semesters) {
         });
         
         return innerDiffer.promise;
-    }
+    };
     
     Q.all(coursePromises).then(function() {
         deferred.resolve(finalCourses); 
