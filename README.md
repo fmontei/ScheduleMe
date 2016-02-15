@@ -19,14 +19,14 @@
   * `css/`
   * `images/`
   * `lib/`: 3rd-party library files. This folder should be modified only
-    by Gruntfile.js, which is executed using grunt and copies the necessary
+    by `Gruntfile.js`, which is executed using `grunt` and copies the necessary
     files from `bower_components`.
 * `routes/`: Instead of assigning all routes in `index.js`, create a router
 for each part of the application in separate files here and then
 mount them in `index.js`. See how CAS works for an example.
 * `scripts/`: Development utilities.
 * `views/`: Application pages to be rendered using `handlebars.js`.
-  * `layouts;` Templates to be used for rendering multiple pages.
+  * `layouts/`: Templates to be used for rendering multiple pages.
 
 ## Using CAS
 
