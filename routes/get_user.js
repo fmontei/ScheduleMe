@@ -1,0 +1,33 @@
+var express = require('express');
+var sqlite3 = require('sqlite3').verbose();
+var async = require('async');
+
+var router = express.Router();
+var db = new sqlite3.Database('scheduleme.db');
+
+router.use(function(req, res, next) {
+    var username = req.username;
+
+    if (!username) {
+        res.status(404).send(null);
+        return;
+    }
+
+    async.waterfall([
+        function(callback) {
+            username = username.trim();
+            var query = "SELECT * from user WHERE username = '" + username + "';";
+            db.all(query, function(err, rows) {
+                callback(null, rows);
+            });
+        }
+    ], function (err, rows) {
+        if (rows && rows.length > 0) {
+            res.send(rows[0]);
+        } else {
+            res.status(404).send('User with username: ' + username + ' not found.');
+        }
+    });
+});
+
+module.exports = router;

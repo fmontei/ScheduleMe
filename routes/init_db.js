@@ -33,6 +33,9 @@ router.use(function(req, res, next) {
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
             "professor VARCHAR(255)," +
+            "seat_capacity INTEGER," +
+            "seat_actual INTEGER," +
+            "seat_remaining INTEGER," +
             "class_id INTEGER NOT NULL," +
             "foreign key (class_id) references CLASS(class_id));")
           .run("CREATE TABLE if not exists SECTIONSCHEDULE(" +
@@ -54,8 +57,8 @@ router.use(function(req, res, next) {
     
     var semesters = [];
     var courses = [];
-    var sections;
-    var timeslots;
+    var sections = [];
+    var timeslots = [];
 
     getSemesters(true).then(function(semestersResponse) {
         semesters = semestersResponse;
@@ -198,14 +201,16 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
     
     function saveSections(finalSections) {
         var deferred = Q.defer();
-        var query = db.prepare("INSERT INTO section(crn, professor, class_id) " + 
-            "VALUES(?, ?, ?);");
+        var query = db.prepare("INSERT INTO section(crn, professor, class_id, " +
+            "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?);");
         deferredCount = finalSections.length;
         
         for (var i = 0; i < finalSections.length; i++) {
             var section = finalSections[i];
             query.run([
-                section['crn'], section['professor'], section['class_id']
+                section['crn'], section['professor'], section['class_id'],
+                section['seat_capacity'], section['seat_actual'], 
+                section['seat_remaining']
             ], function(error) {
                 deferredCount -= 1;
             });
