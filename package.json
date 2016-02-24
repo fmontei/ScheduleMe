@@ -22,7 +22,8 @@
     "xml2js": "^0.4.16",
     "sqlite3": "^2.2.3",
     "q": "^1.0.0",
-    "async": "^1.0.0"
+    "async": "^1.0.0",
+    "body-parser": "~1.15.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

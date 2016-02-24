@@ -1,7 +1,9 @@
 var express = require('express');
 var ehb = require('express-handlebars');
+var bodyParser = require('body-parser');
 
 var cas = require('./routes/cas');
+
 var init_db = require('./routes/init_db');
 var select_db = require('./routes/select_db');
 
@@ -12,6 +14,14 @@ var get_semesters = require('./routes/get_semesters');
 var get_classes = require('./routes/get_classes');
 var get_sections = require('./routes/get_sections');
 var get_timeslots = require('./routes/get_timeslots');
+
+var create_user = require('./routes/create_user');
+var create_schedule = require('./routes/create_schedule');
+
+var update_schedule = require('./routes/update_schedule');
+
+var delete_user = require('./routes/delete_user');
+var delete_schedule = require('./routes/delete_schedule');
 
 var app = express();
 
@@ -24,6 +34,9 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 
 app.use('/static', express.static('public'));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/user', function(req, res) {
     res.send(req.session ? req.session.username : '');
@@ -84,6 +97,21 @@ app.use('/timeslot/:section_id', function(req, res, next) {
     req.section_id = req.params.section_id;
     get_timeslots(req, res, next);
 });
+
+// Create user
+app.use('/user', create_user);
+
+// Create schedule
+app.use('/schedule', create_schedule);
+
+// Add or delete section/timeslot to schedule
+app.use('/update_schedule', update_schedule);
+
+// Delete user
+app.use('/delete_user', delete_user);
+
+// Delete schedule
+app.use('/delete_schedule', delete_schedule);
 
 app.listen(3000, function() {
     console.log("listening on port 3000");
