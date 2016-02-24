@@ -12,7 +12,6 @@ router.use(function(req, res, next) {
     
     async.waterfall([
         function(callback) {
-            var username = req.body.user_id;
             db.run('insert into schedule(user_id, date) values($user_id, $date);', {
                 $user_id: req.body.user_id.trim(),
                 $date: req.body.date.trim() || Date.now()

@@ -26,7 +26,6 @@ router.use(function(req, res, next) {
 function delete_section_from_schedule() {
     async.waterfall([
         function(callback) {
-            var username = req.body.user_id;
             db.run('delete from sectionschedule where schedule_id = $schedule_id ' + 
                 'and section_id = $section_id and timeslot_id = $timeslot_id);', {
                 $schedule_id: req.body.schedule_id.trim(),
@@ -48,7 +47,6 @@ function delete_section_from_schedule() {
 function add_section_to_schedule() {
     async.waterfall([
         function(callback) {
-            var username = req.body.user_id;
             db.run('insert into sectionschedule(schedule_id, section_id, timeslot_id) ' +
                 'values($schedule_id, $section_id, $timeslot_id) where not exists (' +
                 'select * from sectionschedule where schedule_id = $schedule_id and ' +
