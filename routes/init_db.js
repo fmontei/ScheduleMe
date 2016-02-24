@@ -38,12 +38,6 @@ router.use(function(req, res, next) {
             "seat_remaining INTEGER," +
             "class_id INTEGER NOT NULL," +
             "foreign key (class_id) references CLASS(class_id));")
-          .run("CREATE TABLE if not exists SECTIONSCHEDULE(" +
-            "section_schedule_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "schedule_id INTEGER NOT NULL," +
-            "section_id INTEGER NOT NULL," +
-            "foreign key (schedule_id) references SCHEDULE(schedule_id)," + 
-            "foreign key (section_id) references SECTION(section_id));")
           .run("CREATE TABLE if not exists TIMESLOT(" +
             "timeslot_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "location VARCHAR(255)," +
@@ -52,7 +46,15 @@ router.use(function(req, res, next) {
             "day_of_week VARCHAR(10)," +
             "section_id INTEGER NOT NULL," +
             "foreign key (section_id) references SECTION(section_id)," +
-            "UNIQUE(location, start_time, end_time, day_of_week) ON CONFLICT IGNORE);");
+            "UNIQUE(location, start_time, end_time, day_of_week) ON CONFLICT IGNORE);")
+          .run("CREATE TABLE if not exists SECTIONSCHEDULE(" +
+            "section_schedule_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "schedule_id INTEGER NOT NULL," +
+            "section_id INTEGER NOT NULL," +
+            "timeslot_id INTEGER NOT NULL," +
+            "foreign key (schedule_id) references SCHEDULE(schedule_id)," + 
+            "foreign key (section_id) references SECTION(section_id)," +
+            "foreign key (timeslot_id) references TIMESLOT(timeslot_id));");
     });
     
     var semesters = [];

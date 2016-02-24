@@ -19,9 +19,13 @@ router.use(function(req, res, next) {
     async.waterfall([
         function(callback) {
             user_id = user_id.trim();
-            var query = "SELECT * from schedule sch RIGHT OUTER JOIN schedulesemester ss " + 
-                "on ss.schedule_id = sch.schedule_id WHERE user_id = '" 
-                + user_id + "';";
+            var query = "select * from sectionschedule ss " +
+                "left outer join schedule sch on ss.schedule_id = sch.schedule_id " +
+                "inner join section sect on sect.section_id = ss.section_id " +
+                "left outer join class cls on cls.class_id = sect.class_id " +
+                "inner join timeslot ts on ts.timeslot_id = ss.timeslot_id " + 
+                "where sch.user_id = '" + user_id + "';";
+            console.log(query);
             db.all(query, function(err, rows) {
                 callback(null, rows);
             });

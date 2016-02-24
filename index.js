@@ -6,7 +6,7 @@ var init_db = require('./routes/init_db');
 var select_db = require('./routes/select_db');
 
 var get_user = require('./routes/get_user');
-var get_schedule = require('./routes/get_schedule');
+var get_schedules = require('./routes/get_schedules');
 var get_semester = require('./routes/get_semester');
 var get_semesters = require('./routes/get_semesters');
 var get_classes = require('./routes/get_classes');
@@ -55,7 +55,7 @@ app.use('/user/:username', function(req, res, next) {
 // Get all schedules by user id
 app.use('/schedules/:user_id', function(req, res, next) {
     req.user_id = req.params.user_id;
-    get_schedule(req, res, next);
+    get_schedules(req, res, next);
 });
 
 // Get semester by specific semester id
