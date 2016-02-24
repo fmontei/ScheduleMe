@@ -51,8 +51,8 @@ function add_section_to_schedule() {
             var username = req.body.user_id;
             db.run('insert into sectionschedule(schedule_id, section_id, timeslot_id) ' +
                 'values($schedule_id, $section_id, $timeslot_id) where not exists (' +
-                'select * from sectionschedule where schedule_id = $schedule_id,' +
-                'section_id = $section_id, timeslot_id = $timeslot_id);', {
+                'select * from sectionschedule where schedule_id = $schedule_id and ' +
+                'section_id = $section_id and timeslot_id = $timeslot_id);', {
                 $schedule_id: req.body.schedule_id.trim(),
                 $section_id: req.body.section_id.trim(),
                 $timeslot_id: req.body.timeslot_id.trim()
