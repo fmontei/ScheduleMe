@@ -12,7 +12,7 @@ router.use(function(req, res, next) {
     var user_id = req.user_id;
     
     if (!user_id) {
-        res.status(404).send(null);
+        res.send('user_id must be provided.', 404);
         return;
     }
 
@@ -24,7 +24,7 @@ router.use(function(req, res, next) {
                 "inner join section sect on sect.section_id = ss.section_id " +
                 "left outer join class cls on cls.class_id = sect.class_id " +
                 "inner join timeslot ts on ts.timeslot_id = ss.timeslot_id " + 
-                "where sch.user_id = '" + user_id + "';";
+                "where sch.user_id = '" + user_id + "' order by ss.schedule_id asc;";
             console.log(query);
             db.all(query, function(err, rows) {
                 callback(null, rows);

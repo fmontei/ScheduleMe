@@ -7,7 +7,7 @@ var db = new sqlite3.Database('scheduleme.db');
 
 router.use(function(req, res, next) {
     if (!req.body || !req.body.username) {
-        return res.sendStatus(400);
+        return res.send('Username must be provided.', 400);
     }
     
     async.waterfall([

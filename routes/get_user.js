@@ -9,7 +9,7 @@ router.use(function(req, res, next) {
     var username = req.username;
 
     if (!username) {
-        res.status(404).send(null);
+        res.status(404).send('Username must be provided.');
         return;
     }
 
