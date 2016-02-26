@@ -58,19 +58,19 @@ app.use('/init', init_db);
 // Test database
 app.use('/select', select_db);
 
-// Get user by ID
+// Get user by specified username
 app.get('/user/:username', function(req, res, next) {
     req.username = req.params.username;
     get_user(req, res, next);
 });
 
-// Get all schedules by user id
+// Get all schedules by specified user id
 app.get('/schedules/:user_id', function(req, res, next) {
     req.user_id = req.params.user_id;
     get_schedules(req, res, next);
 });
 
-// Get semester by specific semester id
+// Get semester by specified semester id
 app.get('/semester/:semester_id', function(req, res, next) {
     req.semester_id = req.params.semester_id;
     get_semester(req, res, next);
@@ -79,19 +79,19 @@ app.get('/semester/:semester_id', function(req, res, next) {
 // Get all semesters
 app.get('/semesters', get_semesters);
 
-// Get all classes by semester id
+// Get all classes by specified semester id
 app.get('/classes/:semester_id', function(req, res, next) {
     req.semester_id = req.params.semester_id;
     get_classes(req, res, next);
 });
 
-// Get all sections by class id
+// Get all sections by specified class id
 app.get('/sections/:class_id', function(req, res, next) {
     req.class_id = req.params.class_id;
     get_sections(req, res, next);
 });
 
-// Get all timeslots by section id
+// Get all timeslots by specified section id
 app.get('/timeslots/:section_id', function(req, res, next) {
     req.section_id = req.params.section_id;
     get_timeslots(req, res, next);
@@ -103,19 +103,19 @@ app.post('/user', create_user);
 // Create schedule
 app.post('/schedule', create_schedule);
 
-// Add or delete section/timeslot to schedule
+// Add or remove a schedule/timeslot to or from a specified schedule
 app.put('/schedule/:schedule_id', function(req, res, next) { 
     req.schedule_id = req.params.schedule_id;
     update_schedule(req, res, next);
 });
 
-// Delete user
+// Delete specified user
 app.delete('/user/:user_id', function(req, res, next) {
     req.user_id = req.params.user_id;
     delete_user(req, res, next);
 });
 
-// Delete schedule
+// Delete specified schedule
 app.delete('/schedule/:schedule_id', function(req, res, next) {
     req.schedule_id = req.params.schedule_id;
     delete_schedule(req, res, next);
