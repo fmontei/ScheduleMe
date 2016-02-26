@@ -7,14 +7,14 @@ var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
 router.use(function(req, res, next) {
-    if (!req.body || !req.body.schedule_id) {
+    if (!req.body || !req.schedule_id) {
         return res.sendStatus(400);
     }
     
     async.waterfall([
         function(callback) {
             db.run('delete from sectionschedule where schedule_id = $schedule_id;', {
-                $schedule_id: req.body.schedule_id.trim(),
+                $schedule_id: req.schedule_id.trim(),
             }, function(err) {
                 callback(err);
             });
@@ -24,7 +24,7 @@ router.use(function(req, res, next) {
                 return res.status(500).send(err);
             }
             db.run('delete from schedule where schedule_id = $schedule_id;', {
-                $schedule_id: req.body.schedule_id.trim(),
+                $schedule_id: req.schedule_id.trim(),
             }, function(err) {
                 callback(err);
             });

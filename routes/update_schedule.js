@@ -11,7 +11,7 @@ var db = new sqlite3.Database('scheduleme.db');
  * from the schedule.
  */
 router.use(function(req, res, next) {
-    if (!req.body || !req.body.schedule_id || !req.body.section_id || 
+    if (!req.body || !req.schedule_id || !req.body.section_id || 
         !req.body.timeslot_id) {
         return res.sendStatus(400);
     }
@@ -28,7 +28,7 @@ function delete_section_from_schedule() {
         function(callback) {
             db.run('delete from sectionschedule where schedule_id = $schedule_id ' + 
                 'and section_id = $section_id and timeslot_id = $timeslot_id);', {
-                $schedule_id: req.body.schedule_id.trim(),
+                $schedule_id: req.schedule_id.trim(),
                 $section_id: req.body.section_id.trim(),
                 $timeslot_id: req.body.timeslot_id.trim()
             }, function(err) {
@@ -51,7 +51,7 @@ function add_section_to_schedule() {
                 'values($schedule_id, $section_id, $timeslot_id) where not exists (' +
                 'select * from sectionschedule where schedule_id = $schedule_id and ' +
                 'section_id = $section_id and timeslot_id = $timeslot_id);', {
-                $schedule_id: req.body.schedule_id.trim(),
+                $schedule_id: req.schedule_id.trim(),
                 $section_id: req.body.section_id.trim(),
                 $timeslot_id: req.body.timeslot_id.trim()
             }, function(err) {

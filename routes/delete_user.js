@@ -6,7 +6,7 @@ var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
 router.use(function(req, res, next) {
-    if (!req.body || !req.body.user_id) {
+    if (!req.body || !req.user_id) {
         return res.sendStatus(400);
     }
     
@@ -14,7 +14,7 @@ router.use(function(req, res, next) {
         function(callback) {
             db.run('delete from sectionschedule where schedule_id in (' + 
                 'select schedule_id from schedule where user_id = $user_id);', {
-                $user_id: req.body.user_id.trim(),
+                $user_id: req.user_id.trim(),
             }, function(err) {
                 callback(err);
             });
@@ -24,7 +24,7 @@ router.use(function(req, res, next) {
                 return res.status(500).send(err);
             }
             db.run('delete from schedule where user_id = $user_id;', {
-                $user_id: req.body.user_id.trim(),
+                $user_id: req.user_id.trim(),
             }, function(err) {
                 callback(err);
             });
@@ -34,7 +34,7 @@ router.use(function(req, res, next) {
                 return res.status(500).send(err);
             }
             db.run('delete from user where user_id = $user_id;', {
-                $user_id: req.body.user_id.trim(),
+                $user_id: req.user_id.trim(),
             }, function(err) {
                 callback(err);
             });
