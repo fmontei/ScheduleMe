@@ -7,7 +7,7 @@ var db = new sqlite3.Database('scheduleme.db');
 
 router.use(function(req, res, next) {
     if (!req.body || !req.user_id) {
-        return res.sendStatus(400);
+        return res.status(400).send('Missing required parameters.');
     }
     
     async.waterfall([

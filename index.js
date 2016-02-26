@@ -92,7 +92,7 @@ app.get('/sections/:class_id', function(req, res, next) {
 });
 
 // Get all timeslots by section id
-app.get('/timeslot/:section_id', function(req, res, next) {
+app.get('/timeslots/:section_id', function(req, res, next) {
     req.section_id = req.params.section_id;
     get_timeslots(req, res, next);
 });

@@ -12,8 +12,7 @@ router.use(function(req, res, next) {
     var user_id = req.user_id;
     
     if (!user_id) {
-        res.send('user_id must be provided.', 404);
-        return;
+        return res.status(400).send('url request must end with /:user_id.');
     }
 
     async.waterfall([
@@ -32,7 +31,7 @@ router.use(function(req, res, next) {
         }
     ], function (err, rows) {
         if (rows && rows.length > 0) {
-            res.send(rows);
+            res.send(rows, 200);
         } else {
             res.status(404).send('User with user_id: ' + user_id + ' not found.');
         }

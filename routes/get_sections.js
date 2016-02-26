@@ -12,8 +12,7 @@ router.use(function(req, res, next) {
     var class_id = req.class_id;
     
     if (!class_id) {
-        res.status(404).send(null);
-        return;
+        return res.status(400).send('url request must end with /:class_id.');
     }
 
     async.waterfall([

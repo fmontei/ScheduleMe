@@ -13,7 +13,8 @@ var db = new sqlite3.Database('scheduleme.db');
 router.use(function(req, res, next) {
     if (!req.body || !req.schedule_id || !req.body.section_id || 
         !req.body.timeslot_id) {
-        return res.sendStatus(400);
+        return res.status(400)
+            .send('section_id and timeslot_id parameters are required.');
     }
     
     if (req.body.delete) {

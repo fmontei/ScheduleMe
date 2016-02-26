@@ -7,14 +7,13 @@ var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
 /**
- * Get all sections by class id.
+ * Get all timeslots by section id.
  */
 router.use(function(req, res, next) {
     var section_id = req.section_id;
     
     if (!section_id) {
-        res.status(404).send(null);
-        return;
+        return res.status(400).send('url request must end with /:section_id.');
     }
 
     async.waterfall([

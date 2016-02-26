@@ -12,8 +12,7 @@ router.use(function(req, res, next) {
     var semester_id = req.semester_id;
     
     if (!semester_id) {
-        res.status(404).send(null);
-        return;
+        return res.status(400).send('url request must end with /:semester_id.');
     }
 
     async.waterfall([
