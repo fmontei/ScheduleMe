@@ -48,6 +48,10 @@ app.get('/', function(req, res) {
     res.render('home');
 });
 
+app.get('/schedule', function(req, res) {
+    res.render('schedule');
+});
+
 app.get('/courseoff', function(req, res) {
     res.render('courseoff');
 });
