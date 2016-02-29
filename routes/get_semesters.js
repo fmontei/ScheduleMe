@@ -11,7 +11,7 @@ var db = new sqlite3.Database('scheduleme.db');
 router.use(function(req, res, next) {
     async.waterfall([
         function(callback) {
-            var query = "SELECT * from semester;";
+            var query = "SELECT * from semester order by semester_id desc;";
             db.all(query, function(err, rows) {
                 callback(null, rows);
             });

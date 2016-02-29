@@ -12,7 +12,7 @@
         <script src="/static/js/controllers.js"></script>
     </head>
     
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default navbar-fixed-top" ng-controller="ScheduleMeCtrl">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -30,6 +30,23 @@
                     <li><a href="/courseoff">CourseOff</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="javascript:void(0)" 
+                           class="dropdown-toggle" 
+                           data-toggle="dropdown" 
+                           role="button" 
+                           aria-haspopup="true" 
+                           aria-expanded="false">
+                           Semester 
+                           <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="semester in allSemesters"
+                                ng-class="{active:$first}">
+                                <a href="javascript:void(0)">\{{semester.term}} \{{semester.year}}</a>
+                            </li>
+                        </ul>
+                    </li>
                     <li><a href="#">Logout</a></li>
                 </ul>
             </div>
@@ -44,7 +61,7 @@
     
     <footer style="background-color:#e7e7e7" class="footer navbar-fixed-bottom">
         <div class="container">
-        <p class="text-muted">Georgia Institute of Technology | Terms & Conditions | About | Contact</p>
+        <center><p class="text-muted">Georgia Institute of Technology | Terms & Conditions | About | Contact</p></center>
         </div>
     </footer>
 </html>

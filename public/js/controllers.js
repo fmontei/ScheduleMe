@@ -3,24 +3,37 @@ var scheduleMeApp = angular.module('ScheduleMeApp', ['ui.bootstrap',
 );
 
 scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http', 
-    'LocalStorage', 'ClassHttpService', function($rootScope, $scope, $http,
-    localStorage, classHttpService) {
-    
-    classHttpService.getAllClasses().then(function(allClasses) {
-        localStorage.set('allClasses', allClasses);
-        localStorage.set('allDepartments', getDepartments(allClasses));
+    'LocalStorage', 'ClassHttpService', 'SemesterHttpService',
+    function($rootScope, $scope, $http, localStorage, classHttpService, 
+        semesterHttpService) {
+            
+    semesterHttpService.getAllSemesters().then(function(allSemesters) {
+        var thisSemester = allSemesters[0];
+        localStorage.set('allSemesters', allSemesters);
+        
+        classHttpService.getAllClasses(thisSemester.semester_id).then(
+            function(allClasses) {
+            localStorage.set('allClasses', allClasses);
+            localStorage.set('allDepartments', getDepartments(allClasses));
+        });
     });
+    
+    $scope.$watch(function() {
+        return localStorage.get('allSemesters');
+    }, function(newValue, oldValue) {
+        $scope.allSemesters = newValue;
+    }, true);
     
     $scope.$watch(function() {
         return localStorage.get('selectedClasses');
     }, function(newValue, oldValue) {
-       $scope.selectedClasses = newValue;
+        $scope.selectedClasses = newValue;
     }, true);
     
     $scope.$watch(function() {
         return localStorage.get('selectedGroups');
     }, function(newValue, oldValue) {
-       $scope.selectedGroups = newValue;
+        $scope.selectedGroups = newValue;
     }, true);
 }]);
 
@@ -103,13 +116,13 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
     $scope.$watch(function() {
         return localStorage.get('allClasses');
     }, function(newValue, oldValue) {
-       $scope.allClasses = newValue;
+        $scope.allClasses = newValue;
     }, true);
     
     $scope.$watch(function() {
         return localStorage.get('allDepartments');
     }, function(newValue, oldValue) {
-       $scope.allDepartments = newValue;
+        $scope.allDepartments = newValue;
     }, true);
 }]);
 
@@ -133,20 +146,42 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
     return myLocalStorage;
 }]);
 
-scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
-  var classHttpService = {};
+scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q) {
+  var semesterHttpService = {};
   
-  classHttpService.getAllClasses = function() {
+  semesterHttpService.getAllSemesters = function() {
     var deferred = $q.defer();  
       
     $http({
         method: 'GET',
-        url: '/classes/1'
+        url: '/semesters'
     }).then(function successCallback(response) {
         deferred.resolve(response['data']);
     }, function errorCallback(response) {
         console.log(response);
-        defer.reject(response);
+        deferred.reject(response);
+    });
+    
+    return deferred.promise;
+  };
+
+  return semesterHttpService;
+}]);
+
+scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
+  var classHttpService = {};
+  
+  classHttpService.getAllClasses = function(semesterID) {
+    var deferred = $q.defer();  
+      
+    $http({
+        method: 'GET',
+        url: '/classes/' + semesterID
+    }).then(function successCallback(response) {
+        deferred.resolve(response['data']);
+    }, function errorCallback(response) {
+        console.log(response);
+        deferred.reject(response);
     });
     
     return deferred.promise;
