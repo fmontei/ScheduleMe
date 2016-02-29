@@ -16,10 +16,18 @@ scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http',
     }, function(newValue, oldValue) {
        $scope.selectedClasses = newValue;
     }, true);
+    
+    $scope.$watch(function() {
+        return localStorage.get('selectedGroups');
+    }, function(newValue, oldValue) {
+       $scope.selectedGroups = newValue;
+    }, true);
 }]);
 
 scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage', 
     function($rootScope, $scope, localStorage) {
+        
+    $scope.groupClasses = [];
         
     $scope.filterClassesByDept = function() {
         var filteredClasses = [];
@@ -34,24 +42,49 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
     
     $scope.selectClass = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
-        var selectedClass = $scope.modalData.selectedClass;
+        var _class = $scope.modalData.selectedClass;
         if (!allSelectedClasses) {
             allSelectedClasses = [];
         }
         if (allSelectedClasses.indexOf(selectedClass) === -1) {
-            $scope.modalData.selectedClass.isClass = true;
             // Get the actual object
-            var selectedClassNum = parseInt(selectedClass.substring(0, 
-                selectedClass.indexOf(' ')));
-            var selectedClassObj = {};
+            var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
+            var classObj = {};
             for (var i = 0; i < $scope.allClasses.length; i++) {
-                if ($scope.allClasses[i]['course_number'] === selectedClassNum) {
-                    selectedClassObj = $scope.allClasses[i];
+                if ($scope.allClasses[i]['course_number'] === classNum) {
+                    classObj = $scope.allClasses[i];
                     break;
                 }
             }
-            allSelectedClasses.push(selectedClassObj);
+            allSelectedClasses.push(classObj);
             localStorage.set('selectedClasses', allSelectedClasses);
+        }
+    };
+    
+    $scope.updateGroupClasses = function() {
+        $scope.modalData.groupClasses.push($scope.modalData.groupClass);
+    };
+    
+    $scope.selectGroup = function() {
+        var allSelectedGroups = localStorage.get('selectedGroups');
+        var selectedGroup = $scope.modalData.groupClasses;
+        if (!allSelectedGroups) {
+            allSelectedGroups = [];
+        }
+        if (allSelectedGroups.indexOf(selectedGroup) === -1) {
+            var classObjs = [];
+            for (var i = 0; i < $scope.modalData.groupClasses.length; i++) {
+                var _class = $scope.modalData.groupClasses[i];
+                var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
+                for (var i = 0; i < $scope.allClasses.length; i++) {
+                    if ($scope.allClasses[i]['course_number'] === classNum) {
+                        classObjs.push($scope.allClasses[i]);
+                        break;
+                    }
+                }
+            }
+            allSelectedGroups.push(selectedGroup);
+            localStorage.set('selectedGroups', allSelectedGroups);
         }
     };
     
@@ -60,6 +93,8 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
             filteredClasses: [],
             selectedDept: null,
             selectedClass: null,
+            groupClass: null,
+            groupClasses: [],
         };
     };
     

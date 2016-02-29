@@ -4,12 +4,16 @@
             <h3><u>Classes</u></h3>
             
             <!--List selected classes-->
-            <div class="panel panel-default"
-                 ng-repeat="class in selectedClasses">
-              <div class="panel-body">
-                  \{{class.course_number}} <em>\{{class.name}}</em>
-              </div>
-            </div>
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="class in selectedClasses"> 
+                    <small><span class="glyphicon glyphicon-lock pull-right"></span></small>
+                    \{{class.course_number}} <em>\{{class.name}}</em>
+                </li>
+                <li class="list-group-item" ng-repeat="group in selectedGroups">
+                    <small><span class="glyphicon glyphicon-th-large pull-right"></span></small>
+                    <p ng-repeat="class in group">\{{class}}</p>
+                </li>
+            </ul>
             
             <div class="btn-group">
                 <label class="btn btn-default" 
@@ -49,7 +53,7 @@
                             ng-click="resetModal()">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                    <h4 class="modal-title" id="myModalLabel">Add Class</h4>
                 </div>
                 
                 <div class="modal-body">
@@ -94,6 +98,78 @@
                             ng-click="selectClass()"
                             data-dismiss="modal">
                         Add Class
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="group-modal" tabindex="-1" role="dialog" aria-labelledby="class-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" 
+                            class="close" 
+                            aria-label="Close" 
+                            data-dismiss="modal" 
+                            ng-click="resetModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Add Group</h4>
+                </div>
+                
+                <div class="modal-body">
+                    TODO: Remove selected classes from grouping
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <label><u>Department</u></label>
+                        </div>
+                        <div class="col col-md-8">
+                            <select class="form-control"
+                                    ng-model="modalData.selectedDept"
+                                    ng-change="filterClassesByDept()">
+                                <option ng-repeat="dept in allDepartments">\{{dept}}</option>
+                            </select>
+                        </div>
+                    </div> <!--./row-->
+                    
+                    <br />
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <label><u>Class</u></label>
+                        </div>
+                        <div class="col col-md-8">
+                            <select class="form-control"
+                                    ng-model="modalData.groupClass"
+                                    ng-change="updateGroupClasses()">
+                                <option ng-repeat="class in modalData.filteredClasses">
+                                    \{{class.course_number}} (\{{class.name}})
+                                </option>
+                            </select>
+                        </div>
+                    </div> <!--./row-->
+                    
+                    <br />
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
+                            \{{class}}
+                            <small><span class="glyphicon glyphicon-remove pull-right"></span></small>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" 
+                            class="btn btn-default" 
+                            ng-click="resetModal()"
+                            data-dismiss="modal">
+                            Close
+                    </button>
+                    <button type="button" 
+                            class="btn btn-primary"
+                            ng-click="selectGroup()"
+                            data-dismiss="modal">
+                        Add Group
                     </button>
                 </div>
             </div>
