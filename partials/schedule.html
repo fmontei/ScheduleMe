@@ -7,11 +7,11 @@
             <ul class="list-group">
                 <li class="list-group-item" ng-repeat="class in selectedClasses"> 
                     <small><span class="glyphicon glyphicon-lock pull-right"></span></small>
-                    \{{class.course_number}} <em>\{{class.name}}</em>
+                    {{class.course_number}} <em>{{class.name}}</em>
                 </li>
                 <li class="list-group-item" ng-repeat="group in selectedGroups">
                     <small><span class="glyphicon glyphicon-th-large pull-right"></span></small>
-                    <p ng-repeat="class in group">\{{class}}</p>
+                    <p ng-repeat="class in group">{{class}}</p>
                 </li>
             </ul>
             

@@ -1,12 +1,29 @@
-var scheduleMeApp = angular.module('ScheduleMeApp', ['ui.bootstrap', 
-    'LocalStorageModule']
-);
+var scheduleMeApp = angular.module('ScheduleMeApp', [
+    'ngRoute',
+    'ui.bootstrap', 
+    'LocalStorageModule'
+]);
+
+scheduleMeApp.config(['$routeProvider', function($routeProvider) {
+    $routeProvider.when('/schedule', {
+        templateUrl: 'partials/schedule.html',
+        controller: 'ScheduleMeCtrl'
+    }).when('/courseoff', {
+        templateUrl: 'partials/courseoff.html',
+        controller: 'CourseOffCtrl'
+    }).otherwise({
+       redirectTo: '/schedule'
+    });
+}]);
+
+scheduleMeApp.controller('CourseOffCtrl', ['$scope', function($scope) {
+    // Intentionally left blank for now
+}]);
 
 scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http', 
     'LocalStorage', 'ClassHttpService', 'SemesterHttpService',
     function($rootScope, $scope, $http, localStorage, classHttpService, 
         semesterHttpService) {
-            
     semesterHttpService.getAllSemesters().then(function(allSemesters) {
         var thisSemester = allSemesters[0];
         localStorage.set('allSemesters', allSemesters);

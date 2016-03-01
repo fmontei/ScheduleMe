@@ -1,6 +1,7 @@
 var express = require('express');
 var ehb = require('express-handlebars');
 var bodyParser = require('body-parser');
+var path = require('path');
 
 var cas = require('./routes/cas');
 
@@ -45,15 +46,13 @@ app.get('/user', function(req, res) {
 //app.use('/*', cas);
 
 app.get('/', function(req, res) {
-    res.render('home');
+    res.sendFile(path.join(__dirname, '/index.html')); 
 });
 
-app.get('/schedule', function(req, res) {
-    res.render('schedule');
-});
-
-app.get('/courseoff', function(req, res) {
-    res.render('courseoff');
+// Used for sending back partial html files, which are sandwiched between the
+// index.html template 
+app.get('/partials/:partial_name', function(req, res) {
+    res.sendFile(path.join(__dirname, '/partials/', req.params.partial_name)); 
 });
 
 // Init database

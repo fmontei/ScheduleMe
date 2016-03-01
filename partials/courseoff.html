@@ -18,19 +18,19 @@
             <h3>Predfined queries</h3>
             <div class="btn-group">
                 <a class="btn btn-default" id="select-semester-btn" 
-                    href="javascript:void" data-query="select * from semester;">
+                   href="javascript:void(0)" data-query="select * from semester;">
                     Select all semesters
                 </a>
                 <a class="btn btn-default" id="select-class-btn" 
-                    href="javascript:void" data-query="select * from class order by semester_id;">
+                    href="javascript:void(0)" data-query="select * from class order by semester_id;">
                     Select all classes
                 </a>
                 <a class="btn btn-default" id="select-section-btn" 
-                    href="javascript:void" data-query="select * from section order by class_id;">
+                    href="javascript:void(0)" data-query="select * from section order by class_id;">
                     Select all sections
                 </a>
                 <a class="btn btn-default" id="select-timeslot-btn" 
-                    href="javascript:void" data-query="select * from timeslot order by section_id;">
+                    href="javascript:void(0)" data-query="select * from timeslot order by section_id;">
                     Select all timeslots
                 </a>
             </div>
@@ -52,23 +52,6 @@
         </div>
     </div>
 </div>
-
-<script>
-var scheduleMeApp = angular.module('ScheduleMeApp', []);
-
-scheduleMeApp.controller('ScheduleMeCtrl', ['$scope', function($scope) {
-    $scope.title = "ASDIKAHSDIPASHJND";
-    $scope.phones = [
-        {'name': 'Nexus S',
-         'snippet': 'Fast just got faster with Nexus S.'},
-        {'name': 'Motorola XOOM™ with Wi-Fi',
-         'snippet': 'The Next, Next Generation tablet.'},
-        {'name': 'MOTOROLA XOOM™',
-         'snippet': 'The Next, Next Generation tablet.'}
-      ];
-}]);
-
-</script>
 
 <script>
     $(document).ready(function() {

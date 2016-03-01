@@ -25,8 +25,9 @@
 for each part of the application in separate files here and then
 mount them in `index.js`. See how CAS works for an example.
 * `scripts/`: Development utilities.
-* `views/`: Application pages to be rendered using `handlebars.js`.
-  * `layouts/`: Templates to be used for rendering multiple pages.
+* `partials/`: Application pages to be sandwiched between the `index.html` 
+template page. This is managed by AngularJS. 
+* `index.html`: Contains the header and footer html code. 
 
 ## Using CAS
 
