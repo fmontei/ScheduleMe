@@ -95,7 +95,7 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
                     break;
                 }
             }
-            if (classObj) {
+            if (classObj && !isClassAlreadySelected(classObj, allSelectedClasses)) {
                 allSelectedClasses.push(classObj);
                 localStorage.set('selectedClasses', allSelectedClasses);
             }
@@ -105,6 +105,7 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
 
     $scope.selectGroup = function() {
         var allSelectedGroups = localStorage.get('selectedGroups');
+        var allSelectedClasses = localStorage.get('selectedClasses');
         var selectedGroup = $scope.modalData.groupClasses;
         if (selectedGroup.length === 1) {
             $scope.modalData.selectedClass = $scope.modalData.groupClasses[0];
@@ -120,15 +121,26 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
                 for (var j = 0; j < $scope.allClasses.length; j++) {
                     if ($scope.allClasses[j]['class_number'] === _class['class_number'] &&
                         $scope.allClasses[j]['department'] === _class['department']) {
-                        classObjs.push($scope.allClasses[j]);
+                        var classObj = $scope.allClasses[j];
+                        // If the class hasn't been individually selected and doesn't
+                        // already belong to this group, then add it.
+                        if (!isClassAlreadySelected(classObj, allSelectedClasses) &&
+                            !isClassAlreadySelected(classObj, classObjs)) {
+                            classObjs.push(classObj);
+                        }
                         break;
                     }
                 }
             }
             if (classObjs && classObjs.length > 0) {
-                allSelectedGroups.push(classObjs);
+                if (classObjs.length == 1) {
+                    allSelectedClasses.push(classObjs[0]);
+                    localStorage.set('selectedClasses', allSelectedClasses);
+                } else {
+                    allSelectedGroups.push(classObjs);
+                    localStorage.set('selectedGroups', allSelectedGroups);
+                }
             }
-            localStorage.set('selectedGroups', allSelectedGroups);
         }
         $scope.resetModal();
     };
@@ -157,7 +169,7 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
         );
     };
 
-    $scope.removeSelectedGroupClass = function(_class) {
+    $scope.removeSelectedGroupOption = function(_class) {
         var index = $scope.modalData.groupClasses.indexOf(_class);
         $scope.modalData.groupClasses.splice(index, 1);
     };
@@ -282,5 +294,13 @@ function getDepartments(allClasses) {
     return departments;
 };
 
+function isClassAlreadySelected(_class, list) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i]['class_id'] === _class['class_id']) {
+            return true;
+        }
+    }
+    return false;
+};
 
 
