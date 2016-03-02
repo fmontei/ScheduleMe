@@ -10,7 +10,7 @@ var db = new sqlite3.Database('scheduleme.db');
  */
 router.use(function(req, res, next) {
     var semester_id = req.semester_id;
-    
+
     if (!semester_id) {
         return res.status(400).send('url request must end with /:semester_id.');
     }
@@ -18,8 +18,8 @@ router.use(function(req, res, next) {
     async.waterfall([
         function(callback) {
             semester_id = semester_id.trim();
-            var query = "SELECT * from class WHERE semester_id = '" + semester_id 
-                + "' order by department, course_number;";
+            var query = "SELECT * from class WHERE semester_id = '" + semester_id
+                + "' order by department, class_number;";
             db.all(query, function(err, rows) {
                 callback(null, rows);
             });

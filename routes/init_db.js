@@ -25,10 +25,11 @@ router.use(function(req, res, next) {
             "class_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "name VARCHAR(255) NOT NULL," +
             "department VARCHAR(10) NOT NULL," +
-            "course_number INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
+            "class_number INTEGER NOT NULL," +
             "credits INTEGER," +
             "semester_id INTEGER NOT NULL," +
-            "foreign key (semester_id) references SEMESTER(semeter_id));")
+            "foreign key (semester_id) references SEMESTER(semeter_id)," +
+            "UNIQUE(department, class_number) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
@@ -162,7 +163,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
     function saveCourses(finalCourses) {
         var deferred = Q.defer();
         var statement = db.prepare("INSERT INTO class(name, department, " +
-            "course_number, credits, semester_id) VALUES(?, ?, ?, ?, ?);");
+            "class_number, credits, semester_id) VALUES(?, ?, ?, ?, ?);");
         deferredCount = finalCourses.length;
 
         for (var i = 0; i < finalCourses.length; i++) {
@@ -186,10 +187,10 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
         for (var i = 0; i < sections.length; i++) {
             var section = sections[i];
-            var innerQuery = "SELECT class_id FROM class where course_number = '" +
-                section['course_number'] + "' LIMIT 1;";
+            var innerQuery = "SELECT class_id FROM class where class_number = '" +
+                section['class_number'] + "' LIMIT 1;";
             var promise = executeInnerQuery(innerQuery, section, 'class_id',
-                'course_number', true).then(function(finalSection) {
+                'class_number', true).then(function(finalSection) {
                 sectionsWithClassIDs.push(finalSection);
             });
             sectionPromises.push(promise);
@@ -457,7 +458,7 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
         var sections = courses[i]['sections'];
         for (var j = 0; j < sections.length; j++) {
             var section = sections[j];
-            section['course_number'] = courses[i]['number'];
+            section['class_number'] = courses[i]['number'];
             courses[i]['credits'] = sections[j]['credits'];
             if (finalSections.indexOf(section) === -1) {
                 finalSections.push(section);

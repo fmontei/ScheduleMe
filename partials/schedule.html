@@ -22,11 +22,11 @@
             <ul class="list-group">
                 <li class="list-group-item" ng-repeat="class in selectedClasses">
                     <small><span class="glyphicon glyphicon-lock pull-right"></span></small>
-                    {{class.course_number}} <em>{{class.name}}</em>
+                    {{class.class_number}} <em>{{class.name}}</em>
                 </li>
                 <li class="list-group-item" ng-repeat="group in selectedGroups">
                     <small><span class="glyphicon glyphicon-th-large pull-right"></span></small>
-                    <p ng-repeat="class in group">{{class}}</p>
+                    <p ng-repeat="class in group">{{class.department}} {{class.class_number}} - {{class.name}}</p>
                 </li>
             </ul>
 
@@ -93,7 +93,7 @@
                             <select class="form-control"
                                     ng-model="modalData.selectedClass">
                                 <option ng-repeat="class in modalData.filteredClasses">
-                                    {{class.course_number}} ({{class.name}})
+                                    {{class.class_number}} ({{class.name}})
                                 </option>
                             </select>
                         </div>
@@ -158,7 +158,7 @@
                                     ng-model="modalData.groupClass"
                                     ng-change="updateGroupClasses()">
                                 <option ng-repeat="class in modalData.filteredClasses">
-                                    {{class.course_number}} ({{class.name}})
+                                    {{class.class_number}} ({{class.name}})
                                 </option>
                             </select>
                         </div>
@@ -167,7 +167,7 @@
                     <br />
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
-                            {{class}}
+                            {{class.class_number}} {{class.name}}
                             <small><span class="glyphicon glyphicon-remove pull-right"></span></small>
                         </li>
                     </ul>

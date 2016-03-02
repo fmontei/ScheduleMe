@@ -29,9 +29,9 @@ scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http',
     function($rootScope, $scope, $http, localStorage, classHttpService,
         semesterHttpService) {
     semesterHttpService.getAllSemesters().then(function(allSemesters) {
-        var thisSemester = allSemesters[0];
         localStorage.set('allSemesters', allSemesters);
 
+        var thisSemester = allSemesters[0];
         classHttpService.getAllClasses(thisSemester.semester_id).then(
             function(allClasses) {
             localStorage.set('allClasses', allClasses);
@@ -61,8 +61,6 @@ scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http',
 scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
     function($rootScope, $scope, localStorage) {
 
-    $scope.groupClasses = [];
-
     $scope.filterClassesByDept = function() {
         var filteredClasses = [];
         for (var i = 0; i < $scope.allClasses.length; i++) {
@@ -80,23 +78,37 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
         if (!allSelectedClasses) {
             allSelectedClasses = [];
         }
-        if (allSelectedClasses.indexOf(selectedClass) === -1) {
+        if (allSelectedClasses.indexOf(_class) === -1) {
             // Get the actual object
             var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-            var classObj = {};
+            var classDept = $scope.modalData.selectedDept;
+            var classObj = null;
             for (var i = 0; i < $scope.allClasses.length; i++) {
-                if ($scope.allClasses[i]['course_number'] === classNum) {
+                console.log($scope.allClasses[i]);
+                if ($scope.allClasses[i]['class_number'] === classNum &&
+                    $scope.allClasses[i]['department'] === classDept) {
                     classObj = $scope.allClasses[i];
                     break;
                 }
             }
-            allSelectedClasses.push(classObj);
-            localStorage.set('selectedClasses', allSelectedClasses);
+            if (classObj) {
+                allSelectedClasses.push(classObj);
+                localStorage.set('selectedClasses', allSelectedClasses);
+            }
         }
     };
 
     $scope.updateGroupClasses = function() {
-        $scope.modalData.groupClasses.push($scope.modalData.groupClass);
+        var _class = $scope.modalData.groupClass;
+        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
+        var className = _class.substring(_class.indexOf(' '));
+        $scope.modalData.groupClasses.push(
+            {
+                'class_number': classNum,
+                'name': className,
+                'department': $scope.modalData.selectedDept
+            }
+        );
     };
 
     $scope.selectGroup = function() {
@@ -109,15 +121,17 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
             var classObjs = [];
             for (var i = 0; i < $scope.modalData.groupClasses.length; i++) {
                 var _class = $scope.modalData.groupClasses[i];
-                var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-                for (var i = 0; i < $scope.allClasses.length; i++) {
-                    if ($scope.allClasses[i]['course_number'] === classNum) {
-                        classObjs.push($scope.allClasses[i]);
+                for (var j = 0; j < $scope.allClasses.length; j++) {
+                    if ($scope.allClasses[j]['class_number'] === _class['class_number'] &&
+                        $scope.allClasses[j]['department'] === _class['department']) {
+                        classObjs.push($scope.allClasses[j]);
                         break;
                     }
                 }
             }
-            allSelectedGroups.push(selectedGroup);
+            if (classObjs && classObjs.length > 0) {
+                allSelectedGroups.push(classObjs);
+            }
             localStorage.set('selectedGroups', allSelectedGroups);
         }
     };
