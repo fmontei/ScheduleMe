@@ -20,12 +20,34 @@
 
             <!--List selected classes-->
             <ul class="list-group">
-                <li class="list-group-item" ng-repeat="class in selectedClasses">
-                    <small><span class="glyphicon glyphicon-lock pull-right"></span></small>
+                <li class="list-group-item"
+                    ng-repeat="class in selectedClasses"
+                    ng-mouseenter="class.hasFocus = true"
+                    ng-mouseleave="class.hasFocus = false">
+                    <small>
+                        <a href="javascript:void(0)"
+                           style="margin-left: 5px"
+                           class="glyphicon glyphicon-remove pull-right"
+                           ng-show="class.hasFocus == true"
+                           ng-click="undoSelection(class, 'selectedClasses')">
+                        </a>
+                        <span class="glyphicon glyphicon-lock pull-right"></span>
+                    </small>
                     {{class.department}} {{class.class_number}} - <em>{{class.name}}</em>
                 </li>
-                <li class="list-group-item" ng-repeat="group in selectedGroups">
-                    <small><span class="glyphicon glyphicon-th-large pull-right"></span></small>
+                <li class="list-group-item"
+                    ng-repeat="group in selectedGroups"
+                    ng-mouseenter="group.hasFocus = true"
+                    ng-mouseleave="group.hasFocus = false">
+                    <small>
+                        <a href="javascript:void(0)"
+                           style="margin-left: 5px"
+                           class="glyphicon glyphicon-remove pull-right"
+                           ng-show="group.hasFocus == true"
+                           ng-click="undoSelection(class, 'selectedGroups')">
+                        </a>
+                        <span class="glyphicon glyphicon-th-large pull-right"></span>
+                    </small>
                     <p ng-repeat="class in group">{{class.department}} {{class.class_number}} - <em>{{class.name}}</em></p>
                 </li>
             </ul>
@@ -92,7 +114,7 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
-                                    ng-model="modalData.selectedClass"
+                                    ng-model="modalData.selectedClassOption"
                                     ng-change="updateSelectedClass()">
                                 <option ng-repeat="class in modalData.filteredClasses">
                                     {{class.class_number}} ({{class.name}})
@@ -134,7 +156,6 @@
                 </div>
 
                 <div class="modal-body">
-                    TODO: Remove selected classes from grouping
                     <div class="row">
                         <div class="col col-md-4">
                             <label><u>Department</u></label>
@@ -168,7 +189,12 @@
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
                             {{class.class_number}} {{class.name}}
-                            <small><span class="glyphicon glyphicon-remove pull-right"></span></small>
+                            <small>
+                                <a href="javascript:void(0)"
+                                   class="glyphicon glyphicon-remove pull-right"
+                                   ng-click="removeSelectedGroupClass(class)">
+                               </a>
+                            </small>
                         </li>
                     </ul>
                 </div>

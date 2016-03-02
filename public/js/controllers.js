@@ -39,6 +39,13 @@ scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http',
         });
     });
 
+    $scope.undoSelection = function(_class, listName) {
+        var list = (listName === 'selectedClasses') ? $scope.selectedClasses : $scope.selectedGroups;
+        var index = list.indexOf(_class);
+        list.splice(index, 1);
+        localStorage.set(listName, list);
+    };
+
     $scope.$watch(function() {
         return localStorage.get('allSemesters');
     }, function(newValue, oldValue) {
@@ -96,30 +103,6 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
         $scope.resetModal();
     };
 
-    $scope.updateSelectedClass = function() {
-        var _class = $scope.modalData.selectedClass;
-        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-        var className = _class.substring(_class.indexOf(' '));
-        $scope.modalData.selectedClass = {
-            'class_number': classNum,
-            'name': className,
-            'department': $scope.modalData.selectedDept
-        }
-    }
-
-    $scope.updateSelectedGroupClasses = function() {
-        var _class = $scope.modalData.selectedClass;
-        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-        var className = _class.substring(_class.indexOf(' '));
-        $scope.modalData.groupClasses.push(
-            {
-                'class_number': classNum,
-                'name': className,
-                'department': $scope.modalData.selectedDept
-            }
-        );
-    };
-
     $scope.selectGroup = function() {
         var allSelectedGroups = localStorage.get('selectedGroups');
         var selectedGroup = $scope.modalData.groupClasses;
@@ -148,6 +131,35 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
             localStorage.set('selectedGroups', allSelectedGroups);
         }
         $scope.resetModal();
+    };
+
+    $scope.updateSelectedClass = function() {
+        var _class = $scope.modalData.selectedClassOption;
+        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
+        var className = _class.substring(_class.indexOf(' '));
+        $scope.modalData.selectedClass = {
+            'class_number': classNum,
+            'name': className,
+            'department': $scope.modalData.selectedDept
+        }
+    };
+
+    $scope.updateSelectedGroupClasses = function() {
+        var _class = $scope.modalData.selectedClass;
+        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
+        var className = _class.substring(_class.indexOf(' '));
+        $scope.modalData.groupClasses.push(
+            {
+                'class_number': classNum,
+                'name': className,
+                'department': $scope.modalData.selectedDept
+            }
+        );
+    };
+
+    $scope.removeSelectedGroupClass = function(_class) {
+        var index = $scope.modalData.groupClasses.indexOf(_class);
+        $scope.modalData.groupClasses.splice(index, 1);
     };
 
     $scope.resetModal = function() {
