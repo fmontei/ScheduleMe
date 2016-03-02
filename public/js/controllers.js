@@ -204,9 +204,9 @@ scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q)
 }]);
 
 scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
-  var classHttpService = {};
+    var classHttpService = {};
 
-  classHttpService.getAllClasses = function(semesterID) {
+    classHttpService.getAllClasses = function(semesterID) {
     var deferred = $q.defer();
 
     $http({
@@ -215,15 +215,32 @@ scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
     }).then(function successCallback(response) {
         deferred.resolve(response['data']);
     }, function errorCallback(response) {
-        console.log(response);
+        console.log('Error: ' + response);
         deferred.reject(response);
     });
 
     return deferred.promise;
-  };
+    };
 
-  return classHttpService;
+    return classHttpService;
 }]);
+
+scheduleMeApp.directive('closeModal', function () {
+    return {
+        restrict: 'AE',
+        scope: {
+            modalToClose: '@modalToClose',
+            functionToCall: '&functionToCall'
+        },
+        link: function link(scope, element, attrs) {
+            element.click(function() {
+                var success = scope.functionToCall();
+                $(scope.modalToClose).modal('hide');
+                scope.$apply();
+            });
+        }
+    };
+});
 
 // Helper functions
 function getDepartments(allClasses) {

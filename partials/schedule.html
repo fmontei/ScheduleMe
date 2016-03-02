@@ -22,11 +22,11 @@
             <ul class="list-group">
                 <li class="list-group-item" ng-repeat="class in selectedClasses">
                     <small><span class="glyphicon glyphicon-lock pull-right"></span></small>
-                    {{class.class_number}} <em>{{class.name}}</em>
+                    {{class.department}} {{class.class_number}} - <em>{{class.name}}</em>
                 </li>
                 <li class="list-group-item" ng-repeat="group in selectedGroups">
                     <small><span class="glyphicon glyphicon-th-large pull-right"></span></small>
-                    <p ng-repeat="class in group">{{class.department}} {{class.class_number}} - {{class.name}}</p>
+                    <p ng-repeat="class in group">{{class.department}} {{class.class_number}} - <em>{{class.name}}</em></p>
                 </li>
             </ul>
 
@@ -41,7 +41,8 @@
                 <label class="btn btn-default"
                        ng-model="radioModel"
                        uib-btn-radio="'Add Group'"
-                       data-toggle="modal" data-target="#group-modal">
+                       data-toggle="modal"
+                       data-target="#group-modal">
                        Add Group
                 </label> <!--./btn-group -->
             </div>
@@ -103,15 +104,13 @@
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-default"
-                            ng-click="resetModal()"
-                            data-dismiss="modal">
+                            close-modal modal-to-close="#class-modal" function-to-call="resetModal()">
                             Close
                     </button>
                     <button type="button"
                             class="btn btn-primary"
                             ng-disabled="!modalData.selectedDept || !modalData.selectedClass"
-                            ng-click="selectClass()"
-                            data-dismiss="modal">
+                            close-modal modal-to-close="#class-modal" function-to-call="selectClass()">
                         Add Class
                     </button>
                 </div>
@@ -176,14 +175,15 @@
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-default"
-                            ng-click="resetModal()"
-                            data-dismiss="modal">
+                            close-modal modal-to-close="#group-modal" function-to-call="resetModal()">
                             Close
                     </button>
                     <button type="button"
                             class="btn btn-primary"
-                            ng-click="selectGroup()"
-                            data-dismiss="modal">
+                            ng-disabled="!modalData.selectedDept ||
+                                         !modalData.groupClasses ||
+                                         modalData.groupClasses.length === 0"
+                            close-modal modal-to-close="#group-modal" function-to-call="selectGroup()">
                         Add Group
                     </button>
                 </div>
