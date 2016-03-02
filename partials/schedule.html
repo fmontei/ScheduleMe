@@ -92,7 +92,8 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
-                                    ng-model="modalData.selectedClass">
+                                    ng-model="modalData.selectedClass"
+                                    ng-change="updateSelectedClass()">
                                 <option ng-repeat="class in modalData.filteredClasses">
                                     {{class.class_number}} ({{class.name}})
                                 </option>
@@ -154,8 +155,8 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
-                                    ng-model="modalData.groupClass"
-                                    ng-change="updateGroupClasses()">
+                                    ng-model="modalData.selectedClass"
+                                    ng-change="updateSelectedGroupClasses()">
                                 <option ng-repeat="class in modalData.filteredClasses">
                                     {{class.class_number}} ({{class.name}})
                                 </option>

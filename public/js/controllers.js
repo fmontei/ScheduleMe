@@ -80,13 +80,10 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
         }
         if (allSelectedClasses.indexOf(_class) === -1) {
             // Get the actual object
-            var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-            var classDept = $scope.modalData.selectedDept;
             var classObj = null;
             for (var i = 0; i < $scope.allClasses.length; i++) {
-                console.log($scope.allClasses[i]);
-                if ($scope.allClasses[i]['class_number'] === classNum &&
-                    $scope.allClasses[i]['department'] === classDept) {
+                if ($scope.allClasses[i]['class_number'] === _class['class_number'] &&
+                    $scope.allClasses[i]['department'] === _class['department']) {
                     classObj = $scope.allClasses[i];
                     break;
                 }
@@ -96,10 +93,22 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
                 localStorage.set('selectedClasses', allSelectedClasses);
             }
         }
+        $scope.resetModal();
     };
 
-    $scope.updateGroupClasses = function() {
-        var _class = $scope.modalData.groupClass;
+    $scope.updateSelectedClass = function() {
+        var _class = $scope.modalData.selectedClass;
+        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
+        var className = _class.substring(_class.indexOf(' '));
+        $scope.modalData.selectedClass = {
+            'class_number': classNum,
+            'name': className,
+            'department': $scope.modalData.selectedDept
+        }
+    }
+
+    $scope.updateSelectedGroupClasses = function() {
+        var _class = $scope.modalData.selectedClass;
         var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
         var className = _class.substring(_class.indexOf(' '));
         $scope.modalData.groupClasses.push(
@@ -114,6 +123,10 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
     $scope.selectGroup = function() {
         var allSelectedGroups = localStorage.get('selectedGroups');
         var selectedGroup = $scope.modalData.groupClasses;
+        if (selectedGroup.length === 1) {
+            $scope.modalData.selectedClass = $scope.modalData.groupClasses[0];
+            return $scope.selectClass();
+        }
         if (!allSelectedGroups) {
             allSelectedGroups = [];
         }
@@ -134,6 +147,7 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
             }
             localStorage.set('selectedGroups', allSelectedGroups);
         }
+        $scope.resetModal();
     };
 
     $scope.resetModal = function() {
@@ -141,7 +155,6 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
             filteredClasses: [],
             selectedDept: null,
             selectedClass: null,
-            groupClass: null,
             groupClasses: [],
         };
     };
@@ -234,7 +247,10 @@ scheduleMeApp.directive('closeModal', function () {
         },
         link: function link(scope, element, attrs) {
             element.click(function() {
-                var success = scope.functionToCall();
+                scope.functionToCall();
+                if (scope.modalToClose[0] != '#') {
+                    scope.modalToClose = '#' + scope.modalToClose;
+                }
                 $(scope.modalToClose).modal('hide');
                 scope.$apply();
             });
