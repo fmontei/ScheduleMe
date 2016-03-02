@@ -29,10 +29,23 @@ module.exports = function(grunt) {
                     }
                 }
             }
+        },
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'public/lib/bootstrap/',
+                        src: ['*.eot', '*.svg', '*.ttf', '*.woff', '*.woff2'],
+                        dest: 'public/lib/fonts/',
+                    }
+                ]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-bower');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('default', [ 'bower' ]);
+    grunt.registerTask('default', [ 'bower', 'copy' ]);
 }
