@@ -11,3 +11,7 @@ a.glyphicon.no-link:hover {
 .glyphicon.glyphicon-remove.no-link {
     color: rgb(160, 0, 0);
 }
+
+.glyphicon.glyphicon-remove.no-link:hover {
+    color: red;
+}
