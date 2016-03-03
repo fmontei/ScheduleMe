@@ -114,11 +114,9 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
-                                    ng-model="modalData.selectedClassOption"
+                                    ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
+                                    ng-model="modalData.selectedClass"
                                     ng-change="updateSelectedClass()">
-                                <option ng-repeat="class in modalData.filteredClasses">
-                                    {{class.class_number}} ({{class.name}})
-                                </option>
                             </select>
                         </div>
                     </div> <!--./row-->
@@ -176,11 +174,9 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
+                                    ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
                                     ng-model="modalData.selectedClass"
                                     ng-change="updateSelectedGroupClasses()">
-                                <option ng-repeat="class in modalData.filteredClasses">
-                                    {{class.class_number}} ({{class.name}})
-                                </option>
                             </select>
                         </div>
                     </div> <!--./row-->
@@ -188,7 +184,7 @@
                     <br />
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
-                            {{class.class_number}} {{class.name}}
+                            {{class.class_number}} - <em>{{class.name}}</em>
                             <small>
                                 <a href="javascript:void(0)"
                                    class="glyphicon glyphicon-remove pull-right"

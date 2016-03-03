@@ -85,21 +85,8 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
         if (!allSelectedClasses) {
             allSelectedClasses = [];
         }
-        if (allSelectedClasses.indexOf(_class) === -1) {
-            // Get the actual object
-            var classObj = null;
-            for (var i = 0; i < $scope.allClasses.length; i++) {
-                if ($scope.allClasses[i]['class_number'] === _class['class_number'] &&
-                    $scope.allClasses[i]['department'] === _class['department']) {
-                    classObj = $scope.allClasses[i];
-                    break;
-                }
-            }
-            if (classObj && !isClassAlreadySelected(classObj, allSelectedClasses)) {
-                allSelectedClasses.push(classObj);
-                localStorage.set('selectedClasses', allSelectedClasses);
-            }
-        }
+        allSelectedClasses.push(_class);
+        localStorage.set('selectedClasses', allSelectedClasses);
         $scope.resetModal();
     };
 
@@ -115,58 +102,31 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
             allSelectedGroups = [];
         }
         if (allSelectedGroups.indexOf(selectedGroup) === -1) {
-            var classObjs = [];
-            for (var i = 0; i < $scope.modalData.groupClasses.length; i++) {
-                var _class = $scope.modalData.groupClasses[i];
-                for (var j = 0; j < $scope.allClasses.length; j++) {
-                    if ($scope.allClasses[j]['class_number'] === _class['class_number'] &&
-                        $scope.allClasses[j]['department'] === _class['department']) {
-                        var classObj = $scope.allClasses[j];
-                        // If the class hasn't been individually selected and doesn't
-                        // already belong to this group, then add it.
-                        if (!isClassAlreadySelected(classObj, allSelectedClasses) &&
-                            !isClassAlreadySelected(classObj, classObjs)) {
-                            classObjs.push(classObj);
-                        }
-                        break;
-                    }
-                }
-            }
-            if (classObjs && classObjs.length > 0) {
-                if (classObjs.length == 1) {
-                    allSelectedClasses.push(classObjs[0]);
-                    localStorage.set('selectedClasses', allSelectedClasses);
-                } else {
-                    allSelectedGroups.push(classObjs);
-                    localStorage.set('selectedGroups', allSelectedGroups);
-                }
-            }
+            allSelectedGroups.push(selectedGroup);
+            localStorage.set('selectedGroups', allSelectedGroups);
         }
         $scope.resetModal();
     };
 
     $scope.updateSelectedClass = function() {
-        var _class = $scope.modalData.selectedClassOption;
-        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-        var className = _class.substring(_class.indexOf(' '));
-        $scope.modalData.selectedClass = {
-            'class_number': classNum,
-            'name': className,
-            'department': $scope.modalData.selectedDept
+        var allSelectedClasses = localStorage.get('selectedClasses');
+        var alreadyExists = isClassAlreadySelected($scope.modalData.selectedClass,
+            allSelectedClasses);
+        if (alreadyExists) {
+            $scope.modalData.selectedClass = null;
         }
     };
 
     $scope.updateSelectedGroupClasses = function() {
+        var allSelectedClasses = localStorage.get('selectedClasses');
         var _class = $scope.modalData.selectedClass;
-        var classNum = parseInt(_class.substring(0, _class.indexOf(' ')));
-        var className = _class.substring(_class.indexOf(' '));
-        $scope.modalData.groupClasses.push(
-            {
-                'class_number': classNum,
-                'name': className,
-                'department': $scope.modalData.selectedDept
-            }
-        );
+        var alreadyExists = isClassAlreadySelected(_class, $scope.modalData.groupClasses) ||
+            isClassAlreadySelected(_class, allSelectedClasses);
+        if (alreadyExists === false) {
+            $scope.modalData.groupClasses.push($scope.modalData.selectedClass);
+        } else {
+            $scope.modalData.selectedClass = null;
+        }
     };
 
     $scope.removeSelectedGroupOption = function(_class) {
@@ -219,25 +179,25 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
 }]);
 
 scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q) {
-  var semesterHttpService = {};
+    var semesterHttpService = {};
 
-  semesterHttpService.getAllSemesters = function() {
-    var deferred = $q.defer();
+    semesterHttpService.getAllSemesters = function() {
+        var deferred = $q.defer();
 
-    $http({
-        method: 'GET',
-        url: '/semesters'
-    }).then(function successCallback(response) {
-        deferred.resolve(response['data']);
-    }, function errorCallback(response) {
-        console.log(response);
-        deferred.reject(response);
-    });
+        $http({
+            method: 'GET',
+            url: '/semesters'
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(response) {
+            console.log('Error: ' + response);
+            deferred.reject(response);
+        });
 
-    return deferred.promise;
-  };
+        return deferred.promise;
+    };
 
-  return semesterHttpService;
+    return semesterHttpService;
 }]);
 
 scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
@@ -262,7 +222,8 @@ scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
     return classHttpService;
 }]);
 
-scheduleMeApp.directive('closeModal', function () {
+// Directives
+scheduleMeApp.directive('closeModal', function() {
     return {
         restrict: 'AE',
         scope: {
