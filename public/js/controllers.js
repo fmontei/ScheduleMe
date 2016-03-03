@@ -30,7 +30,6 @@ scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http',
         semesterHttpService) {
     semesterHttpService.getAllSemesters().then(function(allSemesters) {
         localStorage.set('allSemesters', allSemesters);
-
         var thisSemester = allSemesters[0];
         classHttpService.getAllClasses(thisSemester.semester_id).then(
             function(allClasses) {
@@ -38,6 +37,15 @@ scheduleMeApp.controller('ScheduleMeCtrl', ['$rootScope', '$scope', '$http',
             localStorage.set('allDepartments', getDepartments(allClasses));
         });
     });
+
+    $scope.updateClassMandatoryStatus = function(_class) {
+        var selectedClasses = localStorage.get('selectedClasses');
+        var index = indexOfClass(_class, selectedClasses);
+        if (index !== -1) {
+            selectedClasses[index].isMandatory = !selectedClasses[index].isMandatory;
+            localStorage.set('selectedClasses', selectedClasses);
+        }
+    };
 
     $scope.undoSelection = function(_class, listName) {
         var list = (listName === 'selectedClasses') ? $scope.selectedClasses : $scope.selectedGroups;
@@ -110,7 +118,7 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
 
     $scope.updateSelectedClass = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
-        var alreadyExists = isClassAlreadySelected($scope.modalData.selectedClass,
+        var alreadyExists = isClassInList($scope.modalData.selectedClass,
             allSelectedClasses);
         if (alreadyExists) {
             $scope.modalData.selectedClass = null;
@@ -120,8 +128,8 @@ scheduleMeApp.controller('ModalCtrl', ['$rootScope', '$scope', 'LocalStorage',
     $scope.updateSelectedGroupClasses = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
         var _class = $scope.modalData.selectedClass;
-        var alreadyExists = isClassAlreadySelected(_class, $scope.modalData.groupClasses) ||
-            isClassAlreadySelected(_class, allSelectedClasses);
+        var alreadyExists = isClassInList(_class, $scope.modalData.groupClasses) ||
+            isClassInList(_class, allSelectedClasses);
         if (alreadyExists === false) {
             $scope.modalData.groupClasses.push($scope.modalData.selectedClass);
         } else {
@@ -255,13 +263,22 @@ function getDepartments(allClasses) {
     return departments;
 };
 
-function isClassAlreadySelected(_class, list) {
+function isClassInList(_class, list) {
     for (var i = 0; i < list.length; i++) {
         if (list[i]['class_id'] === _class['class_id']) {
             return true;
         }
     }
     return false;
+};
+
+function indexOfClass(_class, list) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i]['class_id'] === _class['class_id']) {
+            return i;
+        }
+    }
+    return -1;
 };
 
 
