@@ -9,8 +9,9 @@ var init_db = require('./routes/init_db');
 var select_db = require('./routes/select_db');
 
 var get_user = require('./routes/get_user');
-var get_schedules = require('./routes/get_schedules');
+var get_schedule = require('./routes/get_schedule');
 var get_semester = require('./routes/get_semester');
+var get_latest_semester = require('./routes/get_latest_semester');
 var get_semesters = require('./routes/get_semesters');
 var get_classes = require('./routes/get_classes');
 var get_sections = require('./routes/get_sections');
@@ -68,10 +69,14 @@ app.get('/user/:username', function(req, res, next) {
 });
 
 // Get all schedules by specified user id
-app.get('/schedules/:user_id', function(req, res, next) {
+app.get('/user/:user_id/schedule/:semester_id', function(req, res, next) {
     req.user_id = req.params.user_id;
-    get_schedules(req, res, next);
+    req.semester_id = req.params.semester_id;
+    get_schedule(req, res, next);
 });
+
+// Get latest semester 
+app.get('/semester/latest', get_latest_semester);
 
 // Get semester by specified semester id
 app.get('/semester/:semester_id', function(req, res, next) {

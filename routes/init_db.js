@@ -14,8 +14,9 @@ router.use(function(req, res, next) {
           .run("CREATE TABLE if not exists SCHEDULE(" +
             "schedule_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "user_id INTEGER NOT NULL," +
-            "date VARCHAR(30)," +
-            "foreign key (user_id) references USER(user_id));")
+            "semester_id INTEGER NOT NULL," +
+            "foreign key (user_id) references USER(user_id)," +
+            "foreign key (semester_id) references SEMESTER(semester_id));")
           .run("CREATE TABLE if not exists SEMESTER(" +
             "semester_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "year INTEGER NOT NULL," +

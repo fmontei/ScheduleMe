@@ -11,10 +11,14 @@
         <script src="/static/lib/angular-bootstrap/ui-bootstrap-tpls.js" type="text/javascript"></script>
         <script src="/static/lib/angular-local-storage/angular-local-storage.js" type="text/javascript"></script>
         <script src="/static/lib/angular-route/angular-route.js" type="text/javascript"></script>
-        <script src="/static/js/controllers.js"></script>
+        <script src="/static/js/app.js"></script>
+        <script src="/static/js/workspace-controller.js"></script>
+        <script src="/static/js/schedule-controller.js"></script>
+        <script src="/static/js/modal-controller.js"></script>
+        <script src="/static/js/nav-controller.js"></script>
     </head>
 
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default navbar-fixed-top" ng-controller="NavController">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -27,9 +31,15 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li ng-class="{'active': location.path() == '/profile'}"><a href="#">Profile</a></li>
-                    <li ng-class="{'active': location.path() == '/schedule'}"><a href="#/schedule">Schedule</a></li>
-                    <li ng-class="{'active': location.path() == '/courseoff'}"><a href="#/courseoff">CourseOff</a></li>
+                    <li ng-class="{'active': location.path() == '/schedule'}">
+                        <a href="#/schedule">Schedule</a>
+                    </li>
+                    <li ng-class="{'active': location.path() == '/workspace'}">
+                        <a href="#/workspace">Workspace</a>
+                    </li>
+                    <li ng-class="{'active': location.path() == '/courseoff'}">
+                        <a href="#/courseoff">CourseOff</a>
+                    </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">

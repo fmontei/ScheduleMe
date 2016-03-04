@@ -1,221 +1,31 @@
 <div class="container">
-    <div class="row">
-        <div class="col col-md-5">
-            <h3><u>Classes</u></h3>
-            <small>
-                <span class="glyphicon glyphicon-star"></span> = mandatory |
-                <span class="glyphicon glyphicon-star-empty"></span> = optional |
-                <span class="glyphicon glyphicon-th-large"></span> = pick one from group |
-                <a href="javascript:void(0)"><span class="glyphicon glyphicon-info-sign"></span>&nbsp;more info</a>
-            </small>
-
-            <!-- Display message when no classes/groups -->
-            <div class="panel panel-default"
-                 ng-if="(!selectedClasses || selectedClasses.length == 0) &&
-                        (!selectedGroups || selectedGroups.length == 0)">
-                <div class="panel-body">
-                    <p>
-                        You currently have no classes selected. To add a class,
-                        click on 'Add Class'. To add a group of classes that
-                        fulfill the same degree requirement, click on 'Add Group'.
-                        Classes that are grouped together are mutually exclusive:
-                        they cannot both appear in the same schedule.
-                    </p>
-                </div>
-            </div>
-
-            <!--List selected classes-->
-            <ul class="list-group">
-                <li class="list-group-item"
-                    ng-repeat="class in selectedClasses">
-                    <small>
-                        <a href="javascript:void(0)"
-                           style="margin-left: 5px"
-                           class="glyphicon glyphicon-remove no-link pull-right"
-                           ng-click="undoSelection(class, 'selectedClasses')">
-                        </a>
-                        <a  href="javascript:void(0)"
-                            ng-class="{'glyphicon glyphicon-star no-link pull-right': class.isMandatory === true,
-                                       'glyphicon glyphicon-star-empty no-link pull-right': !class.isMandatory}"
-                            ng-click="updateClassMandatoryStatus(class)">
-                        </a>
-                    </small>
-                    {{class.department}} {{class.class_number}} - <em>{{class.name}}</em>
-                </li>
-                <li class="list-group-item"
-                    ng-repeat="group in selectedGroups">
-                    <small>
-                        <a href="javascript:void(0)"
-                           style="margin-left: 5px"
-                           class="glyphicon glyphicon-remove no-link pull-right"
-                           ng-click="undoSelection(class, 'selectedGroups')">
-                        </a>
-                        <span class="glyphicon glyphicon-th-large pull-right"></span>
-                    </small>
-                    <p ng-repeat="class in group">{{class.department}} {{class.class_number}} - <em>{{class.name}}</em></p>
-                </li>
-            </ul>
-
-            <div class="btn-group">
-                <label class="btn btn-default"
-                       ng-model="radioModel"
-                       uib-btn-radio="'Add Class'"
-                       data-toggle="modal"
-                       data-target="#class-modal">
-                       Add Class
-                </label>
-                <label class="btn btn-default"
-                       ng-model="radioModel"
-                       uib-btn-radio="'Add Group'"
-                       data-toggle="modal"
-                       data-target="#group-modal">
-                       Add Group
-                </label> <!--./btn-group -->
-            </div>
-        </div>
-
-        <div class="col col-md-2">
+    <div class="row" style="margin-top: 50px">
+        <div class="col col-md-7">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tues</th>
+                        <th>Wed</th>
+                        <th>Thurs</th>
+                        <th>Fri</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
 
         <div class="col col-md-5">
-            <h3><u>Criteria</u></h3>
+            <div uib-accordion close-others="oneAtATime">
+                <div ng-repeat="class in classData" 
+                     uib-accordion-group heading="{{class.department}} {{class.class_number}} {{class.name}}"
+                     is-open="status.isFirstOpen" 
+                     is-disabled="status.isFirstDisabled">
+                  <label>CRN:</label>&nbsp;{{class.crn}}<br />
+                  <label>Professor:</label>&nbsp;{{class.professor}}<br />
+                  <label>Location:</label>&nbsp;{{class.location}}
+                <div /uib-accordion-group>    
+            </div uib-accordion>
         </div>
     </div>
 </div>
-
-<div ng-controller="ModalCtrl">
-    <div class="modal fade" id="class-modal" tabindex="-1" role="dialog" aria-labelledby="class-modal-label">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button"
-                            class="close"
-                            aria-label="Close"
-                            data-dismiss="modal"
-                            ng-click="resetModal()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">Add Class</h4>
-                </div>
-
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col col-md-4">
-                            <label><u>Department</u></label>
-                        </div>
-                        <div class="col col-md-8">
-                            <select class="form-control"
-                                    ng-model="modalData.selectedDept"
-                                    ng-change="filterClassesByDept()">
-                                <option ng-repeat="dept in allDepartments">{{dept}}</option>
-                            </select>
-                        </div>
-                    </div> <!--./row-->
-                    <br />
-                    <div class="row">
-                        <div class="col col-md-4">
-                            <label><u>Class</u></label>
-                        </div>
-                        <div class="col col-md-8">
-                            <select class="form-control"
-                                    ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
-                                    ng-model="modalData.selectedClass"
-                                    ng-change="updateSelectedClass()">
-                            </select>
-                        </div>
-                    </div> <!--./row-->
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-default"
-                            close-modal modal-to-close="#class-modal" function-to-call="resetModal()">
-                            Close
-                    </button>
-                    <button type="button"
-                            class="btn btn-primary"
-                            ng-disabled="!modalData.selectedDept || !modalData.selectedClass"
-                            close-modal modal-to-close="#class-modal" function-to-call="selectClass()">
-                        Add Class
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="group-modal" tabindex="-1" role="dialog" aria-labelledby="class-modal-label">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button"
-                            class="close"
-                            aria-label="Close"
-                            data-dismiss="modal"
-                            ng-click="resetModal()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">Add Group</h4>
-                </div>
-
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col col-md-4">
-                            <label><u>Department</u></label>
-                        </div>
-                        <div class="col col-md-8">
-                            <select class="form-control"
-                                    ng-model="modalData.selectedDept"
-                                    ng-change="filterClassesByDept()">
-                                <option ng-repeat="dept in allDepartments">{{dept}}</option>
-                            </select>
-                        </div>
-                    </div> <!--./row-->
-
-                    <br />
-                    <div class="row">
-                        <div class="col col-md-4">
-                            <label><u>Class</u></label>
-                        </div>
-                        <div class="col col-md-8">
-                            <select class="form-control"
-                                    ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
-                                    ng-model="modalData.selectedClass"
-                                    ng-change="updateSelectedGroupClasses()">
-                            </select>
-                        </div>
-                    </div> <!--./row-->
-
-                    <br />
-                    <ul class="list-group">
-                        <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
-                            {{class.class_number}} - <em>{{class.name}}</em>
-                            <small>
-                                <a href="javascript:void(0)"
-                                   class="glyphicon glyphicon-remove no-link pull-right"
-                                   ng-click="removeSelectedGroupOption(class)">
-                               </a>
-                            </small>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-default"
-                            close-modal modal-to-close="#group-modal" function-to-call="resetModal()">
-                            Close
-                    </button>
-                    <button type="button"
-                            class="btn btn-primary"
-                            ng-disabled="!modalData.selectedDept ||
-                                         !modalData.groupClasses ||
-                                         modalData.groupClasses.length === 0"
-                            close-modal modal-to-close="#group-modal" function-to-call="selectGroup()">
-                        Add Group
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+ 
