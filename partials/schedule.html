@@ -16,16 +16,36 @@
 
         <div class="col col-md-5">
             <div uib-accordion close-others="oneAtATime">
-                <div ng-repeat="class in classData" 
+                <div ng-repeat="class in classData"
                      uib-accordion-group heading="{{class.department}} {{class.class_number}} {{class.name}}"
-                     is-open="status.isFirstOpen" 
+                     is-open="status.isFirstOpen"
                      is-disabled="status.isFirstDisabled">
-                  <label>CRN:</label>&nbsp;{{class.crn}}<br />
-                  <label>Professor:</label>&nbsp;{{class.professor}}<br />
-                  <label>Location:</label>&nbsp;{{class.location}}
-                <div /uib-accordion-group>    
+                  <div class="row">
+                    <div class="col col-md-6">
+                      <p><label>CRN:</label><br />{{class.crn}}</p>
+                      <p><label>Professor:</label><br />{{class.professor}}</p>
+                      <p><label>Location:</label><br />{{class.location}}</p>
+                    </div>
+                    <div class="col col-md-6">
+                      <p><label>{{class.start_time}} - {{class.end_time}}</label></p>
+                      <p>
+                        <table>
+                          <tbody>
+                            <tr>
+                              <td><div ng-class="[{'square black': class.day_of_week === 'M'}, {'square white': class.day_of_week !== 'M'}]"></div></td>
+                              <td><div ng-class="[{'square black': class.day_of_week === 'T'}, {'square white': class.day_of_week !== 'T'}]"></div></td>
+                              <td><div ng-class="[{'square black': class.day_of_week === 'W'}, {'square white': class.day_of_week !== 'W'}]"></div></td>
+                              <td><div ng-class="[{'square black': class.day_of_week === 'R'}, {'square white': class.day_of_week !== 'R'}]"></div></td>
+                              <td><div ng-class="[{'square black': class.day_of_week === 'F'}, {'square white': class.day_of_week !== 'F'}]"></div></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </p>
+                      <p><label>Remaining:</label><br />{{class.seat_remaining}} ({{class.seat_actual}} / {{class.seat_capacity}})</p>
+                    </div>
+                  </div>
+                </div uib-accordion-group>
             </div uib-accordion>
         </div>
     </div>
 </div>
- 

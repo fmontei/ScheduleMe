@@ -15,3 +15,19 @@ a.glyphicon.no-link:hover {
 .glyphicon.glyphicon-remove.no-link:hover {
     color: red;
 }
+
+.square.black {
+    width: 10px;
+    height: 10px;
+    background: black;
+    border: 1px solid black;
+    margin-right: 2px;
+}
+
+.square.white {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border: 1px solid black;
+    margin-right: 2px;
+}

@@ -115,7 +115,7 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
 
 // Helper functions
 function isClassInList(_class, list) {
-    for (var i = 0; i < list.length; i++) {
+    for (var i = 0; list && i < list.length; i++) {
         if (list[i]['class_id'] === _class['class_id']) {
             return true;
         }
@@ -124,7 +124,7 @@ function isClassInList(_class, list) {
 };
 
 function indexOfClass(_class, list) {
-    for (var i = 0; i < list && list.length; i++) {
+    for (var i = 0; list && i < list.length; i++) {
         if (list[i]['class_id'] === _class['class_id']) {
             return i;
         }
