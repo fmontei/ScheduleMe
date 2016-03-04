@@ -85,7 +85,36 @@
         </div>
 
         <div class="col col-md-5">
-            <h3><u>Criteria</u></h3>
+            <h3>
+                <u>Criteria</u>
+                <small>
+                <a href="javascript:void(0)" 
+                   class="glyphicon glyphicon-info-sign"
+                   ng-click="showInfo2 = !showInfo2">
+                </a>
+                </small>
+            </h3>
+            <small ng-show="showInfo2 === true">
+                <h5>Use this section to modify your preferences!</h5>
+            </small>
+            <div style="margin-bottom: 10px;">
+                <label style="display: table-cell; vertical-align: middle;">Number of Credit Hours: </label>
+                <span style="display: table-cell;"><input type="number" ng-model="credit" class="form-control" /></span>
+            </div>
+            <uib-accordion close-others="true">
+                <uib-accordion-group heading="Time of Day" is-open="true">
+                  Time slots go here!
+                </uib-accordion-group>
+                <uib-accordion-group heading="Time Between Classes">
+                    
+                </uib-accordion-group>
+                <uib-accordion-group heading="Distance Between Classes" template-url="group-template.html">
+                  
+                </uib-accordion-group>
+                <uib-accordion-group heading="Reserved Time">
+
+                </uib-accordion-group>
+            </uib-accordion>
         </div>
     </div>
 </div>
