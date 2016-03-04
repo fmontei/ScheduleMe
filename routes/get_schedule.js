@@ -25,10 +25,33 @@ router.use(function(req, res, next) {
                 "left outer join class cls on cls.class_id = sect.class_id " +
                 "inner join timeslot ts on ts.timeslot_id = ss.timeslot_id " + 
                 "where sch.user_id = '" + user_id + "' and sch.semester_id = '" +
-                semester_id + "' order by ss.schedule_id asc;";
-            console.log(query);
+                semester_id + "' order by ss.schedule_id, ss.section_id, ss.timeslot_id asc;";
             db.all(query, function(err, rows) {
-                callback(null, rows);
+                var formattedRows = [];
+                for (var i = 0; rows && i < rows.length; i++) {
+                    var sectionID = rows[i]['section_id'];
+                    var previouslySeenRow = getRowBySectionID(formattedRows, 
+                        sectionID);
+                    if (previouslySeenRow === null) {
+                        var dayOfWeek = rows[i]['day_of_week'];
+                        delete rows[i]['day_of_week'];
+                        rows[i]['days_of_week'] = [];
+                        rows[i]['days_of_week'].push(dayOfWeek);
+                        formattedRows.push(rows[i]);
+                    } else {
+                        var dayOfWeek = rows[i]['day_of_week'];
+                        previouslySeenRow['days_of_week'].push(dayOfWeek);
+                    }
+                }
+                function getRowBySectionID(formattedRows, sectionID) {
+                    for (var i = 0; i < formattedRows.length; i++) {
+                        if (formattedRows[i]['section_id'] === sectionID) {
+                            return formattedRows[i];
+                        }
+                    }
+                    return null;
+                }
+                callback(null, formattedRows);
             });
         }
     ], function (err, rows) {

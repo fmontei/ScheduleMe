@@ -99,7 +99,9 @@
             </small>
             <div style="margin-bottom: 10px;">
                 <label style="display: table-cell; vertical-align: middle;">Number of Credit Hours: </label>
-                <span style="display: table-cell;"><input type="number" ng-model="credit" class="form-control" /></span>
+                <span style="display: table-cell;">
+                    <input type="number" min="0" max="21" ng-model="credit" class="form-control" />
+                </span>
             </div>
             <uib-accordion close-others="true">
                 <uib-accordion-group heading="Time of Day" is-open="true">
@@ -108,7 +110,7 @@
                 <uib-accordion-group heading="Time Between Classes">
                     
                 </uib-accordion-group>
-                <uib-accordion-group heading="Distance Between Classes" template-url="group-template.html">
+                <uib-accordion-group heading="Distance Between Classes">
                   
                 </uib-accordion-group>
                 <uib-accordion-group heading="Reserved Time">

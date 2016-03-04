@@ -1,9 +1,10 @@
 <div class="container">
     <div class="row" style="margin-top: 50px">
         <div class="col col-md-7">
-            <table class="table table-striped">
+            <table id="class-table">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Mon</th>
                         <th>Tues</th>
                         <th>Wed</th>
@@ -11,6 +12,18 @@
                         <th>Fri</th>
                     </tr>
                 </thead>
+                <tbody>
+                    <tr ng-repeat="timeSlot in timeSlots">
+                        <td>{{timeSlot.time}}</td>
+                        <td ng-repeat="weekDay in weekDays">
+                            <div ng-repeat="class in timeSlot.classes">
+                                <span ng-show="class.days_of_week.indexOf(weekDay) !== -1">
+                                    <strong>{{class.department}}<br />{{class.class_number}}</strong>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
@@ -32,11 +45,11 @@
                         <table>
                           <tbody>
                             <tr>
-                              <td><div ng-class="[{'square black': class.day_of_week === 'M'}, {'square white': class.day_of_week !== 'M'}]"></div></td>
-                              <td><div ng-class="[{'square black': class.day_of_week === 'T'}, {'square white': class.day_of_week !== 'T'}]"></div></td>
-                              <td><div ng-class="[{'square black': class.day_of_week === 'W'}, {'square white': class.day_of_week !== 'W'}]"></div></td>
-                              <td><div ng-class="[{'square black': class.day_of_week === 'R'}, {'square white': class.day_of_week !== 'R'}]"></div></td>
-                              <td><div ng-class="[{'square black': class.day_of_week === 'F'}, {'square white': class.day_of_week !== 'F'}]"></div></td>
+                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('M') !== -1}, {'square white': class.days_of_week.indexOf('M') === -1}]"></div></td>
+                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('T') !== -1}, {'square white': class.days_of_week.indexOf('T') === -1}]"></div></td>
+                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('W') !== -1}, {'square white': class.days_of_week.indexOf('W') === -1}]"></div></td>
+                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('R') !== -1}, {'square white': class.days_of_week.indexOf('R') === -1}]"></div></td>
+                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('F') !== -1}, {'square white': class.days_of_week.indexOf('F') === -1}]"></div></td>
                             </tr>
                           </tbody>
                         </table>

@@ -31,3 +31,15 @@ a.glyphicon.no-link:hover {
     border: 1px solid black;
     margin-right: 2px;
 }
+
+table#class-table {
+    width: 100%;
+}
+
+#class-table  th {
+    height: 50px;
+}
+
+#class-table  tr {
+    height: 15px;
+}
