@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row" style="margin-top: 50px">
-        <div class="col col-md-7">
+        <div class="col col-md-8">
             <table id="class-table">
                 <thead>
                     <tr>
@@ -14,12 +14,17 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="timeSlot in timeSlots">
-                        <td>{{timeSlot.time}}</td>
+                        <td><strong>{{formatTime(timeSlot.time)}}</strong></td>
                         <td ng-repeat="weekDay in weekDays">
                             <div ng-repeat="class in timeSlot.classes">
-                                <span ng-show="class.days_of_week.indexOf(weekDay) !== -1">
-                                    <strong>{{class.department}}<br />{{class.class_number}}</strong>
-                                </span>
+                                <a href="javascript:void(0)"
+                                   ng-show="class.days_of_week.indexOf(weekDay) !== -1"
+                                   open-accordion-when-clicked
+                                   accordion="#accordion-for-{{class.department}}-{{class.class_number}}">
+                                    <strong>{{class.department}} {{class.class_number}}</strong>
+                                    <br />
+                                    <small>{{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}</small>
+                                </a>
                             </div>
                         </td>
                     </tr>
@@ -27,10 +32,12 @@
             </table>
         </div>
 
-        <div class="col col-md-5">
+        <div class="col col-md-4">
             <div uib-accordion close-others="oneAtATime">
                 <div ng-repeat="class in classData"
-                     uib-accordion-group heading="{{class.department}} {{class.class_number}} {{class.name}}"
+                     id="accordion-for-{{class.department}}-{{class.class_number}}"
+                     uib-accordion-group 
+                     heading="{{class.department}} {{class.class_number}} {{class.name}}"
                      is-open="status.isFirstOpen"
                      is-disabled="status.isFirstDisabled">
                   <div class="row">
@@ -40,7 +47,7 @@
                       <p><label>Location:</label><br />{{class.location}}</p>
                     </div>
                     <div class="col col-md-6">
-                      <p><label>{{class.start_time}} - {{class.end_time}}</label></p>
+                      <p><label>{{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}</label></p>
                       <p>
                         <table>
                           <tbody>

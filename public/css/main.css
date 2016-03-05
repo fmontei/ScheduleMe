@@ -34,10 +34,11 @@ a.glyphicon.no-link:hover {
 
 table#class-table {
     width: 100%;
+    table-layout: fixed;
 }
 
-#class-table  th {
-    height: 50px;
+#class-table  th, td {
+    overflow: hidden;
 }
 
 #class-table  tr {

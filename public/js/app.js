@@ -66,7 +66,6 @@ scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
     var classHttpService = {};
 
     classHttpService.getAllClasses = function(semesterID) {
-        console.log(semesterID);
         var deferred = $q.defer();
 
         $http({
@@ -140,5 +139,24 @@ scheduleMeApp.directive('closeModal', function() {
         }
     };
 });
+
+scheduleMeApp.directive('openAccordionWhenClicked', function() {
+    return {
+        restrict: 'AE',
+        scope: {
+            accordion: '@accordion'
+        },
+        link: function(scope, element, attrs) {
+            element.click(function() {
+                $('div[uib-accordion-group]').each(function() {
+                    $(this).removeClass('panel-primary');
+                });
+                $(scope.accordion).addClass('panel-primary');
+            });
+        }
+    };
+});
+
+
 
 

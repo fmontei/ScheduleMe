@@ -18,7 +18,6 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
         }
         
         function getClassesWhenReady() {
-            console.log(JSON.stringify(selectedSemester));
             classHttpService.getAllClasses(selectedSemester['semester_id']).then(
                 function(allClasses) {
                 localStorage.set('allClasses', allClasses);

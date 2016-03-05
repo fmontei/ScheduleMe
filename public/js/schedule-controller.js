@@ -10,12 +10,12 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
 
         $scope.getTimeSlots = function(classData) {
             var timeSlots = [];
-            for (var i = 8; i < 20; i++) {
+            for (var i = 8; i <= 19; i++) {
                 var hours = i.toString();
                 if (i < 10) {
                     hours = '0' + i;
                 }
-                for (var j = 0; j <= 45; j += 15) {
+                for (var j = 0; j <= 30; j += 30) {
                     var minutes = j.toString();
                     if (j < 10) {
                         minutes = '0' + j;
@@ -49,6 +49,17 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
         };
 
         $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
+
+        $scope.formatTime = function(time) {
+            var hours = parseInt(time.substring(0, time.indexOf(':'))),
+                mins = time.substring(time.indexOf(':') + 1),
+                meridian = 'am';
+            if (hours > 12) {
+                hours -= 12;
+                meridian = 'pm';
+            }
+            return hours + ':' + mins + ' ' + meridian;
+        };
 
         $scope.$watch(function() {
             return localStorage.get('classData');
