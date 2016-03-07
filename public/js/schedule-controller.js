@@ -3,13 +3,9 @@ var scheduleMeApp = angular.module('ScheduleMeApp');
 scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
     'LocalStorage', 'ScheduleHttpService', function($rootScope, $scope, $http,
         localStorage, scheduleHttpService) {
-        scheduleHttpService.getScheduleForUser(1).then(function(classData) {
-            localStorage.set('classData', classData);
-            $scope.timeSlots = $scope.getTimeSlots(classData);
-        });
-
-        $scope.getTimeSlots = function(classData) {
-            var timeSlots = [];
+        $scope.getTimeSlots = function() {
+            var classData = localStorage.get('classData'),
+                timeSlots = [];
             for (var i = 8; i <= 19; i++) {
                 var hours = i.toString();
                 if (i < 10) {
@@ -48,8 +44,6 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
             return timeSlots;
         };
 
-        $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
-
         $scope.formatTime = function(time) {
             var hours = parseInt(time.substring(0, time.indexOf(':'))),
                 mins = time.substring(time.indexOf(':') + 1),
@@ -60,6 +54,9 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
             }
             return hours + ':' + mins + ' ' + meridian;
         };
+
+        $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
+        $scope.timeSlots = $scope.getTimeSlots();
 
         $scope.$watch(function() {
             return localStorage.get('classData');

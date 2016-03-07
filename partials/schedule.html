@@ -13,18 +13,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="timeSlot in timeSlots">
+                    <tr class="class-table-cell"
+                        ng-repeat="timeSlot in timeSlots">
                         <td><strong>{{formatTime(timeSlot.time)}}</strong></td>
                         <td ng-repeat="weekDay in weekDays">
-                            <div ng-repeat="class in timeSlot.classes">
-                                <a href="javascript:void(0)"
-                                   ng-show="class.days_of_week.indexOf(weekDay) !== -1"
-                                   open-accordion-when-clicked
-                                   accordion="#accordion-for-{{class.department}}-{{class.class_number}}">
-                                    <strong>{{class.department}} {{class.class_number}}</strong>
-                                    <br />
-                                    <small>{{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}</small>
-                                </a>
+                            <div class="panel panel-default"
+                                 ng-repeat="class in timeSlot.classes"
+                                 ng-show="class.days_of_week.indexOf(weekDay) !== -1">
+                                <div class="panel-body">
+                                    <a href="javascript:void(0)"
+                                       data-target="#accordion-for-{{class.department}}-{{class.class_number}}">
+                                        <strong>{{class.department}} {{class.class_number}}</strong>
+                                        <br />
+                                        <small>
+                                            {{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}
+                                        </small>
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -33,39 +38,97 @@
         </div>
 
         <div class="col col-md-4">
-            <div uib-accordion close-others="oneAtATime">
-                <div ng-repeat="class in classData"
+            <div class="panel-group">
+                <div class="panel panel-default class-accordion"
                      id="accordion-for-{{class.department}}-{{class.class_number}}"
-                     uib-accordion-group 
-                     heading="{{class.department}} {{class.class_number}} {{class.name}}"
-                     is-open="status.isFirstOpen"
-                     is-disabled="status.isFirstDisabled">
-                  <div class="row">
-                    <div class="col col-md-6">
-                      <p><label>CRN:</label><br />{{class.crn}}</p>
-                      <p><label>Professor:</label><br />{{class.professor}}</p>
-                      <p><label>Location:</label><br />{{class.location}}</p>
+                     ng-repeat="class in classData">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" 
+                               href="javascript:void(0)">
+                                {{class.department}} {{class.class_number}} {{class.name}}
+                            </a>
+                        </h4>
                     </div>
-                    <div class="col col-md-6">
-                      <p><label>{{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}</label></p>
-                      <p>
-                        <table>
-                          <tbody>
-                            <tr>
-                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('M') !== -1}, {'square white': class.days_of_week.indexOf('M') === -1}]"></div></td>
-                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('T') !== -1}, {'square white': class.days_of_week.indexOf('T') === -1}]"></div></td>
-                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('W') !== -1}, {'square white': class.days_of_week.indexOf('W') === -1}]"></div></td>
-                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('R') !== -1}, {'square white': class.days_of_week.indexOf('R') === -1}]"></div></td>
-                              <td><div ng-class="[{'square black': class.days_of_week.indexOf('F') !== -1}, {'square white': class.days_of_week.indexOf('F') === -1}]"></div></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </p>
-                      <p><label>Remaining:</label><br />{{class.seat_remaining}} ({{class.seat_actual}} / {{class.seat_capacity}})</p>
+                    <div class="panel-collapse collapse">
+                        <div class="panel-body">
+                        <div class="row">
+                            <div class="col col-md-6">
+                                <p><small><label>CRN:</label> {{class.crn}}</small></p>
+                                <p><small><label>Professor:</label> {{class.professor}}</small></p>
+                                <p><small><label>Location:</label> {{class.location}}</small></p>
+                            </div>
+                            <div class="col col-md-6">
+                                <small>
+                                    <label>{{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}</label>
+                                </small>
+                                <p>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td ng-repeat="weekDay in weekDays">
+                                                <div ng-class="[
+                                                        {'square black': 
+                                                            class.days_of_week.indexOf('{{weekDay}}') !== -1}, 
+                                                        {'square white': 
+                                                            class.days_of_week.indexOf('{{weekDay}}') === -1}]">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                                <p>
+                                    <small>
+                                        <label>Remaining:</label>
+                                        {{class.seat_remaining}} ({{class.seat_actual}} / {{class.seat_capacity}})
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                </div uib-accordion-group>
-            </div uib-accordion>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).on("click", ".class-table-cell a", function() {
+        $('.class-table-cell a').each(function() {
+            var target = $(this).attr('data-target').trim(),
+            body = $(target).find('.panel-collapse');
+            if (body.hasClass('in')) {
+                $(target).removeClass('panel-primary');
+                body.removeClass('in');
+            } 
+        });
+        var target = $(this).attr('data-target').trim(),
+            body = $(target).find('.panel-collapse');
+        if (body.hasClass('in')) {
+            $(target).removeClass('panel-primary');
+            body.removeClass('in');
+        } else {
+            $(target).addClass('panel-primary');
+            body.addClass('in');
+        }
+    }).on("click", ".class-accordion a", function() {
+        $('.class-accordion a').each(function() {
+            var panel = $(this).closest('.class-accordion'),
+            panelBody = panel.find('.panel-collapse');
+            if (panel.hasClass('panel-primary')) {
+                panel.removeClass('panel-primary');
+                panelBody.removeClass('in');
+            }
+        });
+        var panel = $(this).closest('.class-accordion'),
+            panelBody = panel.find('.panel-collapse');
+        if (panel.hasClass('panel-primary')) {
+            panel.removeClass('panel-primary');
+            panelBody.removeClass('in');
+        } else {
+            panel.addClass('panel-primary');
+            panelBody.addClass('in');
+        }
+    });
+</script>

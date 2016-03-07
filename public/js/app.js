@@ -5,7 +5,10 @@ var scheduleMeApp = angular.module('ScheduleMeApp', [
 ]);
 
 scheduleMeApp.config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/workspace', {
+    $routeProvider.when('/', {
+        templateUrl: 'partials/load-data.html',
+        controller: 'LoadDataController'
+    }).when('/workspace', {
         templateUrl: 'partials/workspace.html',
         controller: 'WorkspaceController'
     }).when('/schedule', {
@@ -14,7 +17,7 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     }).when('/courseoff', {
         templateUrl: 'partials/courseoff.html'
     }).otherwise({
-       redirectTo: '/workspace'
+       redirectTo: '/'
     });
 }]);
 
@@ -119,6 +122,75 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
     return scheduleHttpService;
 }]);
 
+scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpService', 
+    'SemesterHttpService', 'ScheduleHttpService', function($q, localStorage,
+    classHttpService, semesterHttpService, scheduleHttpService) {
+    var serverDataService = {};
+
+    serverDataService.getAllSemesters = function() {
+        var deferred = $q.defer();
+        semesterHttpService.getAllSemesters().then(function(allSemesters) {
+            localStorage.set('allSemesters', allSemesters);
+            deferred.resolve();
+        });
+        return deferred.promise;
+    };
+
+    serverDataService.getClassesForSelectedSemester = function() {
+        var deferred = $q.defer();
+        var selectedSemester = localStorage.get('selectedSemester');
+        if (!selectedSemester) {
+            semesterHttpService.getLatestSemester().then(function(latestSemester) {
+                selectedSemester = latestSemester;
+                localStorage.set('selectedSemester', selectedSemester);
+                getClassesWhenReady();
+                deferred.resolve();
+            });
+        } else {
+            getClassesWhenReady();
+            deferred.resolve();
+        }
+        
+        function getClassesWhenReady() {
+            classHttpService.getAllClasses(selectedSemester['semester_id']).then(
+                function(allClasses) {
+                localStorage.set('allClasses', allClasses);
+                localStorage.set(
+                    'allDepartments', 
+                    classHttpService.getDepartments(allClasses)
+                );
+            });
+        };
+
+        return deferred.promise;
+    };
+
+    serverDataService.getScheduleForUser = function(userID) {
+        var deferred = $q.defer();
+        scheduleHttpService.getScheduleForUser(userID).then(function(classData) {
+            localStorage.set('classData', classData);
+            deferred.resolve();
+        });
+        return deferred.promise;
+    };
+
+    serverDataService.getServerData = function() {
+        var deferred = $q.defer();
+
+        serverDataService.getAllSemesters().then(function() {
+            return serverDataService.getClassesForSelectedSemester();
+        }).then(function() {
+            return serverDataService.getScheduleForUser(1);
+        }).then(function() {
+            deferred.resolve();
+        });
+
+        return deferred.promise;
+    };
+
+    return serverDataService;
+}]);
+
 // Directives
 scheduleMeApp.directive('closeModal', function() {
     return {
@@ -140,7 +212,7 @@ scheduleMeApp.directive('closeModal', function() {
     };
 });
 
-scheduleMeApp.directive('openAccordionWhenClicked', function() {
+scheduleMeApp.directive('toggleAccordionWhenClicked', function() {
     return {
         restrict: 'AE',
         scope: {
@@ -148,9 +220,11 @@ scheduleMeApp.directive('openAccordionWhenClicked', function() {
         },
         link: function(scope, element, attrs) {
             element.click(function() {
-                $('div[uib-accordion-group]').each(function() {
+                $('.schedule-accordion').each(function() {
                     $(this).removeClass('panel-primary');
+                    $(this).find('.panel-collapse').removeClass('in');
                 });
+                $(scope.accordion).find('.panel-collapse').addClass('in');
                 $(scope.accordion).addClass('panel-primary');
             });
         }
