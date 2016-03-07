@@ -11,7 +11,7 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
                 if (i < 10) {
                     hours = '0' + i;
                 }
-                for (var j = 0; j <= 30; j += 30) {
+                for (var j = 0; j < 60; j += 60) {
                     var minutes = j.toString();
                     if (j < 10) {
                         minutes = '0' + j;
@@ -27,16 +27,31 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
             for (var i = 0; i < timeSlots.length; i++) {
                 for (var j = 0; j < classData.length; j++) {
                     var classStartTime = classData[j]['start_time'];
+                    var classEndTime = classData[j]['end_time']
                     var delimStartTime = classStartTime.indexOf(':');
+                    var delimEndTime = classEndTime.indexOf(':');
                     var classStartHours = parseInt(
                         classStartTime.substring(0, delimStartTime)
+                    );
+                    var classEndHours = parseInt(
+                        classEndTime.substring(0, delimEndTime)
                     );
                     var classStartMins = parseInt(
                         classStartTime.substring(delimStartTime + 1)
                     );
-                    var roundedStartMins = classStartMins - (classStartMins % 15);
+                    var classEndMins = parseInt(
+                        classEndTime.substring(delimEndTime + 1)
+                    );
+                    var roundedStartMins = classStartMins - (classStartMins % 60);
+                    var roundedEndMins = classEndMins - (classEndMins % 60);
                     if (classStartHours === timeSlots[i]['hours'] && 
                         roundedStartMins === timeSlots[i]['minutes']) {
+                        timeSlots[i].classes.push(classData[j]);
+                    } 
+                    if (i > 0 && 
+                        timeSlots[i - 1].classes.indexOf(classData[j]) !== -1 &&
+                        timeSlots[i]['hours'] <= classEndHours &&
+                        timeSlots[i]['minutes'] <= roundedEndMins) {
                         timeSlots[i].classes.push(classData[j]);
                     }
                 }

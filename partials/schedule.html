@@ -16,21 +16,19 @@
                     <tr class="class-table-cell"
                         ng-repeat="timeSlot in timeSlots">
                         <td><strong>{{formatTime(timeSlot.time)}}</strong></td>
-                        <td ng-repeat="weekDay in weekDays">
-                            <div class="panel panel-default"
-                                 ng-repeat="class in timeSlot.classes"
-                                 ng-show="class.days_of_week.indexOf(weekDay) !== -1">
-                                <div class="panel-body">
-                                    <a href="javascript:void(0)"
-                                       data-target="#accordion-for-{{class.department}}-{{class.class_number}}">
-                                        <strong>{{class.department}} {{class.class_number}}</strong>
-                                        <br />
-                                        <small>
-                                            {{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}
-                                        </small>
-                                    </a>
-                                </div>
-                            </div>
+                        <td ng-repeat="weekDay in weekDays" >
+                            <a href="javascript:void(0)"
+                               class="btn btn-sm btn-default"
+                               type="button"
+                               data-target="#accordion-for-{{class.department}}-{{class.class_number}}"
+                               ng-repeat="class in timeSlot.classes"
+                               ng-show="class.days_of_week.indexOf(weekDay) !== -1">
+                                <strong>{{class.department}} {{class.class_number}}</strong>
+                                <br />
+                                <small>
+                                    {{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}
+                                </small>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
