@@ -30,27 +30,21 @@ module.exports = function(grunt) {
                         },
                         jquery: {
                             files: [ 'dist/jquery.js' ]
+                        },
+                        'bootstrap-select': {
+                            files: [
+                                'dist/css/bootstrap-select.css',
+                                'dist/css/bootstrap-select.css.map',
+                                'dist/js/bootstrap-select.js',
+                            ]
                         }
                     }
                 }
-            }
-        },
-        copy: {
-            main: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: 'public/lib/bootstrap/',
-                        src: ['*.eot', '*.svg', '*.ttf', '*.woff', '*.woff2'],
-                        dest: 'public/lib/fonts/',
-                    }
-                ]
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-bower');
-    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('default', [ 'bower', 'copy' ]);
+    grunt.registerTask('default', [ 'bower' ]);
 }

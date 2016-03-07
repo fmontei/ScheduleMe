@@ -142,7 +142,31 @@
                     </form>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Reserved Time">
-                    <!-- TO DO -->
+                    <div>No classes on:</div>
+                    <div ng-repeat="timeslot in timeslots">
+                        <select ng-model="timeslot.day">
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                        </select>
+                        <select ng-model="timeslot.type">
+                            <option value="allday">All Day</option>
+                            <option value="range">In Range</option>
+                        </select>
+                        <span ng-show="timeslot.type == 'range'">
+                            <input type="text" style="width:80px"/>
+                            to
+                            <input type="text" style="width:80px"/>
+                        </span>
+                    </div>
+                    <button type="button"
+                        class="btn btn-default"
+                        aria-label="Add Timeslot"
+                        ng-click="addTimeslot()">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Time Slot
+                    </button>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Average GPA">
                     Only select sections with professors with prior GPAs greater than:

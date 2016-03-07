@@ -19,6 +19,17 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
         }
     };
 
+    $scope.credit = 15;
+
+    $scope.timeslots = [];
+
+    $scope.addTimeslot = function() {
+        $scope.timeslots.push({
+            day: 'monday',
+            type: 'allday'
+        });
+    };
+
     $scope.getClassesForSelectedSemester = function() {
         var selectedSemester = localStorage.get('selectedSemester');
         if (!selectedSemester) {
