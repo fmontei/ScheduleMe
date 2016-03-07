@@ -4,7 +4,9 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
     'LocalStorage', 'ClassHttpService', 'SemesterHttpService',
     function($rootScope, $scope, $http, localStorage, classHttpService,
         semesterHttpService) {
-
+    // FOR SOME REASON THIS IS BEING CAUGHT AS A DATE
+    // $scope.earliestTime = "08:00";
+    // $scope.latestTime = "20:00";
     $scope.getClassesForSelectedSemester = function() {
         var selectedSemester = localStorage.get('selectedSemester');
         if (!selectedSemester) {
