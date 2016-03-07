@@ -1,7 +1,8 @@
 var scheduleMeApp = angular.module('ScheduleMeApp', [
     'ngRoute',
     'ui.bootstrap',
-    'LocalStorageModule'
+    'LocalStorageModule',
+    'rzModule'
 ]);
 
 scheduleMeApp.config(['$routeProvider', function($routeProvider) {

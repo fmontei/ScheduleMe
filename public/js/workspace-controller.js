@@ -7,6 +7,18 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
     // FOR SOME REASON THIS IS BEING CAUGHT AS A DATE
     // $scope.earliestTime = "08:00";
     // $scope.latestTime = "20:00";
+
+    $scope.gpaSlider = {
+        value: 3.0,
+        options: {
+            floor: 1.0,
+            ceil: 4.0,
+            step: 0.1,
+            precision: 1,
+            showSelectionBarEnd: true
+        }
+    };
+
     $scope.getClassesForSelectedSemester = function() {
         var selectedSemester = localStorage.get('selectedSemester');
         if (!selectedSemester) {
