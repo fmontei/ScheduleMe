@@ -9,6 +9,7 @@ module.exports = function(grunt) {
                     keepExpandedHierarchy: false,
                     packageSpecific: {
                         bootstrap: {
+                            expand: false,
                             files: [
                                 'dist/css/bootstrap.css',
                                 'dist/css/bootstrap.css.map',
@@ -21,31 +22,29 @@ module.exports = function(grunt) {
                                 'dist/fonts/glyphicons-halflings-regular.ttf',
                                 'dist/fonts/glyphicons-halflings-regular.woff',
                                 'dist/fonts/glyphicons-halflings-regular.woff2',
-                            ]
+                            ],
+                            fonts_dest: 'public/lib/bootstrap/fonts',
+                            css_dest: 'public/lib/bootstrap/css',
+                            map_dest: 'public/lib/bootstrap/css',
+                            js_dest: 'public/lib/bootstrap/js',
                         },
                         jquery: {
                             files: [ 'dist/jquery.js' ]
+                        },
+                        'bootstrap-select': {
+                            files: [
+                                'dist/css/bootstrap-select.css',
+                                'dist/css/bootstrap-select.css.map',
+                                'dist/js/bootstrap-select.js',
+                            ]
                         }
                     }
                 }
-            }
-        },
-        copy: {
-            main: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: 'public/lib/bootstrap/',
-                        src: ['*.eot', '*.svg', '*.ttf', '*.woff', '*.woff2'],
-                        dest: 'public/lib/fonts/',
-                    }
-                ]
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-bower');
-    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('default', [ 'bower', 'copy' ]);
+    grunt.registerTask('default', [ 'bower' ]);
 }

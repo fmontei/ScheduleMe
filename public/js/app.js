@@ -1,7 +1,8 @@
 var scheduleMeApp = angular.module('ScheduleMeApp', [
     'ngRoute',
     'ui.bootstrap',
-    'LocalStorageModule'
+    'LocalStorageModule',
+    'rzModule'
 ]);
 
 scheduleMeApp.config(['$routeProvider', function($routeProvider) {
@@ -207,25 +208,6 @@ scheduleMeApp.directive('closeModal', function() {
                 }
                 $(scope.modalToClose).modal('hide');
                 scope.$apply();
-            });
-        }
-    };
-});
-
-scheduleMeApp.directive('toggleAccordionWhenClicked', function() {
-    return {
-        restrict: 'AE',
-        scope: {
-            accordion: '@accordion'
-        },
-        link: function(scope, element, attrs) {
-            element.click(function() {
-                $('.schedule-accordion').each(function() {
-                    $(this).removeClass('panel-primary');
-                    $(this).find('.panel-collapse').removeClass('in');
-                });
-                $(scope.accordion).find('.panel-collapse').addClass('in');
-                $(scope.accordion).addClass('panel-primary');
             });
         }
     };

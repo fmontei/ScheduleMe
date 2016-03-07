@@ -100,21 +100,79 @@
             <div style="margin-bottom: 10px;">
                 <label style="display: table-cell; vertical-align: middle;">Number of Credit Hours: </label>
                 <span style="display: table-cell;">
-                    <input type="number" min="0" max="21" ng-model="credit" class="form-control" />
+                    <input style="margin-left: 10px;" type="number" min="0" max="21" ng-model="credit" class="form-control" />
                 </span>
             </div>
             <uib-accordion close-others="true">
                 <uib-accordion-group heading="Time of Day" is-open="true">
-                  Time slots go here!
+                <div style="margin-bottom: 10px; margin-right: 50px; float: left;">
+                    <label>Earliest Class: </label><p>(start time)</p>
+                    <form name="test">
+                        <input type="time" ng-model="earliestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
+                    </form>
+                </div>
+                <div>
+                    <label>Latest Class: </label><p>(start time)</p>
+                    <form name="test2">
+                        <input type="time" ng-model="latestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
+                    </form>
+                </div>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Time Between Classes">
-                    
+                    <form name="betweenClass">
+                        <label style="margin-right: 10px;">Time (hrs):</label>
+                        <select name="between" ng-model="betweenDistance">
+                          <option>1</option>
+                          <option>1.5</option>
+                          <option>2</option>
+                          <option>2.5</option>
+                          <option>3</option>
+                        </select>
+                    </form>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Distance Between Classes">
-                  
+                    <form name="distance">
+                        <label style="margin-right: 10px;">Walking Distance (mins):</label>
+                        <select name="distance" ng-model="walkingDistance">
+                          <option>5</option>
+                          <option>10</option>
+                          <option>15</option>
+                          <option>20</option>
+                      </select>
+                    </form>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Reserved Time">
-
+                    <div>No classes on:</div>
+                    <div ng-repeat="timeslot in timeslots">
+                        <select ng-model="timeslot.day">
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                        </select>
+                        <select ng-model="timeslot.type">
+                            <option value="allday">All Day</option>
+                            <option value="range">In Range</option>
+                        </select>
+                        <span ng-show="timeslot.type == 'range'">
+                            <input type="text" style="width:80px"/>
+                            to
+                            <input type="text" style="width:80px"/>
+                        </span>
+                    </div>
+                    <button type="button"
+                        class="btn btn-default"
+                        aria-label="Add Timeslot"
+                        ng-click="addTimeslot()">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Time Slot
+                    </button>
+                </uib-accordion-group>
+                <uib-accordion-group heading="Average GPA">
+                    Only select sections with professors with prior GPAs greater than:
+                    <rzslider
+                        rz-slider-model="gpaSlider.value"
+                        rz-slider-options="gpaSlider.options"></rzslider>
                 </uib-accordion-group>
             </uib-accordion>
         </div>
