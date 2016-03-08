@@ -42,7 +42,7 @@
                      ng-repeat="class in classData">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" 
+                            <a data-toggle="collapse"
                                href="javascript:void(0)">
                                 {{class.department}} {{class.class_number}} {{class.name}}
                             </a>
@@ -52,9 +52,9 @@
                         <div class="panel-body">
                         <div class="row">
                             <div class="col col-md-6">
+                                <p><small><label>Section:</label> {{class.section_name}}</small></p>
                                 <p><small><label>CRN:</label> {{class.crn}}</small></p>
-                                <p><small><label>Professor:</label> {{class.professor}}</small></p>
-                                <p><small><label>Location:</label> {{class.location}}</small></p>
+                                <p><small><label>Prof:</label> {{class.professor}}</small></p>
                             </div>
                             <div class="col col-md-6">
                                 <small>
@@ -66,9 +66,9 @@
                                         <tr>
                                             <td ng-repeat="weekDay in weekDays">
                                                 <div ng-class="[
-                                                        {'square black': 
-                                                            class.days_of_week.indexOf('{{weekDay}}') !== -1}, 
-                                                        {'square white': 
+                                                        {'square black':
+                                                            class.days_of_week.indexOf('{{weekDay}}') !== -1},
+                                                        {'square white':
                                                             class.days_of_week.indexOf('{{weekDay}}') === -1}]">
                                                 </div>
                                             </td>
@@ -82,6 +82,7 @@
                                         {{class.seat_remaining}} ({{class.seat_actual}} / {{class.seat_capacity}})
                                     </small>
                                 </p>
+                                <p><small><label>Loc:</label> {{class.location}}</small></p>
                             </div>
                         </div>
                     </div>
@@ -99,7 +100,7 @@
             if (body.hasClass('in')) {
                 $(target).removeClass('panel-primary');
                 body.removeClass('in');
-            } 
+            }
         });
         var target = $(this).attr('data-target').trim(),
             body = $(target).find('.panel-collapse');

@@ -34,6 +34,7 @@ router.use(function(req, res, next) {
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
+            "name VARCHAR(5)," +
             "professor VARCHAR(255)," +
             "seat_capacity INTEGER," +
             "seat_actual INTEGER," +
@@ -206,16 +207,16 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
     function saveSections(finalSections) {
         var deferred = Q.defer();
-        var query = db.prepare("INSERT INTO section(crn, professor, class_id, " +
-            "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?);");
+        var query = db.prepare("INSERT INTO section(crn, professor, name, class_id, " +
+            "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?, ?);");
         deferredCount = finalSections.length;
 
         for (var i = 0; i < finalSections.length; i++) {
             var section = finalSections[i];
             query.run([
-                section['crn'], section['professor'], section['class_id'],
-                section['seat_capacity'], section['seat_actual'],
-                section['seat_remaining']
+                section['crn'], section['professor'], section['name'],
+                section['class_id'], section['seat_capacity'],
+                section['seat_actual'], section['seat_remaining']
             ], function(error) {
                 deferredCount -= 1;
             });
@@ -545,6 +546,7 @@ function getCourseSectionsForCourse(term, course) {
             var sectionFinal = {};
             sectionFinal['credits'] = section['credits'];
             sectionFinal['crn'] = section['call_number'];
+            sectionFinal['name'] = section['ident'];
             sectionFinal['professor'] = (section['instructor']) ?
                 section['instructor']['lname'].trim() + ', ' +
                 section['instructor']['fname'].trim() : null;

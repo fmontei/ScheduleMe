@@ -4,7 +4,7 @@
             <h3>
                 <u>Classes</u>
                 <small>
-                    <a href="javascript:void(0)" 
+                    <a href="javascript:void(0)"
                        class="glyphicon glyphicon-info-sign"
                        ng-click="showInfo = !showInfo">
                    </a>
@@ -88,7 +88,7 @@
             <h3>
                 <u>Criteria</u>
                 <small>
-                <a href="javascript:void(0)" 
+                <a href="javascript:void(0)"
                    class="glyphicon glyphicon-info-sign"
                    ng-click="showInfo2 = !showInfo2">
                 </a>
@@ -216,8 +216,49 @@
                             <select class="form-control"
                                     ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
                                     ng-model="modalData.selectedClass"
-                                    ng-change="updateSelectedClass()">
+                                    ng-change="updateSelectedClass(); filterSectionsByClass()">
                             </select>
+                        </div>
+                    </div> <!--./row-->
+
+                    <br />
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <label><u>Section</u></label>
+                        </div>
+                        <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
+                            <div class="btn-group"
+                                 role="group"
+                                 ng-show="modalData.filteredSections.length > 0">
+                                <button class="btn btn-sm"
+                                        ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
+                                            {'btn-default': modalData.sectionType === 'Specific'}]"
+                                        ng-click="modalData.sectionType = 'Any'">Any</button>
+                                <button class="btn btn-sm"
+                                        ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
+                                            {'btn-default': modalData.sectionType === 'Any'}]"
+                                        ng-click="modalData.sectionType = 'Specific'">Specific</button>
+                            </div>
+                            <div class="list-group"
+                                 style="margin-top: 2px"
+                                 ng-show="modalData.sectionType === 'Specific'">
+                              <a href="javascript:void(0)" class="list-group-item"
+                                 ng-repeat="section in modalData.filteredSections"
+                                 ng-class="{'active': modalData.selectedSection === section}"
+                                 ng-click="modalData.selectedSection = section">
+                                <small class="list-group-item-heading">
+                                    <div><label>Section</label> {{section.name}}</div>
+                                </small>
+                                <small class="list-group-item-text">
+                                    <div><label>CRN</label> {{section.crn}}</div>
+                                    <div><label>Professor</label> {{section.professor}}</div>
+                                    <div ng-repeat="ts in section.timeslots">
+                                        <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
+                                    </div>
+                                    <div><label>Capacity</label> {{section.seat_remaining}}</div>
+                                </small>
+                              </a>
+                            </div>
                         </div>
                     </div> <!--./row-->
                 </div>
@@ -230,7 +271,8 @@
                     </button>
                     <button type="button"
                             class="btn btn-primary"
-                            ng-disabled="!modalData.selectedDept || !modalData.selectedClass"
+                            ng-disabled="!modalData.selectedDept || !modalData.selectedClass ||
+                                (modalData.sectionType === 'Specific' && !modalData.selectedSection)"
                             close-modal modal-to-close="#class-modal" function-to-call="selectClass()">
                         Add Class
                     </button>
@@ -276,8 +318,46 @@
                             <select class="form-control"
                                     ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
                                     ng-model="modalData.selectedClass"
-                                    ng-change="updateSelectedGroupClasses()">
+                                    ng-change="filterSectionsByClass()">
                             </select>
+                        </div>
+                    </div> <!--./row-->
+
+                    <br />
+                    <div class="row">
+                        <div class="col col-md-4">
+                            <label><u>Section</u></label>
+                        </div>
+                        <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
+                            <div class="btn-group"
+                                 role="group"
+                                 ng-show="modalData.filteredSections.length > 0">
+                                <button class="btn btn-sm"
+                                        ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
+                                            {'btn-default': modalData.sectionType === 'Specific'}]"
+                                        ng-click="modalData.sectionType = 'Any'">Any</button>
+                                <button class="btn btn-sm"
+                                        ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
+                                            {'btn-default': modalData.sectionType === 'Any'}]"
+                                        ng-click="modalData.sectionType = 'Specific'">Specific</button>
+                            </div>
+                            <div class="list-group" ng-show="modalData.sectionType === 'Specific'">
+                              <a href="javascript:void(0)" class="list-group-item"
+                                 ng-repeat="section in modalData.filteredSections"
+                                 ng-click="modalData.selectedSection = section">
+                                <small class="list-group-item-heading">
+                                    <div><label>Section</label> {{section.name}}</div>
+                                </small>
+                                <small class="list-group-item-text">
+                                    <div><label>CRN</label> {{section.crn}}</div>
+                                    <div><label>Professor</label> {{section.professor}}</div>
+                                    <div ng-repeat="ts in section.timeslots">
+                                        <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
+                                    </div>
+                                    <div><label>Capacity</label> {{section.seat_remaining}}</div>
+                                </small>
+                              </a>
+                            </div>
                         </div>
                     </div> <!--./row-->
 

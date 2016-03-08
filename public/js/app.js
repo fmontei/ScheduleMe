@@ -26,8 +26,26 @@ scheduleMeApp.run(function($rootScope, $location) {
     $rootScope.location = $location;
 });
 
-
 // Factories
+scheduleMeApp.factory('LocalStorage', ['localStorageService',
+    function(localStorageService) {
+    var myLocalStorage = {};
+
+    myLocalStorage.get = function(key) {
+        return localStorageService.get(key);
+    };
+
+    myLocalStorage.set = function(key, val) {
+        return localStorageService.set(key, val);
+    };
+
+    myLocalStorage.clearAll = function() {
+        localStorageService.clearAll();
+    };
+
+    return myLocalStorage;
+}]);
+
 scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q) {
     var semesterHttpService = {};
 
@@ -123,7 +141,30 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
     return scheduleHttpService;
 }]);
 
-scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpService', 
+scheduleMeApp.factory('SectionHttpService', ['$http', '$q', 'LocalStorage',
+     function($http, $q, localStorage) {
+    var sectionHttpService = {};
+
+    sectionHttpService.getSectionsForClass = function(classID) {
+        var deferred = $q.defer();
+
+        $http({
+            method: 'GET',
+            url: '/sections/' + classID
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback() {
+            console.log('Error: selection class has no sections.');
+            deferred.resolve(null);
+        });
+
+        return deferred.promise;
+    };
+
+    return sectionHttpService;
+}]);
+
+scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpService',
     'SemesterHttpService', 'ScheduleHttpService', function($q, localStorage,
     classHttpService, semesterHttpService, scheduleHttpService) {
     var serverDataService = {};
@@ -151,13 +192,13 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
             getClassesWhenReady();
             deferred.resolve();
         }
-        
+
         function getClassesWhenReady() {
             classHttpService.getAllClasses(selectedSemester['semester_id']).then(
                 function(allClasses) {
                 localStorage.set('allClasses', allClasses);
                 localStorage.set(
-                    'allDepartments', 
+                    'allDepartments',
                     classHttpService.getDepartments(allClasses)
                 );
             });

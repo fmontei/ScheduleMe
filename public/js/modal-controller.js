@@ -1,7 +1,8 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
 scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStorage',
-    function($rootScope, $scope, localStorage) {
+    'SectionHttpService', function($rootScope, $scope, localStorage,
+    sectionHttpService) {
 
     $scope.filterClassesByDept = function() {
         var filteredClasses = [];
@@ -14,11 +15,31 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.modalData.filteredClasses = filteredClasses;
     };
 
+    $scope.filterSectionsByClass = function() {
+        if (!$scope.modalData.selectedClass) {
+            return;
+        }
+        var classID = $scope.modalData.selectedClass.class_id;
+        sectionHttpService.getSectionsForClass(classID).then(function(sections) {
+            $scope.modalData.filteredSections = sections;
+        });
+    };
+
     $scope.selectClass = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
-        var _class = $scope.modalData.selectedClass;
+        var _class = $scope.modalData.selectedClass,
+            section = $scope.modalData.selectedSection || null;
         if (!allSelectedClasses) {
             allSelectedClasses = [];
+        }
+        if (section) {
+            for (key in section) {
+                if (_class[key]) {
+                    _class['class_' + key] = section['section_' + key];
+                } else {
+                    _class[key] = section[key];
+                }
+            }
         }
         allSelectedClasses.push(_class);
         localStorage.set('selectedClasses', allSelectedClasses);
@@ -74,7 +95,9 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             filteredClasses: [],
             selectedDept: null,
             selectedClass: null,
+            selectedSection: null,
             groupClasses: [],
+            sectionType: 'Any'
         };
     };
 
@@ -93,29 +116,9 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
     }, true);
 }]);
 
-// Local storage factory
-scheduleMeApp.factory('LocalStorage', ['localStorageService',
-    function(localStorageService) {
-    var myLocalStorage = {};
-
-    myLocalStorage.get = function(key) {
-        return localStorageService.get(key);
-    };
-
-    myLocalStorage.set = function(key, val) {
-        return localStorageService.set(key, val);
-    };
-
-    myLocalStorage.clearAll = function() {
-        localStorageService.clearAll();
-    };
-
-    return myLocalStorage;
-}]);
-
 // Helper functions
 function isClassInList(_class, list) {
-    for (var i = 0; list && i < list.length; i++) {
+    for (var i = 0; _class && list && i < list.length; i++) {
         if (list[i]['class_id'] === _class['class_id']) {
             return true;
         }

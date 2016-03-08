@@ -19,7 +19,7 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
         }
     };
 
-    $scope.credit = 15;
+    $scope.defaultTotalCredits = 15;
 
     $scope.timeslots = [];
 
@@ -40,7 +40,7 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
     };
 
     $scope.undoSelection = function(_class, listName) {
-        var list = (listName === 'selectedClasses') ? $scope.selectedClasses 
+        var list = (listName === 'selectedClasses') ? $scope.selectedClasses
             : $scope.selectedGroups;
         var index = list.indexOf(_class);
         list.splice(index, 1);
