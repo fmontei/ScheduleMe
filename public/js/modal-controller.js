@@ -90,6 +90,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
     $scope.resetModal = function() {
         $scope.modalData = {
             filteredClasses: [],
+            filteredSections: [],
             selectedDept: null,
             selectedClass: null,
             selectedSection: null,

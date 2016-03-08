@@ -37,10 +37,15 @@ table#class-table {
     table-layout: fixed;
 }
 
-#class-table  th, td {
-    overflow: hidden;
-}
-
 #class-table  tr {
     height: 15px;
+}
+
+#class-table  th, td {
+    overflow: hidden;
+    vertical-align: center;
+}
+
+#class-table a {
+    width: 100%;
 }

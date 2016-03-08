@@ -24,7 +24,7 @@ router.use(function(req, res, next) {
             "UNIQUE(year, term) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists CLASS(" +
             "class_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "name VARCHAR(255) NOT NULL," +
+            "class_name VARCHAR(255) NOT NULL," +
             "department VARCHAR(10) NOT NULL," +
             "class_number INTEGER NOT NULL," +
             "credits INTEGER," +
@@ -34,7 +34,7 @@ router.use(function(req, res, next) {
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
-            "name VARCHAR(5)," +
+            "section_name VARCHAR(5)," +
             "professor VARCHAR(255)," +
             "seat_capacity INTEGER," +
             "seat_actual INTEGER," +
@@ -164,14 +164,14 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
     function saveCourses(finalCourses) {
         var deferred = Q.defer();
-        var statement = db.prepare("INSERT INTO class(name, department, " +
+        var statement = db.prepare("INSERT INTO class(class_name, department, " +
             "class_number, credits, semester_id) VALUES(?, ?, ?, ?, ?);");
         deferredCount = finalCourses.length;
 
         for (var i = 0; i < finalCourses.length; i++) {
             var course = finalCourses[i];
             statement.run([
-                course['name'], course['major'], course['number'],
+                course['class_name'], course['major'], course['number'],
                 course['credits'], course['semester_id']
             ], function(error) {
                 deferredCount -= 1;
@@ -207,14 +207,14 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
     function saveSections(finalSections) {
         var deferred = Q.defer();
-        var query = db.prepare("INSERT INTO section(crn, professor, name, class_id, " +
+        var query = db.prepare("INSERT INTO section(crn, professor, section_name, class_id, " +
             "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?, ?);");
         deferredCount = finalSections.length;
 
         for (var i = 0; i < finalSections.length; i++) {
             var section = finalSections[i];
             query.run([
-                section['crn'], section['professor'], section['name'],
+                section['crn'], section['professor'], section['section_name'],
                 section['class_id'], section['seat_capacity'],
                 section['seat_actual'], section['seat_remaining']
             ], function(error) {
@@ -519,7 +519,7 @@ function getCoursesByTermAndMajor(term, major) {
         for (var i = 0; i < jsonResponse.length; i++) {
             var course = {};
             course['number'] = jsonResponse[i]['ident'];
-            course['name'] = jsonResponse[i]['name'];
+            course['class_name'] = jsonResponse[i]['name'];
             course['major'] = major;
             courses.push(course);
         }
@@ -546,7 +546,7 @@ function getCourseSectionsForCourse(term, course) {
             var sectionFinal = {};
             sectionFinal['credits'] = section['credits'];
             sectionFinal['crn'] = section['call_number'];
-            sectionFinal['name'] = section['ident'];
+            sectionFinal['section_name'] = section['ident'];
             sectionFinal['professor'] = (section['instructor']) ?
                 section['instructor']['lname'].trim() + ', ' +
                 section['instructor']['fname'].trim() : null;

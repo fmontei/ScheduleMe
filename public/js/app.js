@@ -254,6 +254,28 @@ scheduleMeApp.directive('closeModal', function() {
     };
 });
 
+scheduleMeApp.directive('hide', function() {
+    return {
+        restrict: 'AE',
+        scope: {
+            onCondition: '@onCondition'
+        },
+        link: function link(scope, element, attrs) {
+            if (JSON.parse(scope.onCondition) === true) {
+                element.hide();
+                element.parent().find('a:visible').each(function() {
+                    $(this).css('height', '110%');
+                });
+            } else {
+                element.parent().find('a:hidden').each(function() {
+                    element.css('height', '110%');
+                });
+            }
+        }
+    };
+});
+
+
 
 
 

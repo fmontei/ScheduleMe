@@ -22,7 +22,7 @@
                                type="button"
                                data-target="#accordion-for-{{class.department}}-{{class.class_number}}"
                                ng-repeat="class in timeSlot.classes"
-                               ng-show="class.days_of_week.indexOf(weekDay) !== -1">
+                               hide on-condition="{{class.days_of_week.indexOf(weekDay) === -1}}">
                                 <strong>{{class.department}} {{class.class_number}}</strong>
                                 <br />
                                 <small>
@@ -44,7 +44,7 @@
                         <h4 class="panel-title">
                             <a data-toggle="collapse"
                                href="javascript:void(0)">
-                                {{class.department}} {{class.class_number}} {{class.name}}
+                                {{class.department}} {{class.class_number}} {{class.class_name}}
                             </a>
                         </h4>
                     </div>

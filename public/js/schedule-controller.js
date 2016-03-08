@@ -6,7 +6,7 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
         $scope.getTimeSlots = function() {
             var classData = localStorage.get('classData'),
                 timeSlots = [];
-            for (var i = 8; i <= 19; i++) {
+            for (var i = 7; i <= 19; i++) {
                 var hours = i.toString();
                 if (i < 10) {
                     hours = '0' + i;
@@ -22,7 +22,7 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
                         'time': hours + ':' + minutes,
                         'classes': []
                     });
-                } 
+                }
             }
             for (var i = 0; i < timeSlots.length; i++) {
                 for (var j = 0; j < classData.length; j++) {
@@ -44,11 +44,11 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
                     );
                     var roundedStartMins = classStartMins - (classStartMins % 60);
                     var roundedEndMins = classEndMins - (classEndMins % 60);
-                    if (classStartHours === timeSlots[i]['hours'] && 
+                    if (classStartHours === timeSlots[i]['hours'] &&
                         roundedStartMins === timeSlots[i]['minutes']) {
                         timeSlots[i].classes.push(classData[j]);
-                    } 
-                    if (i > 0 && 
+                    }
+                    if (i > 0 &&
                         timeSlots[i - 1].classes.indexOf(classData[j]) !== -1 &&
                         timeSlots[i]['hours'] <= classEndHours &&
                         timeSlots[i]['minutes'] <= roundedEndMins) {

@@ -47,13 +47,13 @@ app.get('/user', function(req, res) {
 //app.use('/*', cas);
 
 app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, '/index.html')); 
+    res.sendFile(path.join(__dirname, '/index.html'));
 });
 
 // Used for sending back partial html files, which are sandwiched between the
-// index.html template 
+// index.html template
 app.get('/partials/:partial_name', function(req, res) {
-    res.sendFile(path.join(__dirname, '/partials/', req.params.partial_name)); 
+    res.sendFile(path.join(__dirname, '/partials/', req.params.partial_name));
 });
 
 // Init database
@@ -75,7 +75,7 @@ app.get('/user/:user_id/schedule/:semester_id', function(req, res, next) {
     get_schedule(req, res, next);
 });
 
-// Get latest semester 
+// Get latest semester
 app.get('/semester/latest', get_latest_semester);
 
 // Get semester by specified semester id
@@ -112,7 +112,7 @@ app.post('/user', create_user);
 app.post('/schedule', create_schedule);
 
 // Add or remove a schedule/timeslot to or from a specified schedule
-app.put('/schedule/:schedule_id', function(req, res, next) { 
+app.put('/schedule/:schedule_id', function(req, res, next) {
     req.schedule_id = req.params.schedule_id;
     update_schedule(req, res, next);
 });

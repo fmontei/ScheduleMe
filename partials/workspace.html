@@ -47,7 +47,7 @@
                             ng-click="updateClassMandatoryStatus(class)">
                         </a>
                     </small>
-                    <strong>{{class.department}} {{class.class_number}}:</strong> {{class.name}}
+                    <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
                     <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
                 </li>
                 <li class="list-group-item"
@@ -61,7 +61,7 @@
                         <span class="glyphicon glyphicon-th-large pull-right"></span>
                     </small>
                     <p ng-repeat="class in group">
-                        <strong>{{class.department}} {{class.class_number}}:</strong> {{class.name}}
+                        <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
                         <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
                     </p>
                 </li>
@@ -111,15 +111,11 @@
                 <uib-accordion-group heading="Time of Day" is-open="true">
                 <div style="margin-bottom: 10px; margin-right: 50px; float: left;">
                     <label>Earliest Class: </label><p>(start time)</p>
-                    <form name="test">
-                        <input type="time" ng-model="earliestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
-                    </form>
+                    <input type="time" ng-model="earliestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
                 </div>
                 <div>
                     <label>Latest Class: </label><p>(start time)</p>
-                    <form name="test2">
-                        <input type="time" ng-model="latestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
-                    </form>
+                    <input type="time" ng-model="latestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
                 </div>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Time Between Classes">
@@ -234,7 +230,7 @@
                             <div class="btn-group"
                                  role="group">
                                 <button class="btn btn-sm"
-                                        ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
+                                        ng-class="[{'btn-primary': modalData.sectionType === 'Any' || !modalData.sectionType},
                                             {'btn-default': modalData.sectionType === 'Specific'}]"
                                         ng-click="modalData.sectionType = 'Any';
                                             modalData.selectedSection = null;
@@ -375,7 +371,7 @@
                     <br />
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
-                            <strong>{{class.department}} {{class.class_number}}:</strong> {{class.name}}
+                            <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
                             <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
                             <small>
                                 <a href="javascript:void(0)"

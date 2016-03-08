@@ -20,8 +20,8 @@ router.use(function(req, res, next) {
         function(callback) {
             user_id = user_id.trim();
             var query = "select ss.schedule_id, ss.section_id, ss.timeslot_id, " +
-                "cls.name as class_name, cls.department, cls.class_number, cls.credits, " +
-                "sect.crn, sect.name as section_name, sect.professor, sect.seat_capacity, " +
+                "cls.class_name, cls.department, cls.class_number, cls.credits, " +
+                "sect.crn, sect.section_name, sect.professor, sect.seat_capacity, " +
                 "sect.seat_actual, sect.seat_remaining, ts.location, ts.start_time, " +
                 "ts.end_time, ts.day_of_week from schedule sch " +
                 "inner join sectionschedule ss on ss.schedule_id = sch.schedule_id " +
