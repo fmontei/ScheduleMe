@@ -214,7 +214,7 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
-                                    ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
+                                    ng-options="c as (c.class_number + ' - ' + c.class_name) for c in modalData.filteredClasses"
                                     ng-model="modalData.selectedClass"
                                     ng-change="updateSelectedClass(); filterSectionsByClass()">
                             </select>
@@ -249,7 +249,7 @@
                                  ng-class="{'active': modalData.selectedSection === section}"
                                  ng-click="modalData.selectedSection = section; updateSelectedClass()">
                                 <small class="list-group-item-heading">
-                                    <div><label>Section</label> {{section.name}}</div>
+                                    <div><label>Section</label> {{section.section_name}}</div>
                                 </small>
                                 <small class="list-group-item-text">
                                     <div><label>CRN</label> {{section.crn}}</div>
@@ -318,7 +318,7 @@
                         </div>
                         <div class="col col-md-8">
                             <select class="form-control"
-                                    ng-options="c as (c.class_number + ' - ' + c.name) for c in modalData.filteredClasses"
+                                    ng-options="c as (c.class_number + ' - ' + c.class_name) for c in modalData.filteredClasses"
                                     ng-model="modalData.selectedClass"
                                     ng-change="filterSectionsByClass()">
                             </select>
@@ -353,7 +353,7 @@
                                  ng-class="{'active': modalData.selectedSection === section}"
                                  ng-click="modalData.selectedSection = section; updateSelectedGroupClasses()">
                                 <small class="list-group-item-heading">
-                                    <div><label>Section</label> {{section.name}}</div>
+                                    <div><label>Section</label> {{section.section_name}}</div>
                                 </small>
                                 <small class="list-group-item-text">
                                     <div><label>CRN</label> {{section.crn}}</div>
