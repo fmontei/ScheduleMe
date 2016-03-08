@@ -47,7 +47,8 @@
                             ng-click="updateClassMandatoryStatus(class)">
                         </a>
                     </small>
-                    {{class.department}} {{class.class_number}} - <em>{{class.name}}</em>
+                    <strong>{{class.department}} {{class.class_number}}:</strong> {{class.name}}
+                    <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
                 </li>
                 <li class="list-group-item"
                     ng-repeat="group in selectedGroups">
@@ -59,7 +60,10 @@
                         </a>
                         <span class="glyphicon glyphicon-th-large pull-right"></span>
                     </small>
-                    <p ng-repeat="class in group">{{class.department}} {{class.class_number}} - <em>{{class.name}}</em></p>
+                    <p ng-repeat="class in group">
+                        <strong>{{class.department}} {{class.class_number}}:</strong> {{class.name}}
+                        <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
+                    </p>
                 </li>
             </ul>
 
@@ -228,8 +232,7 @@
                         </div>
                         <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
                             <div class="btn-group"
-                                 role="group"
-                                 ng-show="modalData.filteredSections.length > 0">
+                                 role="group">
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
                                             {'btn-default': modalData.sectionType === 'Specific'}]"
@@ -237,7 +240,8 @@
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
                                             {'btn-default': modalData.sectionType === 'Any'}]"
-                                        ng-click="modalData.sectionType = 'Specific'">Specific</button>
+                                        ng-click="modalData.sectionType = 'Specific'"
+                                        ng-show="modalData.filteredSections.length > 0">Specific</button>
                             </div>
                             <div class="list-group"
                                  style="margin-top: 2px"
@@ -245,7 +249,7 @@
                               <a href="javascript:void(0)" class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
                                  ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="modalData.selectedSection = section">
+                                 ng-click="modalData.selectedSection = section; updateSelectedClass()">
                                 <small class="list-group-item-heading">
                                     <div><label>Section</label> {{section.name}}</div>
                                 </small>
@@ -330,21 +334,26 @@
                         </div>
                         <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
                             <div class="btn-group"
-                                 role="group"
-                                 ng-show="modalData.filteredSections.length > 0">
+                                 role="group">
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
                                             {'btn-default': modalData.sectionType === 'Specific'}]"
-                                        ng-click="modalData.sectionType = 'Any'">Any</button>
+                                        ng-click="modalData.sectionType = 'Any';
+                                            modalData.selectedSection = null;
+                                            updateSelectedGroupClasses()">Any</button>
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
                                             {'btn-default': modalData.sectionType === 'Any'}]"
-                                        ng-click="modalData.sectionType = 'Specific'">Specific</button>
+                                        ng-click="modalData.sectionType = 'Specific'"
+                                        ng-show="modalData.filteredSections.length > 0">Specific</button>
                             </div>
-                            <div class="list-group" ng-show="modalData.sectionType === 'Specific'">
+                            <div class="list-group"
+                                 style="margin-top: 2px"
+                                 ng-show="modalData.sectionType === 'Specific'">
                               <a href="javascript:void(0)" class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
-                                 ng-click="modalData.selectedSection = section">
+                                 ng-class="{'active': modalData.selectedSection === section}"
+                                 ng-click="modalData.selectedSection = section; updateSelectedGroupClasses()">
                                 <small class="list-group-item-heading">
                                     <div><label>Section</label> {{section.name}}</div>
                                 </small>
@@ -364,7 +373,8 @@
                     <br />
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
-                            {{class.class_number}} - <em>{{class.name}}</em>
+                            <strong>{{class.department}} {{class.class_number}}:</strong> {{class.name}}
+                            <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
                             <small>
                                 <a href="javascript:void(0)"
                                    class="glyphicon glyphicon-remove no-link pull-right"

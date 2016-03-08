@@ -5,6 +5,8 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
     sectionHttpService) {
 
     $scope.filterClassesByDept = function() {
+        $scope.modalData.filteredClasses = [];
+        $scope.modalData.filteredSections = [];
         var filteredClasses = [];
         for (var i = 0; i < $scope.allClasses.length; i++) {
             var _class = $scope.allClasses[i];
@@ -16,6 +18,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
     };
 
     $scope.filterSectionsByClass = function() {
+        $scope.modalData.filteredSections = [];
         if (!$scope.modalData.selectedClass) {
             return;
         }
@@ -27,19 +30,9 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
 
     $scope.selectClass = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
-        var _class = $scope.modalData.selectedClass,
-            section = $scope.modalData.selectedSection || null;
+        var _class = $scope.modalData.selectedClass;
         if (!allSelectedClasses) {
             allSelectedClasses = [];
-        }
-        if (section) {
-            for (key in section) {
-                if (_class[key]) {
-                    _class['class_' + key] = section['section_' + key];
-                } else {
-                    _class[key] = section[key];
-                }
-            }
         }
         allSelectedClasses.push(_class);
         localStorage.set('selectedClasses', allSelectedClasses);
@@ -66,22 +59,26 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
 
     $scope.updateSelectedClass = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
-        var alreadyExists = isClassInList($scope.modalData.selectedClass,
-            allSelectedClasses);
-        if (alreadyExists) {
+        var _class = $scope.modalData.selectedClass;
+        var section = $scope.modalData.selectedSection || null;
+        var alreadyExists = isClassInList(_class, allSelectedClasses);
+        if (alreadyExists === false) {
+            _class = combineClassWithSection(_class, section);
+            $scope.modalData.selectedClass = _class;
+        } else {
             $scope.modalData.selectedClass = null;
         }
     };
 
     $scope.updateSelectedGroupClasses = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
-        var _class = $scope.modalData.selectedClass;
+        var _class = angular.copy($scope.modalData.selectedClass);
+        var section = $scope.modalData.selectedSection;
         var alreadyExists = isClassInList(_class, $scope.modalData.groupClasses) ||
             isClassInList(_class, allSelectedClasses);
         if (alreadyExists === false) {
-            $scope.modalData.groupClasses.push($scope.modalData.selectedClass);
-        } else {
-            $scope.modalData.selectedClass = null;
+            _class = combineClassWithSection(_class, section);
+            $scope.modalData.groupClasses.push(_class);
         }
     };
 
@@ -97,7 +94,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             selectedClass: null,
             selectedSection: null,
             groupClasses: [],
-            sectionType: 'Any'
+            sectionType: ''
         };
     };
 
@@ -134,3 +131,15 @@ function indexOfClass(_class, list) {
     }
     return -1;
 };
+
+function combineClassWithSection(_class, section) {
+    if (_class) {
+        if (section) {
+            _class['section'] = section;
+        } else {
+            _class['section'] = {};
+            _class['section']['crn'] = 'Any';
+        }
+    }
+    return _class;
+}
