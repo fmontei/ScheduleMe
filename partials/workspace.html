@@ -236,7 +236,9 @@
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
                                             {'btn-default': modalData.sectionType === 'Specific'}]"
-                                        ng-click="modalData.sectionType = 'Any'">Any</button>
+                                        ng-click="modalData.sectionType = 'Any';
+                                            modalData.selectedSection = null;
+                                            updateSelectedClass();">Any</button>
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
                                             {'btn-default': modalData.sectionType === 'Any'}]"
@@ -340,7 +342,7 @@
                                             {'btn-default': modalData.sectionType === 'Specific'}]"
                                         ng-click="modalData.sectionType = 'Any';
                                             modalData.selectedSection = null;
-                                            updateSelectedGroupClasses()">Any</button>
+                                            updateSelectedGroupClasses();">Any</button>
                                 <button class="btn btn-sm"
                                         ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
                                             {'btn-default': modalData.sectionType === 'Any'}]"
