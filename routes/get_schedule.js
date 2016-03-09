@@ -19,11 +19,7 @@ router.use(function(req, res, next) {
     async.waterfall([
         function(callback) {
             user_id = user_id.trim();
-            var query = "select ss.schedule_id, ss.section_id, ss.timeslot_id, " +
-                "cls.class_name, cls.department, cls.class_number, cls.credits, " +
-                "sect.crn, sect.section_name, sect.professor, sect.seat_capacity, " +
-                "sect.seat_actual, sect.seat_remaining, ts.location, ts.start_time, " +
-                "ts.end_time, ts.day_of_week from schedule sch " +
+            var query = "select * from schedule sch " +
                 "inner join sectionschedule ss on ss.schedule_id = sch.schedule_id " +
                 "inner join section sect on sect.section_id = ss.section_id " +
                 "left outer join class cls on cls.class_id = sect.class_id " +
