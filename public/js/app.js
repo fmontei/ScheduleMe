@@ -154,7 +154,7 @@ scheduleMeApp.factory('SectionHttpService', ['$http', '$q', 'LocalStorage',
         }).then(function successCallback(response) {
             deferred.resolve(response['data']);
         }, function errorCallback() {
-            console.log('Error: selection class has no sections.');
+            console.log('Error: selected class has no sections.');
             deferred.resolve(null);
         });
 

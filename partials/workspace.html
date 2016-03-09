@@ -47,9 +47,22 @@
                             ng-click="updateClassMandatoryStatus(class)">
                         </a>
                     </small>
-                    <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
-                    <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
+                    <br />
+                    <table width="90%">
+                        <tbody>
+                            <tr>
+                                <td width="70%">
+                                    <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
+                                </td>
+                                <td width="30%">
+                                    <span class="pull-right"><strong>CRN: </strong> {{class.section.crn}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </li>
+                
+                <!--List selected groups-->
                 <li class="list-group-item"
                     ng-repeat="group in selectedGroups">
                     <small>
@@ -60,10 +73,19 @@
                         </a>
                         <span class="glyphicon glyphicon-th-large pull-right"></span>
                     </small>
-                    <p ng-repeat="class in group">
-                        <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
-                        <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
-                    </p>
+                    <br />
+                    <table width="90%">
+                        <tbody>
+                            <tr ng-repeat="class in group">
+                                <td width="70%">
+                                    <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
+                                </td>
+                                <td width="30%">
+                                    <span class="pull-right"><strong>CRN: </strong> {{class.section.crn}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </li>
             </ul>
 
@@ -371,8 +393,8 @@
                     <br />
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
-                            <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
-                            <small> | <strong>CRN: </strong> {{class.section.crn}}</small>
+                            <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}} -
+                            <small><strong>CRN: </strong> {{class.section.crn}}</small>
                             <small>
                                 <a href="javascript:void(0)"
                                    class="glyphicon glyphicon-remove no-link pull-right"

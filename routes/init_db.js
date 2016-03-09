@@ -27,7 +27,6 @@ router.use(function(req, res, next) {
             "class_name VARCHAR(255) NOT NULL," +
             "department VARCHAR(10) NOT NULL," +
             "class_number INTEGER NOT NULL," +
-            "credits INTEGER," +
             "semester_id INTEGER NOT NULL," +
             "foreign key (semester_id) references SEMESTER(semeter_id)," +
             "UNIQUE(department, class_number) ON CONFLICT IGNORE);")
@@ -35,6 +34,7 @@ router.use(function(req, res, next) {
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
             "section_name VARCHAR(5)," +
+            "credits INTEGER," +
             "professor VARCHAR(255)," +
             "seat_capacity INTEGER," +
             "seat_actual INTEGER," +
@@ -165,14 +165,14 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
     function saveCourses(finalCourses) {
         var deferred = Q.defer();
         var statement = db.prepare("INSERT INTO class(class_name, department, " +
-            "class_number, credits, semester_id) VALUES(?, ?, ?, ?, ?);");
+            "class_number, semester_id) VALUES(?, ?, ?, ?);");
         deferredCount = finalCourses.length;
 
         for (var i = 0; i < finalCourses.length; i++) {
             var course = finalCourses[i];
             statement.run([
                 course['class_name'], course['major'], course['number'],
-                course['credits'], course['semester_id']
+                course['semester_id']
             ], function(error) {
                 deferredCount -= 1;
             });
@@ -207,15 +207,15 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
     function saveSections(finalSections) {
         var deferred = Q.defer();
-        var query = db.prepare("INSERT INTO section(crn, professor, section_name, class_id, " +
-            "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?, ?);");
+        var query = db.prepare("INSERT INTO section(crn, credits, professor, section_name, class_id, " +
+            "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
         deferredCount = finalSections.length;
 
         for (var i = 0; i < finalSections.length; i++) {
             var section = finalSections[i];
             query.run([
-                section['crn'], section['professor'], section['section_name'],
-                section['class_id'], section['seat_capacity'],
+                section['crn'], section['credits'], section['professor'], 
+                section['section_name'], section['class_id'], section['seat_capacity'],
                 section['seat_actual'], section['seat_remaining']
             ], function(error) {
                 deferredCount -= 1;
@@ -461,7 +461,6 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
         for (var j = 0; j < sections.length; j++) {
             var section = sections[j];
             section['class_number'] = courses[i]['number'];
-            courses[i]['credits'] = sections[j]['credits'];
             if (finalSections.indexOf(section) === -1) {
                 finalSections.push(section);
             }
