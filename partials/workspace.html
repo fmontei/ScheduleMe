@@ -271,10 +271,13 @@
                                  ng-class="{'active': modalData.selectedSection === section}"
                                  ng-click="modalData.selectedSection = section; updateSelectedClass()">
                                 <small class="list-group-item-heading">
-                                    <div><label>Section</label> {{section.section_name}}</div>
+                                    <div>
+                                        <label>Section</label> {{section.section_name}} |
+                                        <label>CRN</label> {{section.crn}} |
+                                        <label>Credits</label> {{section.credits}}
+                                    </div>
                                 </small>
                                 <small class="list-group-item-text">
-                                    <div><label>CRN</label> {{section.crn}}</div>
                                     <div><label>Professor</label> {{section.professor}}</div>
                                     <div ng-repeat="ts in section.timeslots">
                                         <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
@@ -375,10 +378,13 @@
                                  ng-class="{'active': modalData.selectedSection === section}"
                                  ng-click="modalData.selectedSection = section; updateSelectedGroupClasses()">
                                 <small class="list-group-item-heading">
-                                    <div><label>Section</label> {{section.section_name}}</div>
+                                    <div>
+                                        <label>Section</label> {{section.section_name}} |
+                                        <label>CRN</label> {{section.crn}} |
+                                        <label>Credits</label> {{section.credits}}
+                                    </div>
                                 </small>
                                 <small class="list-group-item-text">
-                                    <div><label>CRN</label> {{section.crn}}</div>
                                     <div><label>Professor</label> {{section.professor}}</div>
                                     <div ng-repeat="ts in section.timeslots">
                                         <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
