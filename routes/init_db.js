@@ -32,15 +32,16 @@ router.use(function(req, res, next) {
             "UNIQUE(department, class_number) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "crn INTEGER NOT NULL UNIQUE ON CONFLICT IGNORE," +
-            "section_name VARCHAR(5)," +
-            "credits INTEGER," +
+            "crn INTEGER NOT NULL," +
+            "section_name VARCHAR(5) NOT NULL," +
+            "credits INTEGER NOT NULL," +
             "professor VARCHAR(255)," +
             "seat_capacity INTEGER," +
             "seat_actual INTEGER," +
             "seat_remaining INTEGER," +
             "class_id INTEGER NOT NULL," +
-            "foreign key (class_id) references CLASS(class_id));")
+            "foreign key (class_id) references CLASS(class_id)," +
+            "UNIQUE (class_id, crn) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists TIMESLOT(" +
             "timeslot_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "location VARCHAR(255)," +
@@ -171,7 +172,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         for (var i = 0; i < finalCourses.length; i++) {
             var course = finalCourses[i];
             statement.run([
-                course['class_name'], course['major'], course['number'],
+                course['class_name'], course['department'], course['class_number'],
                 course['semester_id']
             ], function(error) {
                 deferredCount -= 1;
@@ -190,7 +191,8 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         for (var i = 0; i < sections.length; i++) {
             var section = sections[i];
             var innerQuery = "SELECT class_id FROM class where class_number = '" +
-                section['class_number'] + "' LIMIT 1;";
+                section['class_number'] + "' AND department = '" + section['department'] +
+                "' LIMIT 1;";
             var promise = executeInnerQuery(innerQuery, section, 'class_id',
                 'class_number', true).then(function(finalSection) {
                 sectionsWithClassIDs.push(finalSection);
@@ -214,7 +216,7 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         for (var i = 0; i < finalSections.length; i++) {
             var section = finalSections[i];
             query.run([
-                section['crn'], section['credits'], section['professor'], 
+                section['crn'], section['credits'], section['professor'],
                 section['section_name'], section['class_id'], section['seat_capacity'],
                 section['seat_actual'], section['seat_remaining']
             ], function(error) {
@@ -460,7 +462,8 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
         var sections = courses[i]['sections'];
         for (var j = 0; j < sections.length; j++) {
             var section = sections[j];
-            section['class_number'] = courses[i]['number'];
+            section['class_number'] = courses[i]['class_number'];
+            section['department'] = courses[i]['department'];
             if (finalSections.indexOf(section) === -1) {
                 finalSections.push(section);
             }
@@ -517,9 +520,9 @@ function getCoursesByTermAndMajor(term, major) {
     httpGet(url).then(function(jsonResponse) {
         for (var i = 0; i < jsonResponse.length; i++) {
             var course = {};
-            course['number'] = jsonResponse[i]['ident'];
+            course['class_number'] = jsonResponse[i]['ident'];
             course['class_name'] = jsonResponse[i]['name'];
-            course['major'] = major;
+            course['department'] = major;
             courses.push(course);
         }
         deferred.resolve(courses);
@@ -533,8 +536,8 @@ function getCoursesByTermAndMajor(term, major) {
  */
 function getCourseSectionsForCourse(term, course) {
     var deferred = Q.defer();
-    var major = course['major'];
-    var number = course['number'];
+    var major = course['department'];
+    var number = course['class_number'];
     var url = "https://soc.courseoff.com/gatech/terms/" + term +
         "/majors/" + major + "/courses/" + number + "/sections";
     var sections = [];
