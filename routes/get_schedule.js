@@ -31,6 +31,7 @@ router.use(function(req, res, next) {
                 "where sch.user_id = '" + user_id + "' and sch.semester_id = '" +
                 semester_id + "' order by ss.schedule_id, ss.section_id, ss.timeslot_id asc;";
             db.all(query, function(err, rows) {
+                console.log(JSON.stringify(rows));
                 var formattedRows = [];
                 for (var i = 0; rows && i < rows.length; i++) {
                     var sectionID = rows[i]['section_id'];
