@@ -37,8 +37,8 @@ table#class-table {
     table-layout: fixed;
 }
 
-#class-table  tr {
-    height: 15px;
+#class-table tr {
+    height: 45px;
 }
 
 #class-table  th, td {

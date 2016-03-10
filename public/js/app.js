@@ -138,6 +138,24 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         return deferred.promise;
     };
 
+    scheduleHttpService.getGroupedScheduleForUser = function(userID) {
+        var deferred = $q.defer();
+        var selectedSemester = localStorage.get('selectedSemester');
+
+        $http({
+            method: 'GET',
+            url: '/user/' + userID + /schedule/ + selectedSemester.semester_id +
+                '?group_by=crn'
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback() {
+            console.log('Error: current user has no schedule for selected semester.');
+            deferred.reject();
+        });
+
+        return deferred.promise;
+    };
+
     return scheduleHttpService;
 }]);
 
@@ -208,9 +226,18 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
     };
 
     serverDataService.getScheduleForUser = function(userID) {
-        var deferred = $q.defer();
-        scheduleHttpService.getScheduleForUser(userID).then(function(classData) {
+        var deferred = $q.defer(), promises = [];
+        var promise = scheduleHttpService.getScheduleForUser(userID).then(
+            function(classData) {
             localStorage.set('classData', classData);
+        });
+        promises.push(promise);
+        promise = scheduleHttpService.getGroupedScheduleForUser(userID).then(
+            function(groupedClassData) {
+            localStorage.set('groupedClassData', groupedClassData);
+        });
+        promises.push(promise);
+        $q.all(promises).then(function() {
             deferred.resolve();
         });
         return deferred.promise;
@@ -254,23 +281,42 @@ scheduleMeApp.directive('closeModal', function() {
     };
 });
 
+
 scheduleMeApp.directive('hide', function() {
     return {
         restrict: 'AE',
         scope: {
-            onCondition: '@onCondition'
+            condition: '@onCondition'
         },
         link: function link(scope, element, attrs) {
-            if (JSON.parse(scope.onCondition) === true) {
+            if (JSON.parse(scope.condition) === true) {
                 element.hide();
-                element.parent().find('a:visible').each(function() {
-                    $(this).css('height', '110%');
-                });
-            } else {
-                element.parent().find('a:hidden').each(function() {
-                    element.css('height', '110%');
-                });
             }
+        }
+    };
+});
+
+scheduleMeApp.directive('watchHeight', function() {
+    return {
+        restrict: 'AE',
+        link: function link(scope, element, attrs) {
+            scope.$watch(function() {
+                var numVisibleByCell = [];
+                element.parent().find('td').each(function() {
+                    numVisibleByCell.push($(this).find('a:visible').length);
+                });
+                return numVisibleByCell;
+            }, function(numVisibleByCell, oldNumVisibleByCell) {
+                var numVisibleThisCell = element.find('a:visible').length;
+                for (var i = 0; i < numVisibleByCell.length; i++) {
+                    if (numVisibleByCell[i] > numVisibleThisCell) {
+                        element.find('a:visible').each(function() {
+                            $(this).css('height', '112%');
+                        });
+                        break;
+                    }
+                }
+            }, true);
         }
     };
 });
