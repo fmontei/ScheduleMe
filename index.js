@@ -44,7 +44,7 @@ app.get('/user', function(req, res) {
 });
 
 // Everything after this line will require authentication
-//app.use('/*', cas);
+// app.use('/*', cas);
 
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, '/index.html'));
