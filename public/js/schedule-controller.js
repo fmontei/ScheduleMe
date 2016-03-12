@@ -58,6 +58,13 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
             }
             return timeSlots;
         };
+        
+        $scope.addSectionToSchedule = function(section_id, schedule_id) {
+            scheduleHttpService.addSectionToSchedule(section_id, schedule_id).
+                then(function(response)) {
+                console.log(response);     
+             });
+        };
 
         $scope.formatTime = function(time) {
             var hours = parseInt(time.substring(0, time.indexOf(':'))),

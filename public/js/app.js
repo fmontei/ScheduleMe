@@ -16,7 +16,8 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
         templateUrl: 'partials/schedule.html',
         controller: 'ScheduleController'
     }).when('/courseoff', {
-        templateUrl: 'partials/courseoff.html'
+        templateUrl: 'partials/courseoff.html',
+        controller: 'CourseOffController'
     }).otherwise({
        redirectTo: '/'
     });
@@ -136,6 +137,27 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         });
 
         return deferred.promise;
+    };
+         
+    scheduleHttpService.addSection
+    ToSchedule = function(section_id, schedule_id) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: '/schedule/' + schedule_id.trim(),
+            data: {
+                'section_id': section_id,
+                'delete': false
+            }
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+            console.log(response['data']);
+        }, function errorCallback(error) {
+            console.log(error);
+            deferred.reject(error);
+        });
+        
+         return deferred.promise;
     };
 
     return scheduleHttpService;
@@ -264,11 +286,11 @@ scheduleMeApp.directive('hide', function() {
             if (JSON.parse(scope.onCondition) === true) {
                 element.hide();
                 element.parent().find('a:visible').each(function() {
-                    $(this).css('height', '110%');
+                    //$(this).css('height', '100%');
                 });
             } else {
                 element.parent().find('a:hidden').each(function() {
-                    element.css('height', '110%');
+                    //element.css('height', '100%');
                 });
             }
         }
