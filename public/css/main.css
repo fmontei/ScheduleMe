@@ -37,8 +37,8 @@ table#class-table {
     table-layout: fixed;
 }
 
-#class-table  tr {
-    height: 15px;
+#class-table tr {
+    height: 30px;
 }
 
 #class-table  th, td {
@@ -48,4 +48,8 @@ table#class-table {
 
 #class-table a {
     width: 100%;
+}
+
+td.schedule-table-cell {
+    height: 100%;
 }

@@ -16,13 +16,13 @@
                     <tr class="class-table-cell"
                         ng-repeat="timeSlot in timeSlots">
                         <td><strong>{{formatTime(timeSlot.time)}}</strong></td>
-                        <td ng-repeat="weekDay in weekDays" >
+                        <td class="schedule-table-cell" ng-repeat="weekDay in weekDays" watch-height>
                             <a href="javascript:void(0)"
                                class="btn btn-sm btn-default"
                                type="button"
                                data-target="#accordion-for-{{class.department}}-{{class.class_number}}"
-                               ng-repeat="class in timeSlot.classes"
-                               hide on-condition="{{class.days_of_week.indexOf(weekDay) === -1}}">
+                               ng-repeat="class in timeSlot.classes | orderBy: '+start_time'"
+                               hide on-condition="{{class.day_of_week !== weekDay}}">
                                 <strong>{{class.department}} {{class.class_number}}</strong>
                                 <br />
                                 <small>
@@ -39,7 +39,7 @@
             <div class="panel-group">
                 <div class="panel panel-default class-accordion"
                      id="accordion-for-{{class.department}}-{{class.class_number}}"
-                     ng-repeat="class in classData">
+                     ng-repeat="class in groupedClassData">
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a data-toggle="collapse"
