@@ -19,12 +19,12 @@
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.13.0",
+    "grunt-contrib-copy": "~0.8.2",
     "handlebars": "^4.0.5",
     "https": "^1.0.0",
-    "q": "^1.0.0",
+    "q": "^1.4.1",
     "sqlite3": "^3.1.1",
-    "xml2js": "^0.4.16",
-    "grunt-contrib-copy": "~0.8.2"
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

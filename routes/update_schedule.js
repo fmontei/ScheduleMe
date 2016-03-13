@@ -1,7 +1,7 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
 var async = require('async');
-var Q = require('Q');
+var Q = require('q');
 
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
@@ -22,9 +22,6 @@ router.use(function(req, res, next) {
     
     schedule_id = req.schedule_id.trim();
     section_id = req.body.section_id.trim();
-    
-    console.log('schedule_id ' + schedule_id);
-    console.log('section_id ' + section_id);
     
     if (req.body.delete) {
         delete_section_from_schedule(res);
@@ -54,18 +51,15 @@ function delete_section_from_schedule(res) {
 };
 
 function add_section_to_schedule(res) {
-    console.log('Adding section');
     async.waterfall([
         function getTimeslotsBySectionID(callback) {
             db.all('select * from timeslot where section_id = $section_id;', {
                 $section_id: section_id
             }, function(err, rows) {
-                console.log('Retrieved timeslots: ' + JSON.stringify(rows));
                 callback(err, rows);
             });    
         },
         function getScheduleSectionsByWeekday(timeslots, callback) {
-            console.log('2');
             var days_of_week = [];
             for (var i = 0; i < timeslots.length; i++) {
                 if (days_of_week.indexOf(timeslots[i]['day_of_week']) === -1) {
@@ -76,18 +70,19 @@ function add_section_to_schedule(res) {
                 'inner join timeslot ts on (ss.timeslot_id = ts.timeslot_id) where ts.day_of_week ' +
                 'in (' + days_of_week.toString() + ') and ss.schedule_id = ' + schedule_id + ';', 
                 function(err, rows) {
-                    console.log('Retrieved section_schedules: ' + JSON.stringify(rows));
                     callback(err, timeslots, rows);
                 }
             );
         }, 
         function checkForTimeConflicts(timeslots, section_schedules, callback) {
-            console.log('3');
             var haveConflict = false;
+            var error = 'Error: could not insert section_id: ' + 
+                section_id + ' into schedule_id: ' + schedule_id + 
+                ' because time conflict exists.';
             
-            for (var i = 0; i < section_schedules.length; i++) {
+            for (var i = 0; haveConflict === false && i < section_schedules.length; i++) {
                 var section_schedule = section_schedules[i];
-                for (var j = 0; j < timeslots.length; j++) {
+                for (var j = 0; haveConflict === false && j < timeslots.length; j++) {
                     var timeslot = timeslots[j];
                     if (timeslot['day_of_week'] === section_schedule['day_of_week']) {
                         var hour = timeslot['start_time'].substring(
@@ -119,50 +114,41 @@ function add_section_to_schedule(res) {
                         );
                         var currEndTime = new Date(0, 0, 0, hour, min, 0, 0);
                         
-                        console.log(newStartTime + ' ' + currStartTime);
-                        console.log(newEndTime + ' ' + currEndTime);
-                        
                         if (newStartTime < currStartTime) {
                             if (newEndTime < currStartTime) {
                                 haveConflict = false;
                             } else {
                                 haveConflict = true;
-                                //callback(haveConflict, null);
+                            }
+                        } else {
+                            if (newStartTime > currEndTime) {
+                                haveConflict = false;
+                            } else {
+                                haveConflict = true;
                             }
                         }
-                    } else {
-                        if (newStartTime > currEndTime) {
-                            haveConflict = false;
-                        } else {
-                            haveConflict = true;
-                            //callback(haveConflict, null);
-                        }
-                    }
+                    } 
                 }
             }
-            console.log('Have conflict? ' + haveConflict);
-            callback(haveConflict, timeslots);
+            if (haveConflict === true) {
+                callback(error, null, null);
+            } else {
+                callback(null, haveConflict, timeslots);
+            }
         }, 
         function insertAllIntoDB(haveConflict, timeslots, callback) {
-            if (haveConflict) {
-                callback('Error: could not insert section_id: ' + section_id +
-                         ' into schedule_id: ' + schedule_id + ' because ' +
-                         'time conflict exists.');
-            }
             var promises = [];
             for (var i = 0; i < timeslots.length; i++) {
-                promises.push(insertSingleIntoDB(timeslot[i]['timeslot_id']));
+                promises.push(insertSingleIntoDB(timeslots[i]['timeslot_id']));
             }
             Q.all(promises).then(function() {
                 callback(null);
             });
         }
-    ], function (err) {
+    ], function(err) {
         if (err) {
-            console.log('Error');
             return res.send(err, 200);
         } else {
-            console.log('Success');
             return res.send('Successfully added new section to schedule.', 200);
         }
     });
@@ -171,14 +157,14 @@ function add_section_to_schedule(res) {
 function insertSingleIntoDB(timeslot_id) {
     var deferred = Q.defer();
     db.run('insert into sectionschedule(schedule_id, section_id, timeslot_id) ' +
-        'values($schedule_id, $section_id, $timeslot_id) where not exists (' +
+        'select $schedule_id, $section_id, $timeslot_id where not exists (' +
         'select * from sectionschedule where schedule_id = $schedule_id and ' +
         'section_id = $section_id and timeslot_id = $timeslot_id);', {
         $schedule_id: schedule_id,
         $section_id: section_id,
         $timeslot_id: timeslot_id
     }, function(err) {
-        Q.resolve(err);
+        deferred.resolve(err);
     });
     return deferred.promise;
 };
