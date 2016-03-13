@@ -6,8 +6,8 @@ scheduleMeApp.controller('CourseOffController', ['$rootScope', '$scope', '$http'
 
     $scope.addSectionToSchedule = function(section_id, schedule_id) {
         scheduleHttpService.addSectionToSchedule(section_id, schedule_id).
-            then(function(response)) {
-            console.log(response);     
+            then(function(response) {
+            console.log(JSON.stringify(response));   
          });
     };
 }]);

@@ -61,7 +61,7 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
         
         $scope.addSectionToSchedule = function(section_id, schedule_id) {
             scheduleHttpService.addSectionToSchedule(section_id, schedule_id).
-                then(function(response)) {
+                then(function(response) {
                 console.log(response);     
              });
         };
@@ -84,5 +84,6 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
             return localStorage.get('classData');
         }, function(newValue, oldValue) {
             $scope.classData = newValue;
+            console.log(JSON.stringify($scope.classData));
         }, true);
 }]);

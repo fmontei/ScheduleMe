@@ -139,11 +139,10 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         return deferred.promise;
     };
          
-    scheduleHttpService.addSection
-    ToSchedule = function(section_id, schedule_id) {
+    scheduleHttpService.addSectionToSchedule = function(section_id, schedule_id) {
         var deferred = $q.defer();
         $http({
-            method: 'POST',
+            method: 'PUT',
             url: '/schedule/' + schedule_id.trim(),
             data: {
                 'section_id': section_id,
