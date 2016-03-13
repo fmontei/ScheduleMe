@@ -11,7 +11,7 @@ var section_id = -1;
 
 /**
  * Mandatory params: section_id
- * Optional param: delete. If provided, will remove the section_id/timeslot_id
+ * Optional param: delete. If provided, will remove the provided section_id
  * from the schedule.
  */
 
@@ -115,15 +115,11 @@ function add_section_to_schedule(res) {
                         var currEndTime = new Date(0, 0, 0, hour, min, 0, 0);
                         
                         if (newStartTime < currStartTime) {
-                            if (newEndTime < currStartTime) {
-                                haveConflict = false;
-                            } else {
+                            if (newEndTime > currStartTime) {
                                 haveConflict = true;
                             }
                         } else {
-                            if (newStartTime > currEndTime) {
-                                haveConflict = false;
-                            } else {
+                            if (newStartTime < currEndTime) {
                                 haveConflict = true;
                             }
                         }
