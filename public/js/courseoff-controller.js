@@ -10,4 +10,11 @@ scheduleMeApp.controller('CourseOffController', ['$rootScope', '$scope', '$http'
             console.log(JSON.stringify(response));   
          });
     };
+    
+    $scope.removeSectionFromSchedule = function(section_id, schedule_id) {
+        scheduleHttpService.removeSectionFromSchedule(section_id, schedule_id).
+            then(function(response) {
+            console.log(JSON.stringify(response));   
+         });
+    };
 }]);

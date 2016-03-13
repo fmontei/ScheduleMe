@@ -143,16 +143,24 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         var deferred = $q.defer();
         $http({
             method: 'PUT',
-            url: '/schedule/' + schedule_id.trim(),
-            data: {
-                'section_id': section_id,
-                'delete': false
-            }
+            url: '/schedule/' + schedule_id.trim() + '/sections/' + section_id.trim()
         }).then(function successCallback(response) {
             deferred.resolve(response['data']);
-            console.log(response['data']);
         }, function errorCallback(error) {
-            console.log(error);
+            deferred.reject(error);
+        });
+        
+         return deferred.promise;
+    };
+    
+    scheduleHttpService.removeSectionFromSchedule = function(section_id, schedule_id) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: '/schedule/' + schedule_id.trim() + '/sections/' + section_id.trim()
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(error) {
             deferred.reject(error);
         });
         
@@ -332,7 +340,7 @@ scheduleMeApp.directive('watchHeight', function() {
                 for (var i = 0; i < numVisibleByCell.length; i++) {
                     if (numVisibleByCell[i] > numVisibleThisCell) {
                         element.find('a:visible').each(function() {
-                            $(this).css('height', '112%');
+                            $(this).css('height', $(this).parent().css('height'));
                         });
                         break;
                     }

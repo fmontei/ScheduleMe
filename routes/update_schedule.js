@@ -16,39 +16,11 @@ var section_id = -1;
  */
 
 router.use(function(req, res, next) {
-    if (!req.body || !req.body.section_id) {
-        return res.send('section_id is required.', 400);
-    }
-    
     schedule_id = req.schedule_id.trim();
-    section_id = req.body.section_id.trim();
+    section_id = req.section_id.trim();
     
-    if (req.body.delete) {
-        delete_section_from_schedule(res);
-    } else {
-        add_section_to_schedule(res);
-    }
+    add_section_to_schedule(res);
 });
-
-function delete_section_from_schedule(res) {
-    async.waterfall([
-        function(callback) {
-            db.run('delete from sectionschedule where schedule_id = $schedule_id ' + 
-                'and section_id = $section_id);', {
-                $schedule_id: schedule_id,
-                $section_id: section_id
-            }, function(err) {
-                callback(err);
-            });
-        }
-    ], function (err) {
-        if (err) {
-            return res.send(err, 200);
-        } else {
-            return res.status('Successfully deleted section from schedule', 200);
-        }
-    });
-};
 
 function add_section_to_schedule(res) {
     async.waterfall([

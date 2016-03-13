@@ -15,7 +15,17 @@
                 <a class="btn btn-primary" id="scrape-data-btn" href="javascript:void(0)">Scrape data</a>
             </div>
             
-            <h3>Add Section to Schedule</h3>
+            <h3>Add/Remove Section to/from Schedule</h3>
+            <div class="row">
+                <div class="col col-md-6">
+                    <select class="form-control" 
+                            ng-model="form.method"
+                            ng-init="form.method = 'Add'">
+                        <option>Add</option>
+                        <option>Remove</option>
+                    </select>
+                </div>
+            </div>
             <div class="row">
                 <div class="col col-md-6">
                     <label>Schedule ID:</label> <input class="form-control" ng-model="form.schedule_id" />
@@ -26,9 +36,16 @@
             </div>
             <div class="row">
                 <div class="col col-md-6">
-                    <button class="btn btn-default" ng-click="addSectionToSchedule(form.section_id, form.schedule_id)">
+                    <button class="btn btn-default" 
+                            ng-if="form.method === 'Add'"
+                            ng-click="addSectionToSchedule(form.section_id, form.schedule_id)">
                         Add section
-                    </button>  
+                    </button>
+                    <button class="btn btn-default" 
+                            ng-if="form.method === 'Remove'"
+                            ng-click="removeSectionFromSchedule(form.section_id, form.schedule_id)">
+                        Remove section
+                    </button>   
                 </div>
             </div>
 
