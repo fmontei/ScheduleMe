@@ -38,8 +38,24 @@
                     <li ng-class="{'active': location.path() == '/schedule'}">
                         <a href="#/schedule">Schedule</a>
                     </li>
-                    <li ng-class="{'active': location.path() == '/workspace'}">
-                        <a href="#/workspace">Workspace</a>
+                    <li ng-class="{'active': location.path().indexOf('/workspace') !== -1}">
+                        <a href="javascript:void(0)"
+                           class="dropdown-toggle"
+                           data-toggle="dropdown"
+                           role="button"
+                           aria-haspopup="true"
+                           aria-expanded="false">
+                           Workspace
+                           <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-class="{'active': location.path() == '/workspace-new'}">
+                                <a href="#/workspace-new">New</a>
+                            </li>
+                            <li ng-class="{'active': location.path() == '/workspace-edit'}">
+                                <a href="#/workspace-edit">Edit (Work in progress)</a>
+                            </li>
+                        </ul>
                     </li>
                     <!--
                     <li ng-class="{'active': location.path() == '/courseoff'}">
@@ -65,7 +81,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li><a href="#">Logout</a></li>
+                    <li><a href="javascript:void(0)">Logout</a></li>
                 </ul>
             </div>
         </div>

@@ -54,4 +54,10 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
     }, function(newValue, oldValue) {
         $scope.selectedGroups = newValue;
     }, true);
+    
+    $scope.$watch(function() {
+        return localStorage.get('groupedClassData');
+    }, function(newValue, oldValue) {
+        $scope.classData = newValue;
+    }, true);
 }]);

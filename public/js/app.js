@@ -9,8 +9,11 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {
         templateUrl: 'partials/load-data.html',
         controller: 'LoadDataController'
-    }).when('/workspace', {
-        templateUrl: 'partials/workspace.html',
+    }).when('/workspace-new', {
+        templateUrl: 'partials/workspace-new.html',
+        controller: 'WorkspaceController'
+    }).when('/workspace-edit', {
+        templateUrl: 'partials/workspace-edit.html',
         controller: 'WorkspaceController'
     }).when('/schedule', {
         templateUrl: 'partials/schedule.html',
@@ -128,7 +131,7 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
 
         $http({
             method: 'GET',
-            url: '/user/' + userID + /schedule/ + selectedSemester.semester_id
+            url: '/user/' + userID + '/schedule/' + selectedSemester.semester_id
         }).then(function successCallback(response) {
             deferred.resolve(response['data']);
         }, function errorCallback() {
