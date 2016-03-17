@@ -136,10 +136,9 @@ function indexOfClass(_class, list) {
 function combineClassWithSection(_class, section) {
     if (_class) {
         if (section) {
-            _class['section'] = section;
+            _class['crn'] = section['crn'];
         } else {
-            _class['section'] = {};
-            _class['section']['crn'] = 'Any';
+            _class['crn'] = 'Any';
         }
     }
     return _class;

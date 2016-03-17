@@ -32,17 +32,38 @@ router.use(function(req, res, next) {
                 } else {
                     var formattedRows = [];
                     for (var i = 0; rows && i < rows.length; i++) {
+                        rows[i]['isMandatory'] = true;
                         var val = rows[i][groupByArg];
                         var previouslySeenRow = getRowByGroupByArg(formattedRows, val);
                         if (previouslySeenRow === null) {
                             var dayOfWeek = rows[i]['day_of_week'];
+                            var time = {
+                                'start_time': rows[i]['start_time'],
+                                'end_time': rows[i]['end_time']
+                            };
                             delete rows[i]['day_of_week'];
+                            delete rows[i]['start_time'];
+                            delete rows[i]['end_time']
                             rows[i]['days_of_week'] = [];
+                            rows[i]['times'] = [];
                             rows[i]['days_of_week'].push(dayOfWeek);
+                            rows[i]['times'].push(time);
                             formattedRows.push(rows[i]);
                         } else {
                             var dayOfWeek = rows[i]['day_of_week'];
+                            var time = {
+                                'start_time': rows[i]['start_time'],
+                                'end_time': rows[i]['end_time']
+                            };
                             previouslySeenRow['days_of_week'].push(dayOfWeek);
+                            for (var j = 0; j < previouslySeenRow['times'].length; j++) {
+                                var prevTime = previouslySeenRow['times'][j];
+                                if (prevTime['start_time'] !== time['start_time'] &&
+                                    prevTime['end_time'] !== time['end_time']) {
+                                    previouslySeenRow['times'].push(time);
+                                    break;
+                                }
+                            }
                         }
                     }
                     function getRowByGroupByArg(formattedRows, val) {
@@ -52,7 +73,7 @@ router.use(function(req, res, next) {
                             }
                         }
                         return null;
-                    }
+                    };
                     callback(null, formattedRows);
                 }
             });

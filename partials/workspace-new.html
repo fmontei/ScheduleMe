@@ -44,7 +44,7 @@
                         <a  href="javascript:void(0)"
                             ng-class="{'glyphicon glyphicon-star no-link pull-right': class.isMandatory === true,
                                        'glyphicon glyphicon-star-empty no-link pull-right': !class.isMandatory}"
-                            ng-click="updateClassMandatoryStatus(class)">
+                            ng-click="updateClassMandatoryStatus(class, 'selectedClasses')">
                         </a>
                     </small>
                     <br />
@@ -55,7 +55,7 @@
                                     <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
                                 </td>
                                 <td width="30%">
-                                    <span class="pull-right"><strong>CRN: </strong> {{class.section.crn}}</span>
+                                    <span class="pull-right"><strong>CRN: </strong> {{class.crn}}</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -81,7 +81,7 @@
                                     <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}}
                                 </td>
                                 <td width="30%">
-                                    <span class="pull-right"><strong>CRN: </strong> {{class.section.crn}}</span>
+                                    <span class="pull-right"><strong>CRN: </strong> {{class.crn}}</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -400,7 +400,7 @@
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">
                             <strong>{{class.department}} {{class.class_number}}:</strong> {{class.class_name}} -
-                            <small><strong>CRN: </strong> {{class.section.crn}}</small>
+                            <small><strong>CRN: </strong> {{class.crn}}</small>
                             <small>
                                 <a href="javascript:void(0)"
                                    class="glyphicon glyphicon-remove no-link pull-right"

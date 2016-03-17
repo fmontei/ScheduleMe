@@ -265,8 +265,8 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         });
         promises.push(promise);
         promise = scheduleHttpService.getGroupedScheduleForUser(userID).then(
-            function(groupedClassData) {
-            localStorage.set('groupedClassData', groupedClassData);
+            function(savedClassData) {
+            localStorage.set('savedClassData', savedClassData);
         });
         promises.push(promise);
         $q.all(promises).then(function() {

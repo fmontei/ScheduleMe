@@ -39,7 +39,7 @@
             <div class="panel-group">
                 <div class="panel panel-default class-accordion"
                      id="accordion-for-{{class.department}}-{{class.class_number}}"
-                     ng-repeat="class in groupedClassData">
+                     ng-repeat="class in savedClassData">
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a data-toggle="collapse"
@@ -50,45 +50,44 @@
                     </div>
                     <div class="panel-collapse collapse">
                         <div class="panel-body">
-                        <div class="row">
-                            <div class="col col-md-6">
-                                <p><small><label>Section:</label> {{class.section_name}}</small></p>
-                                <p><small><label>CRN:</label> {{class.crn}}</small></p>
-                                <p><small><label>Prof:</label> {{class.professor}}</small></p>
+                        <small>
+                            <div class="row">
+                                <div class="col col-md-7">
+                                    <p><label>Section:</label> {{class.section_name}}</p>
+                                    <p><label>CRN:</label> {{class.crn}}</p>
+                                    <p><label>Prof:</label> {{class.professor}}</p>
+                                </div>
+                                <div class="col col-md-5">
+                                    <p>
+                                        <label ng-repeat="time in class.times">
+                                            {{formatTime(time.start_time)}} - {{formatTime(time.end_time)}}
+                                        </label>
+                                    </p>
+                                    <p >
+                                        <table>
+                                            <tbody>
+                                            <tr>
+                                                <td ng-repeat="weekDay in weekDays">
+                                                    <div ng-class="[
+                                                            {'square black':
+                                                                class.days_of_week.indexOf('{{weekDay}}') !== -1},
+                                                            {'square white':
+                                                                class.days_of_week.indexOf('{{weekDay}}') === -1}]">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </p>
+                                    <p style="margin-top: 20px"><label>Loc:</label> {{class.location}}</p>
+                                </div>
                             </div>
-                            <div class="col col-md-6">
-                                <small>
-                                    <label>{{formatTime(class.start_time)}} - {{formatTime(class.end_time)}}</label>
-                                </small>
-                                <p>
-                                    <table>
-                                        <tbody>
-                                        <tr>
-                                            <td ng-repeat="weekDay in weekDays">
-                                                <div ng-class="[
-                                                        {'square black':
-                                                            class.days_of_week.indexOf('{{weekDay}}') !== -1},
-                                                        {'square white':
-                                                            class.days_of_week.indexOf('{{weekDay}}') === -1}]">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                                <p>
-                                    <small>
-                                        <label>Remaining:</label>
-                                        {{class.seat_remaining}} ({{class.seat_actual}} / {{class.seat_capacity}})
-                                    </small>
-                                </p>
-                                <p><small><label>Loc:</label> {{class.location}}</small></p>
-                            </div>
-                        </div>
+                        </small>
                     </div>
                 </div>
             </div>
         </div>
+        <a class="btn btn-info" href="#/workspace-edit/">Edit Schedule</a>
     </div>
 </div>
 

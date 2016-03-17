@@ -26,18 +26,23 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
         });
     };
 
-    $scope.updateClassMandatoryStatus = function(_class) {
-        var selectedClasses = localStorage.get('selectedClasses');
-        var index = indexOfClass(_class, selectedClasses);
+    $scope.updateClassMandatoryStatus = function(_class, listName) {
+        var list = [];
+        if (listName === 'selectedClasses') list = $scope.selectedClasses;
+        else if (listName === 'savedClassData') list = $scope.savedClassData;
+        var selectedClasses = localStorage.get(listName);
+        var index = indexOfClass(_class, list);
         if (index !== -1) {
-            selectedClasses[index].isMandatory = !selectedClasses[index].isMandatory;
-            localStorage.set('selectedClasses', selectedClasses);
+            list[index].isMandatory = !list[index].isMandatory;
+            localStorage.set(listName, list);
         }
     };
 
     $scope.undoSelection = function(_class, listName) {
-        var list = (listName === 'selectedClasses') ? $scope.selectedClasses
-            : $scope.selectedGroups;
+        var list = [];
+        if (listName === 'selectedClasses') list = $scope.selectedClasses;
+        else if (listName === 'selectedGroups') list = $scope.selectedGroups;
+        else if (listName === 'savedClassData') list = $scope.savedClassData;
         var index = list.indexOf(_class);
         list.splice(index, 1);
         localStorage.set(listName, list);
@@ -56,8 +61,8 @@ scheduleMeApp.controller('WorkspaceController', ['$rootScope', '$scope', '$http'
     }, true);
     
     $scope.$watch(function() {
-        return localStorage.get('groupedClassData');
+        return localStorage.get('savedClassData');
     }, function(newValue, oldValue) {
-        $scope.classData = newValue;
+        $scope.savedClassData = newValue;
     }, true);
 }]);

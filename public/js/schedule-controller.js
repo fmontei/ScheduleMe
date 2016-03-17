@@ -81,13 +81,8 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
         $scope.timeSlots = $scope.getTimeSlots();
 
         $scope.$watch(function() {
-            return localStorage.get('classData');
+            return localStorage.get('savedClassData');
         }, function(newValue, oldValue) {
-        }, true);
-
-        $scope.$watch(function() {
-            return localStorage.get('groupedClassData');
-        }, function(newValue, oldValue) {
-            $scope.groupedClassData = newValue;
+            $scope.savedClassData = newValue;
         }, true);
 }]);

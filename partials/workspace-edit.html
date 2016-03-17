@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col col-md-5">
             <h3>
-                <u>Classes</u>
+                <u>Your Current Schedule</u>
                 <small>
                     <a href="javascript:void(0)"
                        class="glyphicon glyphicon-info-sign"
@@ -18,7 +18,7 @@
 
             <!-- Display message when no classes/groups -->
             <div class="panel panel-default"
-                 ng-if="(!classData || classData.length == 0)">
+                 ng-if="(!savedClassData || savedClassData.length == 0)">
                 <div class="panel-body">
                     <p>
                         You currently have no classes selected. To add a class,
@@ -33,17 +33,17 @@
             <!--List selected classes-->
             <ul class="list-group">
                 <li class="list-group-item"
-                    ng-repeat="class in classData">
+                    ng-repeat="class in savedClassData">
                     <small>
                         <a href="javascript:void(0)"
                            style="margin-left: 5px"
                            class="glyphicon glyphicon-remove no-link pull-right"
-                           ng-click="">
+                           ng-click="undoSelection(class, 'savedClassData')">
                         </a>
                         <a  href="javascript:void(0)"
                             ng-class="{'glyphicon glyphicon-star no-link pull-right': class.isMandatory === true,
                                        'glyphicon glyphicon-star-empty no-link pull-right': !class.isMandatory}"
-                            ng-click="">
+                            ng-click="updateClassMandatoryStatus(class, 'savedClassData')">
                         </a>
                     </small>
                     <br />
@@ -242,7 +242,7 @@
                               <a href="javascript:void(0)" class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
                                  ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="modalData.selectedSection = section; updateSelectedClass()">
+                                 ng-click="">
                                 <small class="list-group-item-heading">
                                     <div>
                                         <label>Section</label> {{section.section_name}} |
@@ -273,7 +273,7 @@
                             class="btn btn-primary"
                             ng-disabled="!modalData.selectedDept || !modalData.selectedClass ||
                                 (modalData.sectionType === 'Specific' && !modalData.selectedSection)"
-                            close-modal modal-to-close="#class-modal" function-to-call="selectClass()">
+                            close-modal modal-to-close="#class-modal" function-to-call="">
                         Add Class
                     </button>
                 </div>
@@ -349,7 +349,7 @@
                               <a href="javascript:void(0)" class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
                                  ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="modalData.selectedSection = section; updateSelectedGroupClasses()">
+                                 ng-click="">
                                 <small class="list-group-item-heading">
                                     <div>
                                         <label>Section</label> {{section.section_name}} |
@@ -377,7 +377,7 @@
                             <small>
                                 <a href="javascript:void(0)"
                                    class="glyphicon glyphicon-remove no-link pull-right"
-                                   ng-click="removeSelectedGroupOption(class)">
+                                   ng-click="">
                                </a>
                             </small>
                         </li>
@@ -395,7 +395,7 @@
                             ng-disabled="!modalData.selectedDept ||
                                          !modalData.groupClasses ||
                                          modalData.groupClasses.length === 0"
-                            close-modal modal-to-close="#group-modal" function-to-call="selectGroup()">
+                            close-modal modal-to-close="#group-modal" function-to-call="">
                         Add Group
                     </button>
                 </div>
