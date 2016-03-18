@@ -93,12 +93,18 @@
 
 <script>
     $(document).on("click", ".class-table-cell a", function() {
+        var thisDataTarget = $(this).attr('data-target');
         $('.class-table-cell a').each(function() {
             var target = $(this).attr('data-target').trim(),
             body = $(target).find('.panel-collapse');
             if (body.hasClass('in')) {
                 $(target).removeClass('panel-primary');
                 body.removeClass('in');
+            }
+            if ($(this).attr('data-target') === thisDataTarget) {
+                $(this).removeClass('btn-default').addClass('btn-primary');
+            } else {
+                $(this).addClass('btn-default').removeClass('btn-primary');
             }
         });
         var target = $(this).attr('data-target').trim(),
@@ -111,6 +117,14 @@
             body.addClass('in');
         }
     }).on("click", ".class-accordion a", function() {
+        var thisObjectID = '#' + $(this).closest('.panel').attr('id');
+        $('.class-table-cell a').each(function() {
+            if ($(this).attr('data-target') === thisObjectID) {
+                $(this).removeClass('btn-default').addClass('btn-primary');
+            } else {
+                $(this).addClass('btn-default').removeClass('btn-primary');
+            }
+        });
         $('.class-accordion a').each(function() {
             var panel = $(this).closest('.class-accordion'),
             panelBody = panel.find('.panel-collapse');
