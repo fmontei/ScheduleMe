@@ -65,9 +65,11 @@ router.use(function(req, res, next) {
                                 if (prevTime['start_time'] !== time['start_time'] &&
                                     prevTime['end_time'] !== time['end_time']) {
                                     previouslySeenRow['times'].push(time);
-                                    break;
-                                } else {
-                                    previouslySeenRow['times'][j]['in'].push(dayOfWeek);
+                                } else if (prevTime['start_time'] === time['start_time'] &&
+                                    prevTime['end_time'] === time['end_time']) {
+                                    if (previouslySeenRow['times'][j]['in'].indexOf(dayOfWeek) === -1) {
+                                        previouslySeenRow['times'][j]['in'].push(dayOfWeek);
+                                    }
                                 }
                             }
                         }
