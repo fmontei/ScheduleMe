@@ -3,9 +3,8 @@ var scheduleMeApp = angular.module('ScheduleMeApp');
 scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
     'LocalStorage', 'ScheduleHttpService', function($rootScope, $scope, $http,
         localStorage, scheduleHttpService) {
-        $scope.getTimeSlots = function() {
-            var classData = localStorage.get('classData'),
-                timeSlots = [];
+        $scope.getTimeSlots = function(classData) {
+            var timeSlots = [];
             for (var i = 7; i <= 19; i++) {
                 var hours = i.toString();
                 if (i < 10) {
@@ -77,12 +76,43 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
             return hours + ':' + mins + ' ' + meridian;
         };
 
+        $scope.getTempSchedule = function(count) {
+            if (count === 'prev') {
+                count = $scope.tempScheduleCount - 1;
+            } else if (count === 'next') {
+                count = $scope.tempScheduleCount + 1;
+            }
+            if (count >= 0 && count < $scope.tempScheduleData.length) {
+                $scope.tempScheduleCount = count;
+                localStorage.set('tempScheduleCount', count);
+                var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
+                $scope.timeSlots = $scope.getTimeSlots(schedule);
+            } 
+        };
+
         $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
-        $scope.timeSlots = $scope.getTimeSlots();
+        
+        $scope.$watch(function() {
+            return localStorage.get('scheduleData');
+        }, function(newValue, oldValue) {
+            $scope.timeSlots = $scope.getTimeSlots(newValue);
+        }, true);
 
         $scope.$watch(function() {
-            return localStorage.get('savedClassData');
+            return localStorage.get('savedScheduleData');
         }, function(newValue, oldValue) {
-            $scope.savedClassData = newValue;
+            $scope.savedScheduleData = newValue;
+        }, true);
+
+        $scope.$watch(function() {
+            return localStorage.get('tempScheduleData');
+        }, function(newValue, oldValue) {
+            $scope.tempScheduleData = newValue;
+            if (newValue) {
+                localStorage.set('tempScheduleCount', 0);
+                $scope.tempScheduleCount = localStorage.get('tempScheduleCount');
+                var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
+                $scope.timeSlots = $scope.getTimeSlots(schedule);
+            }
         }, true);
 }]);

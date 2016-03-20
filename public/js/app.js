@@ -18,6 +18,9 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     }).when('/schedule', {
         templateUrl: 'partials/schedule.html',
         controller: 'ScheduleController'
+    }).when('/schedule-select', {
+        templateUrl: 'partials/schedule-select.html',
+        controller: 'ScheduleController'
     }).when('/courseoff', {
         templateUrl: 'partials/courseoff.html',
         controller: 'CourseOffController'
@@ -141,6 +144,22 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
 
         return deferred.promise;
     };
+
+    scheduleHttpService.getGroupedScheduleForUser = function(userID) {
+        var deferred = $q.defer();
+        var selectedSemester = localStorage.get('selectedSemester');
+        $http({
+            method: 'GET',
+            url: '/user/' + userID + /schedule/ + selectedSemester.semester_id +
+                '?group_by=crn'
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback() {
+            console.log('Error: current user has no schedule for selected semester.');
+            deferred.reject();
+        });
+        return deferred.promise;
+    };
          
     scheduleHttpService.addSectionToSchedule = function(section_id, schedule_id) {
         var deferred = $q.defer();
@@ -152,8 +171,7 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         }, function errorCallback(error) {
             deferred.reject(error);
         });
-        
-         return deferred.promise;
+        return deferred.promise;
     };
     
     scheduleHttpService.removeSectionFromSchedule = function(section_id, schedule_id) {
@@ -166,27 +184,25 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         }, function errorCallback(error) {
             deferred.reject(error);
         });
-        
-         return deferred.promise;
-    };
-
-    scheduleHttpService.getGroupedScheduleForUser = function(userID) {
-        var deferred = $q.defer();
-        var selectedSemester = localStorage.get('selectedSemester');
-
-        $http({
-            method: 'GET',
-            url: '/user/' + userID + /schedule/ + selectedSemester.semester_id +
-                '?group_by=crn'
-        }).then(function successCallback(response) {
-            deferred.resolve(response['data']);
-        }, function errorCallback() {
-            console.log('Error: current user has no schedule for selected semester.');
-            deferred.reject();
-        });
-
         return deferred.promise;
     };
+
+    scheduleHttpService.generateSchedule = function(scheduleInput) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: '/generate_schedule/',
+            data: {
+                scheduleInput: scheduleInput
+            }
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    };
+    
 
     return scheduleHttpService;
 }]);
@@ -260,13 +276,13 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
     serverDataService.getScheduleForUser = function(userID) {
         var deferred = $q.defer(), promises = [];
         var promise = scheduleHttpService.getScheduleForUser(userID).then(
-            function(classData) {
-            localStorage.set('classData', classData);
+            function(scheduleData) {
+            localStorage.set('scheduleData', scheduleData);
         });
         promises.push(promise);
         promise = scheduleHttpService.getGroupedScheduleForUser(userID).then(
-            function(savedClassData) {
-            localStorage.set('savedClassData', savedClassData);
+            function(savedScheduleData) {
+            localStorage.set('savedScheduleData', savedScheduleData);
         });
         promises.push(promise);
         $q.all(promises).then(function() {

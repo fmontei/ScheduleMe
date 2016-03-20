@@ -18,6 +18,7 @@ var get_sections = require('./routes/get_sections');
 var get_timeslots = require('./routes/get_timeslots');
 
 var create_user = require('./routes/create_user');
+var generate_schedule = require('./routes/generate_schedule');
 var create_schedule = require('./routes/create_schedule');
 
 var update_schedule = require('./routes/update_schedule');
@@ -108,6 +109,9 @@ app.get('/timeslots/:section_id', function(req, res, next) {
 
 // Create user
 app.post('/user', create_user);
+
+// Generate temporary schedules permutations
+app.post('/generate_schedule', generate_schedule);
 
 // Create schedule
 app.post('/schedule', create_schedule);
