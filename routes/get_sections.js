@@ -6,14 +6,18 @@ var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
 /**
- * Get all sections by class id.
+ * Get all sections/timeslots by class id. Data is returned with the form:
+ * [ section_id: ...
+ *   ...
+ *   timeslots: [
+ *     timeslot_id: ...
+ *     day_of_week: ...
+*      ...
+ *   ]
+ * ]
  */
 router.use(function(req, res, next) {
     var class_id = req.class_id;
-
-    if (!class_id) {
-        return res.status(400).send('url request must end with /:class_id.');
-    }
 
     async.waterfall([
         function(callback) {
@@ -61,9 +65,9 @@ router.use(function(req, res, next) {
         }
     ], function (err, rows) {
         if (rows && rows.length > 0) {
-            res.send(rows);
+            res.send(rows, 200);
         } else {
-            res.status(404).send('Class with semester_id: ' + class_id + ' not found.');
+            res.send('Class with class_id: ' + class_id + ' not found.', 404);
         }
     });
 });

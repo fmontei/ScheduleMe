@@ -21,7 +21,6 @@ a.glyphicon.no-link:hover {
     height: 10px;
     background: black;
     border: 1px solid black;
-    margin-right: 2px;
 }
 
 .square.white {
@@ -29,7 +28,6 @@ a.glyphicon.no-link:hover {
     height: 10px;
     background: white;
     border: 1px solid black;
-    margin-right: 2px;
 }
 
 table#class-table {

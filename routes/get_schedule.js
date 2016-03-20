@@ -39,8 +39,10 @@ router.use(function(req, res, next) {
                             var dayOfWeek = rows[i]['day_of_week'];
                             var time = {
                                 'start_time': rows[i]['start_time'],
-                                'end_time': rows[i]['end_time']
+                                'end_time': rows[i]['end_time'],
+                                'in': []
                             };
+                            time['in'].push(dayOfWeek);
                             delete rows[i]['day_of_week'];
                             delete rows[i]['start_time'];
                             delete rows[i]['end_time']
@@ -53,8 +55,10 @@ router.use(function(req, res, next) {
                             var dayOfWeek = rows[i]['day_of_week'];
                             var time = {
                                 'start_time': rows[i]['start_time'],
-                                'end_time': rows[i]['end_time']
+                                'end_time': rows[i]['end_time'],
+                                'in': []
                             };
+                            time['in'].push(dayOfWeek);
                             previouslySeenRow['days_of_week'].push(dayOfWeek);
                             for (var j = 0; j < previouslySeenRow['times'].length; j++) {
                                 var prevTime = previouslySeenRow['times'][j];
@@ -62,6 +66,8 @@ router.use(function(req, res, next) {
                                     prevTime['end_time'] !== time['end_time']) {
                                     previouslySeenRow['times'].push(time);
                                     break;
+                                } else {
+                                    previouslySeenRow['times'][j]['in'].push(dayOfWeek);
                                 }
                             }
                         }
