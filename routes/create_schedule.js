@@ -15,18 +15,6 @@ router.use(function(req, res, next) {
 
     async.waterfall([
         function(callback) {
-            db.all('select count(*) as count from schedule where user_id = $user_id;', {
-                $user_id: user_id
-            }, function(err, rows) {
-                callback(err, rows[0]['count']);
-            });
-        },
-        function(count, callback) {
-            var haveSchedule = count > 0;
-            if (haveSchedule === true) {
-                callback('Only one schedule per user currently supported.', null);
-                return;
-            }
             db.run('insert into schedule(user_id, semester_id) values($user_id, $semester_id);', {
                 $user_id: user_id,
                 $semester_id: semester_id

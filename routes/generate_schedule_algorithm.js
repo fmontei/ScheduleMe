@@ -542,13 +542,13 @@ function* find_schedules_within_credit_range(section_buckets, lock_count, start_
 }
 
 // This should be commented out so it doesn't run every time you run node
-find_best_schedules(sample_input, 5, function(err, schedules) {
+/*find_best_schedules(sample_input, 5, function(err, schedules) {
     if (err != null) {
         console.dir(err, { depth: null, colors: true });
     } else {
         //console.log(JSON.stringify(schedules, null, 2));
         console.dir(schedules, { depth: null, colors: true });
     }
-});
+});*/
 
 module.exports.find_best_schedules = find_best_schedules;

@@ -170,22 +170,6 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         return deferred.promise;
     };
 
-    scheduleHttpService.getGroupedScheduleForUser = function(userID) {
-        var deferred = $q.defer();
-        var selectedSemester = localStorage.get('selectedSemester');
-        $http({
-            method: 'GET',
-            url: '/user/' + userID + /schedule/ + selectedSemester.semester_id +
-                '?group_by=crn'
-        }).then(function successCallback(response) {
-            deferred.resolve(response['data']);
-        }, function errorCallback() {
-            console.log('Error: current user has no schedule for selected semester.');
-            deferred.reject();
-        });
-        return deferred.promise;
-    };
-
     scheduleHttpService.saveSchedule = function(sectionIDs) {
         var deferred = $q.defer();
         $http({
@@ -317,18 +301,10 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
     };
 
     serverDataService.getScheduleForUser = function(userID) {
-        var deferred = $q.defer(), promises = [];
-        var promise = scheduleHttpService.getScheduleForUser(userID).then(
+        var deferred = $q.defer();
+        scheduleHttpService.getScheduleForUser(userID).then(
             function(scheduleData) {
-            localStorage.set('scheduleData', scheduleData);
-        });
-        promises.push(promise);
-        promise = scheduleHttpService.getGroupedScheduleForUser(userID).then(
-            function(savedScheduleData) {
-            localStorage.set('savedScheduleData', savedScheduleData);
-        });
-        promises.push(promise);
-        $q.all(promises).then(function() {
+            localStorage.set('savedScheduleData', scheduleData);
             deferred.resolve();
         });
         return deferred.promise;

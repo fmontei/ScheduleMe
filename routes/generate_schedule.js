@@ -31,7 +31,7 @@ function generateScheduleDataForSchedules(schedules) {
     var tempScheduleData = [];
     var promises = [];
 
-    for (var i = 0; i < Math.min(5, schedules.length); i++) {
+    for (var i = 0; i < Math.min(10, schedules.length); i++) {
         var promise = generateScheduleDataForSchedule(schedules[i]).then(function(data) {
             tempScheduleData.push(data);
         });

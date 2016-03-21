@@ -1,7 +1,6 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
 var async = require('async');
-var url = require('url');
 
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
@@ -13,10 +12,6 @@ router.use(function(req, res, next) {
     var user_id = req.user_id.trim();
     var semester_id = req.semester_id.trim();
 
-    var urlParts = url.parse(req.url, true);
-    var queryString = urlParts.query;
-    var groupByArg = queryString.group_by;
-
     async.waterfall([
         function(callback) {
             var query = "select * from schedule sch " +
@@ -27,35 +22,54 @@ router.use(function(req, res, next) {
                 "where sch.user_id = '" + user_id + "' and sch.semester_id = '" +
                 semester_id + "' order by ss.schedule_id, ss.section_id, ss.timeslot_id asc;";
             db.all(query, function(err, rows) {
-                if (!queryString || !groupByArg) {
-                    callback(null, rows);
-                } else {
-                    var formattedRows = [];
-                    for (var i = 0; rows && i < rows.length; i++) {
-                        rows[i]['isMandatory'] = true;
-                        var val = rows[i][groupByArg];
-                        var previouslySeenRow = getRowByVal(formattedRows, groupByArg, val);
+                var dictRows = {},
+                    finalRows = [];
+                for (var i = 0; rows && i < rows.length; i++) {
+                    var scheduleID = rows[i]['schedule_id'];
+                    if (dictRows[scheduleID] === undefined) {
+                        dictRows[scheduleID] = [];
+                    }
+                    dictRows[scheduleID].push(rows[i]);
+                }
+                var semesterIndex = -1;
+                for (var scheduleID in dictRows) {
+                    semesterIndex++;
+                    if (finalRows[semesterIndex] === undefined) {
+                        finalRows[semesterIndex] = {
+                            'raw': [],
+                            'grouped': []
+                        }
+                    }
+                    for (var i = 0; i < dictRows[scheduleID].length; i++) {
+                        var classData = dictRows[scheduleID][i];
+                        finalRows[semesterIndex]['raw']
+                            .push(JSON.parse(JSON.stringify(classData)));
+                        classData['isMandatory'] = true;
+                        var val = classData['crn'];
+                        var previouslySeenRow = getRowByVal(
+                            finalRows[semesterIndex]['grouped'], 'crn', val
+                        );
                         if (previouslySeenRow === null) {
-                            var dayOfWeek = rows[i]['day_of_week'];
+                            var dayOfWeek = classData['day_of_week'];
                             var time = {
-                                'start_time': rows[i]['start_time'],
-                                'end_time': rows[i]['end_time'],
+                                'start_time': classData['start_time'],
+                                'end_time': classData['end_time'],
                                 'in': []
                             };
                             time['in'].push(dayOfWeek);
-                            delete rows[i]['day_of_week'];
-                            delete rows[i]['start_time'];
-                            delete rows[i]['end_time']
-                            rows[i]['days_of_week'] = [];
-                            rows[i]['times'] = [];
-                            rows[i]['days_of_week'].push(dayOfWeek);
-                            rows[i]['times'].push(time);
-                            formattedRows.push(rows[i]);
+                            delete classData['day_of_week'];
+                            delete classData['start_time'];
+                            delete classData['end_time']
+                            classData['days_of_week'] = [];
+                            classData['times'] = [];
+                            classData['days_of_week'].push(dayOfWeek);
+                            classData['times'].push(time);
+                            finalRows[semesterIndex]['grouped'].push(classData);
                         } else {
-                            var dayOfWeek = rows[i]['day_of_week'];
+                            var dayOfWeek = classData['day_of_week'];
                             var time = {
-                                'start_time': rows[i]['start_time'],
-                                'end_time': rows[i]['end_time'],
+                                'start_time': classData['start_time'],
+                                'end_time': classData['end_time'],
                                 'in': []
                             };
                             time['in'].push(dayOfWeek);
@@ -74,23 +88,23 @@ router.use(function(req, res, next) {
                             }
                         }
                     }
-                    callback(null, formattedRows);
                 }
+                callback(null, finalRows);
             });
         }
-    ], function (err, rows) {
-        if (rows && rows.length > 0) {
-            res.send(rows, 200);
+    ], function (err, scheduleData) {
+        if (scheduleData && scheduleData.length > 0) {
+            res.status(200).send(scheduleData);
         } else {
             res.status(204).send('No schedule for current user.');
         }
     });
 });
 
-function getRowByVal(formattedRows, key, val) {
-    for (var i = 0; i < formattedRows.length; i++) {
-        if (formattedRows[i][key] === val) {
-            return formattedRows[i];
+function getRowByVal(groupedRows, key, val) {
+    for (var i = 0; i < groupedRows.length; i++) {
+        if (groupedRows[i][key] === val) {
+            return groupedRows[i];
         }
     }
     return null;

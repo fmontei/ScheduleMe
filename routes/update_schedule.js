@@ -16,12 +16,9 @@ var section_id = -1;
  */
 
 router.use(function(req, res, next) {
-    schedule_id = req.schedule_id.trim();
-    section_id = req.section_id.trim();
-    
-    add_section_to_schedule(res);
+    // TODO
+    res.status(501).send('Not yet implemented.');
 });
-
 
 
 module.exports = router;

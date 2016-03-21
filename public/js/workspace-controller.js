@@ -91,7 +91,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             'criteria': [
                 {
                     'type': 'credits',
-                    'parameters': [ 6, 12 ],
+                    'parameters': [ 6, 18 ],
                     'priority': 'required'
                 },
             ]

@@ -90,7 +90,19 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
             } 
         };
 
-        $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
+        $scope.getSavedSchedule = function(count) {
+            if (count === 'prev') {
+                count = $scope.savedScheduleCount - 1;
+            } else if (count === 'next') {
+                count = $scope.savedScheduleCount + 1;
+            }
+            if (count >= 0 && count < $scope.savedScheduleData.length) {
+                $scope.savedScheduleCount = count;
+                localStorage.set('savedScheduleCount', count);
+                var schedule = $scope.savedScheduleData[$scope.savedScheduleCount]['raw'];
+                $scope.timeSlots = $scope.getTimeSlots(schedule);
+            } 
+        };
 
         $scope.saveSchedule = function() {
             var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
@@ -107,28 +119,24 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
                 }
             });
         };
-        
-        $scope.$watch(function() {
-            return localStorage.get('scheduleData');
-        }, function(newValue, oldValue) {
-            $scope.timeSlots = $scope.getTimeSlots(newValue);
-        }, true);
+
+        $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
 
         $scope.$watch(function() {
             return localStorage.get('savedScheduleData');
         }, function(newValue, oldValue) {
             $scope.savedScheduleData = newValue;
+            if (newValue && newValue.length > 0) {
+                $scope.getSavedSchedule(0);
+            }
         }, true);
 
         $scope.$watch(function() {
             return localStorage.get('tempScheduleData');
         }, function(newValue, oldValue) {
             $scope.tempScheduleData = newValue;
-            if (newValue) {
-                localStorage.set('tempScheduleCount', 0);
-                $scope.tempScheduleCount = localStorage.get('tempScheduleCount');
-                var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
-                $scope.timeSlots = $scope.getTimeSlots(schedule);
+            if (newValue && newValue.length > 0) {
+                $scope.getTempSchedule(0);
             }
         }, true);
 }]);
