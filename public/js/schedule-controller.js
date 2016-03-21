@@ -127,7 +127,8 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         }, function(newValue, oldValue) {
             $scope.savedScheduleData = newValue;
             if (newValue && newValue.length > 0) {
-                $scope.getSavedSchedule(0);
+                $scope.savedScheduleCount = localStorage.get('savedScheduleCount') || 0;
+                $scope.getSavedSchedule($scope.savedScheduleCount);
             }
         }, true);
 
@@ -136,7 +137,8 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         }, function(newValue, oldValue) {
             $scope.tempScheduleData = newValue;
             if (newValue && newValue.length > 0) {
-                $scope.getTempSchedule(0);
+                $scope.tempScheduleCount = localStorage.get('tempScheduleCount') || 0;
+                $scope.getTempSchedule($scope.tempScheduleData);
             }
         }, true);
 }]);
