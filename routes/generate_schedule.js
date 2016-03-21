@@ -1,9 +1,11 @@
 "use strict";
 
+var express = require('express');
 let sqlite3 = require('sqlite3').verbose();
 let async = require('async');
 let util = require('util');
 
+let router = express.Router();
 let db = new sqlite3.Database('scheduleme.db');
 
 let sample_input = {
@@ -541,11 +543,17 @@ function* find_schedules_within_credit_range(section_buckets, lock_count, start_
     }
 }
 
-find_best_schedules(sample_input, 5, function(err, schedules) {
-    if (err != null) {
-        console.dir(err, { depth: null, colors: true });
-    } else {
-        //console.log(JSON.stringify(schedules, null, 2));
-        console.dir(schedules, { depth: null, colors: true });
-    }
+router.use(function(req, res, next) {
+    find_best_schedules(sample_input, 5, function(err, schedules) {
+        if (err != null) {
+            console.dir(err, { depth: null, colors: true });
+            return res.send(err, 200);
+        } else {
+            //console.log(JSON.stringify(schedules, null, 2));
+            console.dir(schedules, { depth: null, colors: true });
+            return res.send(schedules, 200);
+        }
+    });
 });
+
+module.exports = router;

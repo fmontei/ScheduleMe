@@ -19,6 +19,7 @@ var get_timeslots = require('./routes/get_timeslots');
 
 var create_user = require('./routes/create_user');
 var create_schedule = require('./routes/create_schedule');
+var generate_schedule = require('./routes/generate_schedule');
 
 var update_schedule = require('./routes/update_schedule');
 
@@ -45,7 +46,7 @@ app.get('/user', function(req, res) {
 });
 
 // Everything after this line will require authentication
-// app.use('/*', cas);
+app.use('/*', cas);
 
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, '/index.html'));
@@ -111,6 +112,8 @@ app.post('/user', create_user);
 
 // Create schedule
 app.post('/schedule', create_schedule);
+
+app.get('/generate_schedule', generate_schedule);
 
 // Add section to a specified schedule
 app.put('/schedule/:schedule_id/sections/:section_id', 
