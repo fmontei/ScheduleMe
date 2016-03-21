@@ -17,7 +17,7 @@ var get_classes = require('./routes/get_classes');
 var get_sections = require('./routes/get_sections');
 var get_timeslots = require('./routes/get_timeslots');
 
-var create_user = require('./routes/create_user');
+var get_or_create_user = require('./routes/get_or_create_user');
 var generate_schedule = require('./routes/generate_schedule');
 var create_schedule = require('./routes/create_schedule');
 
@@ -107,8 +107,8 @@ app.get('/timeslots/:section_id', function(req, res, next) {
     get_timeslots(req, res, next);
 });
 
-// Create user
-app.post('/user', create_user);
+// Get user by username if exists, else create user with username
+app.post('/get_or_create_user', get_or_create_user);
 
 // Generate temporary schedules permutations
 app.post('/generate_schedule', generate_schedule);

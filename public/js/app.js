@@ -6,7 +6,10 @@ var scheduleMeApp = angular.module('ScheduleMeApp', [
 ]);
 
 scheduleMeApp.config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/', {
+    $routeProvider.when('/login', {
+        templateUrl: 'partials/login.html',
+        controller: 'LoginController'
+    }).when('/index', {
         templateUrl: 'partials/load-data.html',
         controller: 'LoadDataController'
     }).when('/workspace-new', {
@@ -25,7 +28,7 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
         templateUrl: 'partials/courseoff.html',
         controller: 'CourseOffController'
     }).otherwise({
-       redirectTo: '/'
+       redirectTo: '/login'
     });
 }]);
 
@@ -51,6 +54,28 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
     };
 
     return myLocalStorage;
+}]);
+
+scheduleMeApp.factory('UserHttpService', ['$http', '$q', function($http, $q) {
+    var userHttpService = {};
+
+    userHttpService.login = function(username) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: '/get_or_create_user/',
+            data: {
+                username: username
+            }
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(response) {
+            deferred.resolve(response['error']);
+        });
+        return deferred.promise;
+    };
+
+    return userHttpService;
 }]);
 
 scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q) {

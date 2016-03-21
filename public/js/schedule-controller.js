@@ -3,7 +3,7 @@ var scheduleMeApp = angular.module('ScheduleMeApp');
 scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
     'LocalStorage', 'ScheduleHttpService', function($rootScope, $scope, $http,
         localStorage, scheduleHttpService) {
-        $scope.getTimeSlots = function(classData) {
+        $scope.getTimeSlots = function(scheduleData) {
             var timeSlots = [];
             for (var i = 7; i <= 19; i++) {
                 var hours = i.toString();
@@ -24,9 +24,9 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
                 }
             }
             for (var i = 0; i < timeSlots.length; i++) {
-                for (var j = 0; j < classData.length; j++) {
-                    var classStartTime = classData[j]['start_time'];
-                    var classEndTime = classData[j]['end_time']
+                for (var j = 0; j < scheduleData.length; j++) {
+                    var classStartTime = scheduleData[j]['start_time'];
+                    var classEndTime = scheduleData[j]['end_time']
                     var delimStartTime = classStartTime.indexOf(':');
                     var delimEndTime = classEndTime.indexOf(':');
                     var classStartHours = parseInt(
@@ -45,13 +45,13 @@ scheduleMeApp.controller('ScheduleController', ['$rootScope', '$scope', '$http',
                     var roundedEndMins = classEndMins - (classEndMins % 60);
                     if (classStartHours === timeSlots[i]['hours'] &&
                         roundedStartMins === timeSlots[i]['minutes']) {
-                        timeSlots[i].classes.push(classData[j]);
+                        timeSlots[i].classes.push(scheduleData[j]);
                     }
                     if (i > 0 &&
-                        timeSlots[i - 1].classes.indexOf(classData[j]) !== -1 &&
+                        timeSlots[i - 1].classes.indexOf(scheduleData[j]) !== -1 &&
                         timeSlots[i]['hours'] <= classEndHours &&
                         timeSlots[i]['minutes'] <= roundedEndMins) {
-                        timeSlots[i].classes.push(classData[j]);
+                        timeSlots[i].classes.push(scheduleData[j]);
                     }
                 }
             }
