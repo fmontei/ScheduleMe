@@ -5,6 +5,8 @@ var parseString = require('xml2js').parseString;
 
 var router = express.Router();
 
+var get_or_create_user_helper = require('../scripts/get_or_create_user_helper');
+
 // TODO: use different session store
 router.use(session({
     resave: true,
@@ -43,7 +45,14 @@ router.use(function(req, res, next) {
                                 result['cas:serviceResponse']['cas:authenticationSuccess'];
                             if (successResult !== undefined) {
                                 session.username = successResult[0]['cas:user'][0];
-                                res.redirect(session.requestedURL);
+                                //res.redirect(session.requestedURL);
+                                get_or_create_user_helper.execute(session.username).
+                                    then(function(result) {
+                                    var queryString = '?bypass=true&user_id=' + 
+                                        result[1]['user_id'] + '&username=' + 
+                                        result[1]['username'];
+                                    res.redirect('/#/login' + queryString);
+                                });
                                 delete session.requestedURL;
                             } else {
                                 res.redirect(302,

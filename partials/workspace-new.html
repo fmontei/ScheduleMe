@@ -95,16 +95,20 @@
                        uib-btn-radio="'Add Class'"
                        data-toggle="modal"
                        data-target="#class-modal">
-                       Add Class
+                    Add Class
                 </label>
                 <label class="btn btn-default"
                        ng-model="radioModel"
                        uib-btn-radio="'Add Group'"
                        data-toggle="modal"
                        data-target="#group-modal">
-                       Add Group
-                </label> <!--./btn-group -->
-            </div>
+                    Add Group
+                </label> 
+                <label class="btn btn-primary"
+                       ng-click="generateSchedule()">
+                    Generate Schedule
+                </label>
+            </div> <!--./btn-group -->
         </div>
 
         <div class="col col-md-2">

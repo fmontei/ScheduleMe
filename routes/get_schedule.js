@@ -34,7 +34,7 @@ router.use(function(req, res, next) {
                     for (var i = 0; rows && i < rows.length; i++) {
                         rows[i]['isMandatory'] = true;
                         var val = rows[i][groupByArg];
-                        var previouslySeenRow = getRowByGroupByArg(formattedRows, val);
+                        var previouslySeenRow = getRowByVal(formattedRows, groupByArg, val);
                         if (previouslySeenRow === null) {
                             var dayOfWeek = rows[i]['day_of_week'];
                             var time = {
@@ -74,14 +74,6 @@ router.use(function(req, res, next) {
                             }
                         }
                     }
-                    function getRowByGroupByArg(formattedRows, val) {
-                        for (var i = 0; i < formattedRows.length; i++) {
-                            if (formattedRows[i][groupByArg] === val) {
-                                return formattedRows[i];
-                            }
-                        }
-                        return null;
-                    };
                     callback(null, formattedRows);
                 }
             });
@@ -90,9 +82,18 @@ router.use(function(req, res, next) {
         if (rows && rows.length > 0) {
             res.send(rows, 200);
         } else {
-            res.status(404).send('Query failed.');
+            res.status(204).send('No schedule for current user.');
         }
     });
 });
+
+function getRowByVal(formattedRows, key, val) {
+    for (var i = 0; i < formattedRows.length; i++) {
+        if (formattedRows[i][key] === val) {
+            return formattedRows[i];
+        }
+    }
+    return null;
+};
 
 module.exports = router;

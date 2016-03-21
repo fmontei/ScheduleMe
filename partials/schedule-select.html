@@ -1,5 +1,50 @@
 <div class="container">
     <div class="row" style="margin-top: 50px">
+        <div class="col col-md-12">
+            <h1>Temporary Schedule: {{tempScheduleCount + 1}}</h1>
+            <div class="row">
+                <div class="col col-md-7">
+                    <nav>
+                        <ul class="pagination">
+                            <li>
+                                <a href="javascript:void(0)" 
+                                   aria-label="Previous"
+                                   ng-click="getTempSchedule('prev')">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li ng-repeat="schedule in tempScheduleData"
+                                ng-class="[{'active': tempScheduleCount === $index}]">
+                                <a href="javascript:void(0)"
+                                   ng-click="getTempSchedule($index)">
+                                   {{$index + 1}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" 
+                                   aria-label="Next"
+                                   ng-click="getTempSchedule('next')">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="col col-md-5" style="margin-top: 10px">
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-primary"
+                           href="javascript:void(0)"
+                           ng-click="saveSchedule()">
+                            Save Schedule
+                        </a>
+                        <a class="btn btn-default"
+                           href="#/workspace-new">
+                            Go Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col col-md-8">
             <table id="class-table">
                 <thead>
@@ -39,7 +84,7 @@
             <div class="panel-group">
                 <div class="panel panel-default class-accordion"
                      id="accordion-for-{{class.department}}-{{class.class_number}}"
-                     ng-repeat="class in savedScheduleData">
+                     ng-repeat="class in tempScheduleData[tempScheduleCount].grouped">
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a data-toggle="collapse"
@@ -88,7 +133,6 @@
                 </div>
             </div>
         </div>
-        <a class="btn btn-info" href="#/workspace-edit/">Edit Schedule</a>
     </div>
 </div>
 
