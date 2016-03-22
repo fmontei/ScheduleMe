@@ -1,5 +1,6 @@
 <div class="container">
-    <div class="row" style="margin-top: 50px">
+    <div class="row"
+         ng-hide="!savedScheduleData || savedScheduleData.length === 0">
         <div class="col col-md-7">
             <nav>
                 <ul class="pagination">
@@ -28,11 +29,28 @@
             </nav>
         </div>
         <div class="col col-md-5">
-            <a class="btn btn-primary pull-right" href="#/workspace-edit/">Edit Schedule</a>
+            <a class="btn btn-primary pull-right" 
+               href="#/workspace-edit/"
+               style="margin-top: 20px">Edit Schedule</a>
         </div>
     </div>
+    <div class="row"
+         ng-hide="savedScheduleData && savedScheduleData.length > 0">
+         <div class="col col-md-12">
+            <div class="jumbotron">
+                <h1>You currently have no schedules.</h1>
+                <p>
+                    Click below to get started:
+                </p>
+                <a class="btn btn-lg btn-primary"
+                   type="button"
+                   href="/#/workspace-new">Build Schedule</a>
+            </div>
+         </div>
+    </div>
     <br />
-    <div class="row">
+    <div class="row"
+         ng-hide="!savedScheduleData || savedScheduleData.length === 0">
         <div class="col col-md-8">
             <table id="class-table">
                 <thead>

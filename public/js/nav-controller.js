@@ -8,7 +8,7 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
     };
 
     $scope.logout = function() {
-        localStorage.set('user', undefined);
+        localStorage.clearAll();
         $location.path('/');
     };
 

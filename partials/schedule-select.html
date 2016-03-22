@@ -1,5 +1,26 @@
 <div class="container">
-    <div class="row" style="margin-top: 50px">
+    <div class="row"
+         ng-hide="tempScheduleData && tempScheduleData.length > 0">
+         <div class="col col-md-12">
+            <div class="jumbotron">
+                <h1>No schedules were generated.</h1>
+                <p>
+                    Try any of the following:
+                    <ul>
+                        <li>Narrow down the list of criteria</li>
+                        <li>Increase the number of allowed credit hours</li>
+                        <li>Add more classes</li>
+                        <li>Select 'Any' for the section</li>
+                    </ul>
+                </p>
+                <a class="btn btn-lg btn-primary"
+                   type="button"
+                   href="/#/workspace-new">Go back</a>
+            </div>
+         </div>
+    </div>
+    <div class="row"
+         ng-hide="!tempScheduleData || tempScheduleData.length === 0">
         <div class="col col-md-12">
             <h1>Temporary Schedule: {{tempScheduleCount + 1}}</h1>
             <div class="row">
@@ -30,7 +51,7 @@
                         </ul>
                     </nav>
                 </div>
-                <div class="col col-md-5" style="margin-top: 10px">
+                <div class="col col-md-5" style="margin-top: 15px">
                     <div class="btn-group pull-right">
                         <a class="btn btn-primary"
                            href="javascript:void(0)"

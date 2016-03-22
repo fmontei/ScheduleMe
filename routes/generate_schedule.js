@@ -33,7 +33,9 @@ function generateScheduleDataForSchedules(schedules) {
 
     for (var i = 0; i < Math.min(10, schedules.length); i++) {
         var promise = generateScheduleDataForSchedule(schedules[i]).then(function(data) {
-            tempScheduleData.push(data);
+            if (data) {
+                tempScheduleData.push(data);
+            }
         });
         promises.push(promise);
     }
@@ -104,7 +106,11 @@ function generateScheduleDataForSchedule(schedule) {
                         }
                     }
                 }
-                callback(null, {'raw': rawRows, 'grouped': groupedRows});
+                if (rawRows.length > 0 && groupedRows.length > 0) {
+                    callback(null, {'raw': rawRows, 'grouped': groupedRows});
+                } else {
+                    callback(null, null);
+                }
             });
         }
     ], function (err, data) {
