@@ -4,26 +4,25 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     'LocalStorage', 'ClassHttpService', 'SemesterHttpService', 'ScheduleHttpService',
     function($location, $scope, $http, localStorage, classHttpService,
         semesterHttpService, scheduleHttpService) {
-    $scope.gpaSlider = {
-        value: 3.0,
-        options: {
-            floor: 1.0,
-            ceil: 4.0,
-            step: 0.1,
-            precision: 1,
-            showSelectionBarEnd: true
-        }
+    $scope.criteria = {
+        gpaSlider: {
+            value: 3.0,
+            options: {
+                floor: 1.0,
+                ceil: 4.0,
+                step: 0.1,
+                precision: 1,
+                showSelectionBarEnd: true
+            }
+        },
+        defaultMinCredits: 6,
+        defaultMaxCredits: 15,
+        timeslots: [],
+
     };
 
-    $scope.defaultTotalCredits = 15;
-
-    $scope.timeslots = [];
-
-    $scope.addTimeslot = function() {
-        $scope.timeslots.push({
-            day: 'monday',
-            type: 'allday'
-        });
+    $scope.addTimeslot = function(day, type, start, end) {
+        $scope.criteria.timeslots.push({});
     };
 
     $scope.updateClassMandatoryStatus = function(_class, listName) {
@@ -84,17 +83,60 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             classGroups.push(group);
         }
 
+        var criteria = [];
+        
+        criteria.push({
+            'type': 'credits',
+            'parameters': [ 
+                $scope.criteria.defaultMinCredits, 
+                $scope.criteria.defaultMaxCredits 
+            ],
+            'priority': 'required'
+        });
+
+        if ($scope.criteria.earliestTime && $scope.criteria.latestTime) {
+            var hourIndex = $scope.criteria.earliestTime.toString().indexOf(':');
+            var startHour = $scope.criteria.earliestTime.toString().
+                substring(hourIndex - 2, hourIndex);
+            var startMin = $scope.criteria.earliestTime.toString().
+                substring(hourIndex + 1, hourIndex + 3);
+            hourIndex = $scope.criteria.latestTime.toString().indexOf(':');
+            var endHour = $scope.criteria.latestTime.toString().
+                substring(hourIndex - 2, hourIndex);
+            var endMin = $scope.criteria.latestTime.toString().
+                substring(hourIndex + 1, hourIndex + 3);
+            criteria.push({
+                'type': 'timeofday',
+                'parameters': { 
+                    'start_time': startHour + ':' + startMin, 
+                    'end_time': endHour + ':' + endMin
+                },
+                'priority': 'required'
+            });
+        }
+
+        if ($scope.criteria.timeslots.length > 0) {
+            for (var i = 0; i < $scope.criteria.timeslots.length; i++) {
+                var timeslot = $scope.criteria.timeslots[i];
+                var startTime = (timeslot.type === 'allday') ? '00:00' : timeslot.start;
+                var endTime =  (timeslot.type === 'allday') ? '23:59' : timeslot.end;
+                criteria.push({
+                    'type': 'timeslot',
+                    'parameters': { 
+                        'day_of_week': timeslot.day, 
+                        'start_time': startTime, 
+                        'end_time': endTime 
+                    },
+                    'priority': 'required'
+                });
+            }
+        }
+
         var scheduleInput = {
             'class_groups': classGroups,
             'locked_class_groups': lockedClassGroups,
             'locked_sections': lockedSections,
-            'criteria': [
-                {
-                    'type': 'credits',
-                    'parameters': [ 6, 18 ],
-                    'priority': 'required'
-                },
-            ]
+            'criteria': criteria
         };
 
         scheduleHttpService.generateSchedule(scheduleInput).then(
