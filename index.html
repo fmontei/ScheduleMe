@@ -39,8 +39,8 @@
                     <li ng-class="{'active': location.path() == '/schedule'}">
                         <a href="#/schedule">Schedule</a>
                     </li>
-                    <li ng-class="{'active': location.path().indexOf('/workspace') !== -1
-                            || location.path() == '/schedule-select'}">
+                    <li ng-class="{'active': location.path().indexOf('/workspace') !== -1 ||
+                        location.path() === '/schedule-select'}">
                         <a href="javascript:void(0)"
                            class="dropdown-toggle"
                            data-toggle="dropdown"
@@ -51,12 +51,14 @@
                            <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li ng-class="{'active': location.path() == '/workspace-new'
-                                    || location.path() == '/schedule-select'}">
+                            <li ng-class="{'active': location.path() === '/workspace-new'}">
                                 <a href="#/workspace-new">New</a>
                             </li>
-                            <li ng-class="{'active': location.path() == '/workspace-edit'}">
+                            <li ng-class="{'active': location.path() === '/workspace-edit'}">
                                 <a href="#/workspace-edit">Edit (Work in progress)</a>
+                            </li>
+                            <li ng-class="{'active': location.path() === '/schedule-select'}">
+                                <a href="#/schedule-select">Generated Schedules</a>
                             </li>
                         </ul>
                     </li>

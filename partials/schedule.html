@@ -29,9 +29,33 @@
             </nav>
         </div>
         <div class="col col-md-5">
-            <a class="btn btn-primary pull-right" 
-               href="#/workspace-edit/"
-               style="margin-top: 20px">Edit Schedule</a>
+            <br />
+            <div class="pull-right">
+                <a class="btn btn-primary" 
+                   href="javascript:void(0)"
+                   class="dropdown-toggle"
+                   data-toggle="dropdown"
+                   role="button"
+                   aria-haspopup="true"
+                   aria-expanded="false"
+                   ng-hide="!savedScheduleData || savedScheduleData.length === 0">
+                   Actions
+                   <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="/#/workspace-edit">
+                            Edit Schedule
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)"
+                           ng-click="deleteSchedule()">
+                            Delete Schedule
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
     <div class="row"
@@ -65,7 +89,7 @@
                 </thead>
                 <tbody>
                     <tr class="class-table-cell"
-                        ng-repeat="timeSlot in timeSlots">
+                        ng-repeat="timeSlot in savedTimeSlots">
                         <td><strong>{{formatTime(timeSlot.time)}}</strong></td>
                         <td class="schedule-table-cell" ng-repeat="weekDay in weekDays" watch-height>
                             <a href="javascript:void(0)"

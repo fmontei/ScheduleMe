@@ -99,6 +99,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
 
         scheduleHttpService.generateSchedule(scheduleInput).then(
             function(tempScheduleData) {
+                localStorage.set('tempScheduleCount', 0);
                 localStorage.set('tempScheduleData', tempScheduleData);
                 $location.path('/schedule-select');
             }

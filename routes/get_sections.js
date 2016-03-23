@@ -17,7 +17,10 @@ var db = new sqlite3.Database('scheduleme.db');
  * ]
  */
 router.use(function(req, res, next) {
-    var class_id = req.class_id;
+    var class_id = (req.class_id) ? req.class_id.trim() : null;
+    if (!class_id) {
+        return res.status(400).send('Error: Missing parameter class_id.');
+    }
 
     async.waterfall([
         function(callback) {
@@ -65,9 +68,10 @@ router.use(function(req, res, next) {
         }
     ], function (err, rows) {
         if (rows && rows.length > 0) {
-            res.send(rows, 200);
+            res.status(200).send(rows);
         } else {
-            res.send('Class with class_id: ' + class_id + ' not found.', 404);
+            res.status(204).
+                send('No sections for class_id: ' + class_id + ' found.');
         }
     });
 });

@@ -187,6 +187,35 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         });
         return deferred.promise;
     };
+
+    scheduleHttpService.generateSchedule = function(scheduleInput) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: '/generate_schedule/',
+            data: {
+                scheduleInput: scheduleInput
+            }
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    };
+
+    scheduleHttpService.deleteSchedule = function(schedule_id) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: '/schedule/' + schedule_id + '/'
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(error) {
+            deferred.resolve(error);
+        });
+        return deferred.promise;
+    };
          
     scheduleHttpService.addSectionToSchedule = function(section_id, schedule_id) {
         var deferred = $q.defer();
@@ -213,24 +242,7 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         });
         return deferred.promise;
     };
-
-    scheduleHttpService.generateSchedule = function(scheduleInput) {
-        var deferred = $q.defer();
-        $http({
-            method: 'POST',
-            url: '/generate_schedule/',
-            data: {
-                scheduleInput: scheduleInput
-            }
-        }).then(function successCallback(response) {
-            deferred.resolve(response['data']);
-        }, function errorCallback(error) {
-            deferred.reject(error);
-        });
-        return deferred.promise;
-    };
     
-
     return scheduleHttpService;
 }]);
 
@@ -334,15 +346,18 @@ scheduleMeApp.directive('closeModal', function() {
         restrict: 'AE',
         scope: {
             modalToClose: '@modalToClose',
-            functionToCall: '&functionToCall'
+            functionToCall: '&functionToCall',
+            onlyWhenTrue: '@onlyWhenTrue'
         },
         link: function link(scope, element, attrs) {
             element.click(function() {
                 scope.functionToCall();
-                if (scope.modalToClose[0] != '#') {
+                if (scope.modalToClose[0] !== '#') {
                     scope.modalToClose = '#' + scope.modalToClose;
                 }
-                $(scope.modalToClose).modal('hide');
+                if (!scope.onlyWhenTrue) {
+                    $(scope.modalToClose).modal('hide');
+                }
                 scope.$apply();
             });
         }

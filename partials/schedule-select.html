@@ -22,7 +22,8 @@
     <div class="row"
          ng-hide="!tempScheduleData || tempScheduleData.length === 0">
         <div class="col col-md-12">
-            <h1>Temporary Schedule: {{tempScheduleCount + 1}}</h1>
+            <h1>Generated Schedule: {{tempScheduleCount + 1}}</h1>
+            <small>These schedules are only temporary. Save the ones you like.</small>
             <div class="row">
                 <div class="col col-md-7">
                     <nav>
@@ -80,7 +81,7 @@
                 </thead>
                 <tbody>
                     <tr class="class-table-cell"
-                        ng-repeat="timeSlot in timeSlots">
+                        ng-repeat="timeSlot in tempTimeSlots">
                         <td><strong>{{formatTime(timeSlot.time)}}</strong></td>
                         <td class="schedule-table-cell" ng-repeat="weekDay in weekDays" watch-height>
                             <a href="javascript:void(0)"

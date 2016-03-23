@@ -3,6 +3,8 @@ var scheduleMeApp = angular.module('ScheduleMeApp');
 scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
     'LocalStorage', 'ScheduleHttpService', function($location, $scope, $http,
         localStorage, scheduleHttpService) {
+        $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
+
         $scope.getTimeSlots = function(scheduleData) {
             var timeSlots = [];
             for (var i = 7; i <= 19; i++) {
@@ -86,7 +88,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
                 $scope.tempScheduleCount = count;
                 localStorage.set('tempScheduleCount', count);
                 var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
-                $scope.timeSlots = $scope.getTimeSlots(schedule);
+                $scope.tempTimeSlots = $scope.getTimeSlots(schedule);
             } 
         };
 
@@ -100,7 +102,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
                 $scope.savedScheduleCount = count;
                 localStorage.set('savedScheduleCount', count);
                 var schedule = $scope.savedScheduleData[$scope.savedScheduleCount]['raw'];
-                $scope.timeSlots = $scope.getTimeSlots(schedule);
+                $scope.savedTimeSlots = $scope.getTimeSlots(schedule);
             } 
         };
 
@@ -113,14 +115,24 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
                 }
             }
             scheduleHttpService.saveSchedule(sectionIDs).then(function(result) {
-                console.log(result);
                 if (result) {
                     $location.path('/');
                 }
             });
         };
 
-        $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
+        $scope.deleteSchedule = function() {
+            var schedule = $scope.savedScheduleData[$scope.savedScheduleCount]['raw'],
+                scheduleID = schedule[0]['schedule_id'];
+            var certain = confirm('Are you sure you want to delete the ' +
+                'current schedule?');
+            if (certain === true) {
+                scheduleHttpService.deleteSchedule(scheduleID).then(function() {
+                    var userID = localStorage.get('user')['user_id'];
+                    $location.path('/');
+                });
+            }
+        };
 
         $scope.$watch(function() {
             return localStorage.get('savedScheduleData');
@@ -138,7 +150,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
             $scope.tempScheduleData = newValue;
             if (newValue && newValue.length > 0) {
                 $scope.tempScheduleCount = localStorage.get('tempScheduleCount') || 0;
-                $scope.getTempSchedule($scope.tempScheduleData);
+                $scope.getTempSchedule($scope.tempScheduleCount);
             }
         }, true);
 }]);

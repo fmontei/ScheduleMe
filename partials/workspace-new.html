@@ -292,19 +292,33 @@
                             </div>
                         </div>
                     </div> <!--./row-->
+                    <br />
+                    <div class="row">
+                        <div class="col col-md-12">
+                            <label class="checkbox-inline pull-left">
+                                <input type="checkbox"
+                                       ng-model="classModalCheckbox"
+                                       ng-init="classModalCheckbox = false">
+                                Keep dialog open until 'Close' is clicked
+                            </label>
+                        </div>
+                    </div> <!--./row-->
                 </div>
 
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-default"
-                            close-modal modal-to-close="#class-modal" function-to-call="resetModal()">
+                            close-modal modal-to-close="#class-modal" 
+                            function-to-call="resetModal()">
                             Close
                     </button>
                     <button type="button"
                             class="btn btn-primary"
                             ng-disabled="!modalData.selectedDept || !modalData.selectedClass ||
                                 (modalData.sectionType === 'Specific' && !modalData.selectedSection)"
-                            close-modal modal-to-close="#class-modal" function-to-call="selectClass()">
+                            close-modal modal-to-close="#class-modal" 
+                            function-to-call="selectClass()"
+                            only-when-true="classModalCheckbox">
                         Add Class
                     </button>
                 </div>
@@ -399,7 +413,6 @@
                             </div>
                         </div>
                     </div> <!--./row-->
-
                     <br />
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="class in modalData.groupClasses">

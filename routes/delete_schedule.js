@@ -7,24 +7,23 @@ var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
 router.use(function(req, res, next) {
-    if (!req.body || !req.schedule_id) {
-        return res.status(400).send('Missing required parameters.');
+    var schedule_id = (req.schedule_id) ? req.schedule_id.trim() : null;
+
+    if (!schedule_id) {
+        return res.status(400).send('Missing required parameter schedule_id.');
     }
     
     async.waterfall([
         function(callback) {
             db.run('delete from sectionschedule where schedule_id = $schedule_id;', {
-                $schedule_id: req.schedule_id.trim(),
+                $schedule_id: schedule_id,
             }, function(err) {
                 callback(err);
             });
         },
-        function(err, callback) {
-            if (err) {
-                return res.status(500).send(err);
-            }
+        function(callback) {
             db.run('delete from schedule where schedule_id = $schedule_id;', {
-                $schedule_id: req.schedule_id.trim(),
+                $schedule_id: schedule_id,
             }, function(err) {
                 callback(err);
             });
@@ -33,7 +32,8 @@ router.use(function(req, res, next) {
         if (err) {
             return res.status(500).send(err);
         } else {
-            return res.status(200).redirect(req.header('Referer') || '/');
+            return res.status(200).send('Successfully delete schedule with ' +
+                'schedule_id: ' + schedule_id + '.');
         }
     });
 });
