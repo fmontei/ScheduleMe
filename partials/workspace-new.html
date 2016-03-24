@@ -130,18 +130,31 @@
             <div style="margin-bottom: 10px;">
                 <label style="display: table-cell; vertical-align: middle;">Number of Credit Hours: </label>
                 <span style="display: table-cell;">
-                    <input style="margin-left: 10px;" type="number" min="0" max="21" ng-model="criteria.credit" class="form-control" />
+                    <input style="margin-left: 10px;" 
+                           type="number" 
+                           min="0" 
+                           max="21" 
+                           ng-model="criteria.credit" 
+                           class="form-control" />
                 </span>
             </div>
             <uib-accordion close-others="true">
                 <uib-accordion-group heading="Time of Day" is-open="true">
                 <div style="margin-bottom: 10px; margin-right: 50px; float: left;">
                     <label>Earliest Class: </label><p>(start time)</p>
-                    <input type="time" ng-model="criteria.earliestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
+                    <input id="earliestTime"
+                           type="time" 
+                           placeholder="HH:mm"
+                           ng-model="criteria.earliestTime"
+                           watch-time other-time="#latestTime" is-start="true" />
                 </div>
                 <div>
                     <label>Latest Class: </label><p>(start time)</p>
-                    <input type="time" ng-model="criteria.latestTime" placeholder="HH:mm" min="08:00" max="20:00"></input>
+                    <input id="latestTime"
+                           type="time" 
+                           placeholder="HH:mm"
+                           ng-model="criteria.latestTime"
+                           watch-time other-time="#earliestTime" is-start="false" />
                 </div>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Time Between Classes">
@@ -181,14 +194,16 @@
                             <option value="allday">All Day</option>
                             <option value="range">In Range</option>
                         </select>
-                        <span ng-show="timeslot.type == 'range'">
-                            <input type="text" 
-                                   style="width:80px" 
-                                   ng-model="timeslot.start" />
+                        <span ng-show="timeslot.type === 'range'">
+                            <input id="reserved-time-start-{{$index}}"
+                                   type="time"  
+                                   ng-model="timeslot.start"
+                                   watch-time other-time="#reserved-time-end-{{$index}}" is-start="true" />
                             to
-                            <input type="text" 
-                                   style="width:80px" 
-                                   ng-model="timeslot.end" />
+                            <input id="reserved-time-end-{{$index}}"
+                                   type="time"  
+                                   ng-model="timeslot.end"
+                                   watch-time other-time="#reserved-time-start-{{$index}}" is-start="false" />
                         </span>
                     </div>
                     <button type="button"

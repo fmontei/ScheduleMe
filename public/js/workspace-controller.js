@@ -84,7 +84,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         }
 
         var criteria = [];
-        
+
         criteria.push({
             'type': 'credits',
             'parameters': [ 
@@ -95,21 +95,13 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         });
 
         if ($scope.criteria.earliestTime && $scope.criteria.latestTime) {
-            var hourIndex = $scope.criteria.earliestTime.toString().indexOf(':');
-            var startHour = $scope.criteria.earliestTime.toString().
-                substring(hourIndex - 2, hourIndex);
-            var startMin = $scope.criteria.earliestTime.toString().
-                substring(hourIndex + 1, hourIndex + 3);
-            hourIndex = $scope.criteria.latestTime.toString().indexOf(':');
-            var endHour = $scope.criteria.latestTime.toString().
-                substring(hourIndex - 2, hourIndex);
-            var endMin = $scope.criteria.latestTime.toString().
-                substring(hourIndex + 1, hourIndex + 3);
+            var startTime = convertDateToTimeStr($scope.criteria.earliestTime),
+                endTime = convertDateToTimeStr($scope.criteria.latestTime);
             criteria.push({
                 'type': 'timeofday',
                 'parameters': { 
-                    'start_time': startHour + ':' + startMin, 
-                    'end_time': endHour + ':' + endMin
+                    'start_time': startTime, 
+                    'end_time': endTime
                 },
                 'priority': 'required'
             });
@@ -166,3 +158,10 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         $scope.savedClassData = newValue;
     }, true);
 }]);
+
+function convertDateToTimeStr(date) {
+    var hourIndex = date.toString().indexOf(':');
+    var hours = date.substring(hourIndex - 2, hourIndex);
+    var mins = date.substring(hourIndex + 1, hourIndex + 3);
+    return hours + ':' + mins;
+};

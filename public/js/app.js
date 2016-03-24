@@ -404,6 +404,40 @@ scheduleMeApp.directive('watchHeight', function() {
     };
 });
 
+scheduleMeApp.directive('watchTime', function() {
+    return {
+        restrict: 'AE',
+        scope: {
+            otherTime: '@otherTime',
+            isStart: '@isStart'
+        },
+        link: function(scope, element, attrs) {
+            var thisID = element.attr('id');
+            scope.$watch(function() {
+                return element.val();
+            }, function(newValue, oldValue) {
+                var isStart = JSON.parse(scope.isStart),
+                    thisTimeHr = parseInt(newValue.substring(0, newValue.indexOf(':'))),
+                    thisTimeMin = parseInt(newValue.substring(newValue.indexOf(':') + 1)),
+                    otherTimeVal = $(scope.otherTime).val(),
+                    otherTimeHr = parseInt(otherTimeVal.substring(0, otherTimeVal.indexOf(':'))),
+                    otherTimeMin = parseInt(otherTimeVal.substring(otherTimeVal.indexOf(':') + 1));
+                if (isStart === true) {
+                    if (isNaN(otherTimeHr) || (thisTimeHr > otherTimeHr) ||
+                        (thisTimeHr === otherTimeHr && thisTimeMin > otherTimeMin)) {
+                        $(scope.otherTime).val(newValue);
+                    }
+                } else if (isStart === false) {
+                    if (isNaN(otherTimeHr) || (thisTimeHr < otherTimeHr) ||
+                        (thisTimeHr === otherTimeHr && thisTimeMin < otherTimeMin)) {
+                        $(scope.otherTime).val(newValue);
+                    }
+                }
+            });
+        }
+    };
+});
+
 
 
 
