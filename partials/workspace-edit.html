@@ -18,7 +18,7 @@
 
             <!-- Display message when no classes/groups -->
             <div class="panel panel-default"
-                 ng-if="(!savedClassData || savedClassData.length == 0)">
+                 ng-if="(!selectedClasses || selectedClasses.length == 0)">
                 <div class="panel-body">
                     <p>
                         You currently have no classes selected. To add a class,
@@ -33,7 +33,7 @@
             <!--List selected classes-->
             <ul class="list-group">
                 <li class="list-group-item"
-                    ng-repeat="class in savedClassData">
+                    ng-repeat="class in selectedClasses">
                     <small>
                         <a href="javascript:void(0)"
                            style="margin-left: 5px"
@@ -76,6 +76,12 @@
                        data-toggle="modal"
                        data-target="#group-modal">
                        Add Group
+                </label>
+                <label class="btn btn-primary"
+                       ng-model="radioModel"
+                       uib-btn-radio="'Generate Schedules'"
+                       ng-click="generateSchedule()">
+                       Schedule Me
                 </label> <!--./btn-group -->
             </div>
         </div>

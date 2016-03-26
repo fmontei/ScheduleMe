@@ -38,11 +38,8 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     };
 
     $scope.undoSelection = function(_class, listName) {
-        var list = [];
-        if (listName === 'selectedClasses') list = $scope.selectedClasses;
-        else if (listName === 'selectedGroups') list = $scope.selectedGroups;
-        else if (listName === 'savedClassData') list = $scope.savedClassData;
-        var index = list.indexOf(_class);
+        var list = localStorage.get(listName),
+            index = list.indexOf(_class);
         list.splice(index, 1);
         localStorage.set(listName, list);
     };

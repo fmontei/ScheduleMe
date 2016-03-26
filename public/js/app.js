@@ -163,7 +163,7 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         }).then(function successCallback(response) {
             deferred.resolve(response['data']);
         }, function errorCallback() {
-            console.log('Error: current user has no schedule for selected semester.');
+            console.log('Error: current user has no schedules for selected semester.');
             deferred.reject();
         });
 

@@ -121,6 +121,16 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
             });
         };
 
+        $scope.editSchedule = function() {
+            var scheduleDataToEdit = $scope.savedScheduleData
+                [$scope.savedScheduleCount]['grouped'];
+            for (var i = 0; i < scheduleDataToEdit.length; i++) {
+                scheduleDataToEdit[i]['isMandatory'] = true;
+            }
+            localStorage.set('selectedClasses', scheduleDataToEdit);
+            $location.path('/workspace-edit');
+        };
+
         $scope.deleteSchedule = function() {
             var schedule = $scope.savedScheduleData[$scope.savedScheduleCount]['raw'],
                 scheduleID = schedule[0]['schedule_id'];

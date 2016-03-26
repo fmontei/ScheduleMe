@@ -12,6 +12,16 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
         $location.path('/');
     };
 
+    // Force logged-out/unregistered users to login before being allowed to
+    // navigate to another part of the app.
+    $scope.$watch(function() {
+        return $location.path();
+    }, function(newValue, oldValue) {
+        if (!localStorage.get('user')) {
+            $location.path('/');
+        }
+    });
+
     $scope.$watch(function() {
         return localStorage.get('allSemesters');
     }, function(newValue, oldValue) {
