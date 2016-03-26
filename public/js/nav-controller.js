@@ -8,6 +8,7 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
     };
 
     $scope.logout = function() {
+        // TODO: invoke logout server call
         localStorage.clearAll();
         $location.path('/');
     };

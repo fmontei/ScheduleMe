@@ -56,8 +56,15 @@
                     <div class="btn-group pull-right">
                         <a class="btn btn-primary"
                            href="javascript:void(0)"
-                           ng-click="saveSchedule()">
+                           ng-click="saveSchedule()"
+                           ng-show="!scheduleToUpdate">
                             Save Schedule
+                        </a>
+                        <a class="btn btn-primary"
+                           href="javascript:void(0)"
+                           ng-click="updateSchedule()"
+                           ng-show="scheduleToUpdate">
+                            Update Schedule
                         </a>
                         <a class="btn btn-default"
                            href="#/workspace-new">

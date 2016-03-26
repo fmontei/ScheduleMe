@@ -17,10 +17,10 @@ router.use(function(req, res, next) {
             });
         }
     ], function (err, rows) {
-        if (rows && rows.length > 0) {
-            res.send(rows);
+        if (err) {
+            return res.status(500).send(err);
         } else {
-            res.status(404).send('No semesters found.');
+            return res.status(200).send(rows);
         }
     });
 });

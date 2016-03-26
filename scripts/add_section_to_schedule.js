@@ -1,15 +1,12 @@
-var sqlite3 = require('sqlite3').verbose();
 var async = require('async');
 var Q = require('q');
 
-var db = new sqlite3.Database('scheduleme.db');
-
-function execute(section_id, schedule_id) {
+function execute(transaction, section_id, schedule_id) {
     var deferred = Q.defer();
 
     async.waterfall([
         function getTimeslotsBySectionID(callback) {
-            db.all('select * from timeslot where section_id = $section_id;', {
+            transaction.all('select * from timeslot where section_id = $section_id;', {
                 $section_id: section_id
             }, function(err, rows) {
                 callback(err, rows);
@@ -22,7 +19,7 @@ function execute(section_id, schedule_id) {
                     days_of_week.push("'" + timeslots[i]['day_of_week'] + "'");
                 }
             }
-            db.all('select ts.day_of_week, ts.start_time, ts.end_time from sectionschedule ss ' +
+            transaction.all('select ts.day_of_week, ts.start_time, ts.end_time from sectionschedule ss ' +
                 'inner join timeslot ts on (ss.timeslot_id = ts.timeslot_id) where ts.day_of_week ' +
                 'in (' + days_of_week.toString() + ') and ss.schedule_id = ' + schedule_id + ';', 
                 function(err, rows) {
@@ -92,7 +89,7 @@ function execute(section_id, schedule_id) {
             var promises = [];
             for (var i = 0; i < timeslots.length; i++) {
                 promises.push(insertSingleIntoDB(
-                    schedule_id, section_id, timeslots[i]['timeslot_id'])
+                    transaction, schedule_id, section_id, timeslots[i]['timeslot_id'])
                 );
             }
             Q.all(promises).then(function() {
@@ -110,9 +107,9 @@ function execute(section_id, schedule_id) {
     return deferred.promise;
 };
 
-function insertSingleIntoDB(schedule_id, section_id, timeslot_id) {
+function insertSingleIntoDB(transaction, schedule_id, section_id, timeslot_id) {
     var deferred = Q.defer();
-    db.run('insert into sectionschedule(schedule_id, section_id, timeslot_id) ' +
+    transaction.run('insert into sectionschedule(schedule_id, section_id, timeslot_id) ' +
         'select $schedule_id, $section_id, $timeslot_id where not exists (' +
         'select * from sectionschedule where schedule_id = $schedule_id and ' +
         'section_id = $section_id and timeslot_id = $timeslot_id);', {

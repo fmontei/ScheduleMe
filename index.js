@@ -26,7 +26,6 @@ var update_schedule = require('./routes/update_schedule');
 
 var delete_user = require('./routes/delete_user');
 var delete_schedule = require('./routes/delete_schedule');
-var remove_from_schedule = require('./routes/remove_from_schedule');
 
 var app = express();
 
@@ -117,13 +116,10 @@ app.post('/generate_schedule', generate_schedule);
 // Create schedule
 app.post('/schedule', create_schedule);
 
-app.get('/generate_schedule', generate_schedule);
-
-// Add section to a specified schedule
-app.put('/schedule/:schedule_id/sections/:section_id', 
+// Update schedule
+app.put('/schedule/:schedule_id/', 
 	function(req, res, next) {
 		req.schedule_id = req.params.schedule_id.trim();
-		req.section_id = req.params.section_id.trim();
 		update_schedule(req, res, next);
 	}
 );
@@ -139,15 +135,6 @@ app.delete('/schedule/:schedule_id', function(req, res, next) {
     req.schedule_id = req.params.schedule_id;
     delete_schedule(req, res, next);
 });
-
-// Remove section from schedule
-app.delete('/schedule/:schedule_id/sections/:section_id', 
-	function(req, res, next) {
-		req.schedule_id = req.params.schedule_id.trim();
-		req.section_id = req.params.section_id.trim();
-		remove_from_schedule(req, res, next);
-	}
-);
 
 app.listen(3000, function() {
     console.log("listening on port 3000");

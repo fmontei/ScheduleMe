@@ -18,7 +18,6 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         defaultMinCredits: 6,
         defaultMaxCredits: 15,
         timeslots: [],
-
     };
 
     $scope.addTimeslot = function(day, type, start, end) {
@@ -154,6 +153,14 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     }, function(newValue, oldValue) {
         $scope.savedClassData = newValue;
     }, true);
+
+    $scope.$watch(function() {
+        return $location.path();
+    }, function(newValue, oldValue) {
+        if (newValue.indexOf('workspace-new') !== -1) {
+            localStorage.set('scheduleToUpdate', null);
+        }
+    });
 }]);
 
 function convertDateToTimeStr(date) {

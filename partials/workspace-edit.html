@@ -38,12 +38,12 @@
                         <a href="javascript:void(0)"
                            style="margin-left: 5px"
                            class="glyphicon glyphicon-remove no-link pull-right"
-                           ng-click="undoSelection(class, 'savedClassData')">
+                           ng-click="undoSelection(class, 'selectedClasses')">
                         </a>
                         <a  href="javascript:void(0)"
                             ng-class="{'glyphicon glyphicon-star no-link pull-right': class.isMandatory === true,
                                        'glyphicon glyphicon-star-empty no-link pull-right': !class.isMandatory}"
-                            ng-click="updateClassMandatoryStatus(class, 'savedClassData')">
+                            ng-click="updateClassMandatoryStatus(class, 'selectedClasses')">
                         </a>
                     </small>
                     <br />
@@ -248,7 +248,7 @@
                               <a href="javascript:void(0)" class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
                                  ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="">
+                                 ng-click="modalData.selectedSection = section; updateSelectedClass()">
                                 <small class="list-group-item-heading">
                                     <div>
                                         <label>Section</label> {{section.section_name}} |
@@ -267,6 +267,17 @@
                             </div>
                         </div>
                     </div> <!--./row-->
+                    <br />
+                    <div class="row">
+                        <div class="col col-md-12">
+                            <label class="checkbox-inline pull-left">
+                                <input type="checkbox"
+                                       ng-model="classModalCheckbox"
+                                       ng-init="classModalCheckbox = false">
+                                Keep dialog open until 'Close' is clicked
+                            </label>
+                        </div>
+                    </div> <!--./row-->
                 </div>
 
                 <div class="modal-footer">
@@ -279,7 +290,9 @@
                             class="btn btn-primary"
                             ng-disabled="!modalData.selectedDept || !modalData.selectedClass ||
                                 (modalData.sectionType === 'Specific' && !modalData.selectedSection)"
-                            close-modal modal-to-close="#class-modal" function-to-call="">
+                            close-modal modal-to-close="#class-modal"
+                            function-to-call="selectClass()"
+                            only-when-true="classModalCheckbox">
                         Add Class
                     </button>
                 </div>

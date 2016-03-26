@@ -75,6 +75,19 @@ scheduleMeApp.factory('UserHttpService', ['$http', '$q', function($http, $q) {
         return deferred.promise;
     };
 
+    userHttpService.logout = function(userID) {
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: '/logout/' + userID
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(response) {
+            deferred.resolve(response['error']);
+        });
+        return deferred.promise;
+    };
+
     return userHttpService;
 }]);
 
@@ -170,6 +183,22 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         return deferred.promise;
     };
 
+    scheduleHttpService.generateSchedule = function(scheduleInput) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: '/generate_schedule/',
+            data: {
+                scheduleInput: scheduleInput
+            }
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback(error) {
+            deferred.reject(error);
+        });
+        return deferred.promise;
+    };
+
     scheduleHttpService.saveSchedule = function(sectionIDs) {
         var deferred = $q.defer();
         $http({
@@ -188,18 +217,18 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
         return deferred.promise;
     };
 
-    scheduleHttpService.generateSchedule = function(scheduleInput) {
+    scheduleHttpService.updateSchedule = function(scheduleID, sectionIDs) {
         var deferred = $q.defer();
         $http({
-            method: 'POST',
-            url: '/generate_schedule/',
+            method: 'PUT',
+            url: '/schedule/' + scheduleID,
             data: {
-                scheduleInput: scheduleInput
+                sectionIDs: sectionIDs
             }
         }).then(function successCallback(response) {
             deferred.resolve(response['data']);
         }, function errorCallback(error) {
-            deferred.reject(error);
+            deferred.resolve(error);
         });
         return deferred.promise;
     };
@@ -213,32 +242,6 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
             deferred.resolve(response['data']);
         }, function errorCallback(error) {
             deferred.resolve(error);
-        });
-        return deferred.promise;
-    };
-         
-    scheduleHttpService.addSectionToSchedule = function(section_id, schedule_id) {
-        var deferred = $q.defer();
-        $http({
-            method: 'PUT',
-            url: '/schedule/' + schedule_id.trim() + '/sections/' + section_id.trim()
-        }).then(function successCallback(response) {
-            deferred.resolve(response['data']);
-        }, function errorCallback(error) {
-            deferred.reject(error);
-        });
-        return deferred.promise;
-    };
-    
-    scheduleHttpService.removeSectionFromSchedule = function(section_id, schedule_id) {
-        var deferred = $q.defer();
-        $http({
-            method: 'DELETE',
-            url: '/schedule/' + schedule_id.trim() + '/sections/' + section_id.trim()
-        }).then(function successCallback(response) {
-            deferred.resolve(response['data']);
-        }, function errorCallback(error) {
-            deferred.reject(error);
         });
         return deferred.promise;
     };
