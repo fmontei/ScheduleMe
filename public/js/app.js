@@ -358,7 +358,8 @@ scheduleMeApp.directive('closeModal', function() {
                 if (scope.modalToClose[0] !== '#') {
                     scope.modalToClose = '#' + scope.modalToClose;
                 }
-                if (!scope.onlyWhenTrue) {
+                if (scope.onlyWhenTrue === undefined || 
+                    JSON.parse(scope.onlyWhenTrue) === false) {
                     $(scope.modalToClose).modal('hide');
                 }
                 scope.$apply();

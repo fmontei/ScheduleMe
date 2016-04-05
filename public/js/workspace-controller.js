@@ -44,6 +44,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     };
 
     $scope.generateSchedule = function() {
+        localStorage.set('previousWorkspacePage', $location.path());
         var classGroups = [];
         var lockedClassGroups = [];
         var lockedSections = [];

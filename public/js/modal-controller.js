@@ -80,6 +80,13 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             _class = combineClassWithSection(_class, section);
             $scope.modalData.groupClasses.push(_class);
         }
+        $scope.modalData.selectedDept = null;
+        $scope.modalData.selectedClass = null;
+        $scope.modalData.selectedSection = null;
+        $scope.modalData.filteredClasses = [];
+        $scope.modalData.filteredSections = [];
+        $scope.modalData.groupMessage = 'Repeat the previous steps for all the ' +
+            'classes that you want grouped together by degree requirement.';
     };
 
     $scope.removeSelectedGroupOption = function(_class) {
@@ -95,7 +102,12 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             selectedClass: null,
             selectedSection: null,
             groupClasses: [],
-            sectionType: ''
+            sectionType: 'Any',
+            groupMessage: "Select a department and class. If you don't mind what " + 
+                "section you're put in, select 'Any' for the section. If the " +
+                "class you've chosen has any available sections and you want to " +
+                "be in a specific section, select 'Specific' and then pick " +
+                "your section from the list that appears."
         };
     };
 

@@ -189,4 +189,14 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
     }, function(newValue, oldValue) {
         $scope.scheduleToUpdate = newValue;
     });
+
+    $scope.$watch(function() {
+        return localStorage.get('previousWorkspacePage');
+    }, function(newValue, oldValue) {
+        if (!newValue) {
+            $scope.previousWorkspacePage = '/#/workspace-new';
+        } else {
+            $scope.previousWorkspacePage = '/#' + newValue;
+        }
+    })
 }]);
