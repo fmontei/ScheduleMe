@@ -148,18 +148,14 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     }, function(newValue, oldValue) {
         $scope.selectedGroups = newValue;
     }, true);
-    
-    $scope.$watch(function() {
-        return localStorage.get('savedClassData');
-    }, function(newValue, oldValue) {
-        $scope.savedClassData = newValue;
-    }, true);
 
     $scope.$watch(function() {
         return $location.path();
     }, function(newValue, oldValue) {
         if (newValue.indexOf('workspace-new') !== -1) {
             localStorage.set('scheduleToUpdate', null);
+            localStorage.set('selectedClasses', null);
+            localStorage.set('selectedGroups', null);
         }
     });
 }]);
