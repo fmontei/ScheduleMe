@@ -4,39 +4,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     'LocalStorage', 'ClassHttpService', 'SemesterHttpService', 'ScheduleHttpService',
     function($location, $scope, $http, localStorage, classHttpService,
         semesterHttpService, scheduleHttpService) {
-    $scope.criteria = {
-        gpaSlider: {
-            value: 3.0,
-            options: {
-                floor: 1.0,
-                ceil: 4.0,
-                step: 0.1,
-                precision: 1,
-                showSelectionBarEnd: true
-            }
-        },
-        creditsSlider: {
-            min: 6,
-            max: 15,
-            options: {
-                floor: 1,
-                ceil: 25,
-                step: 1,
-                noSwitching: true,
-                translate: function(value, sliderId, label) {
-                    switch (label) {
-                        case 'model':
-                            return '<b>Min:</b> ' + value;
-                        case 'high':
-                            return '<b>Max:</b> ' + value;
-                        default:
-                            return value;
-                    }
-                }
-            }
-        },
-        timeslots: []
-    };
+    init(localStorage, $scope);
 
     $scope.addTimeslot = function() {
         $scope.criteria.timeslots.push({});
@@ -164,6 +132,52 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         $scope.selectedGroups = newValue;
     }, true);
 }]);
+
+function init(localStorage, $scope) {
+    var totalCredits = 0, 
+        selectedClasses = localStorage.get('selectedClasses');
+    if (selectedClasses) {
+        for (var i = 0; i < selectedClasses.length; i++) {
+            var credits = parseInt(selectedClasses[i]['credits']);
+            totalCredits += credits;
+        }
+    } else {
+        totalCredits = 15;
+    }
+    $scope.criteria = {
+        gpaSlider: {
+            value: 3.0,
+            options: {
+                floor: 1.0,
+                ceil: 4.0,
+                step: 0.1,
+                precision: 1,
+                showSelectionBarEnd: true
+            }
+        },
+        creditsSlider: {
+            min: 6,
+            max: totalCredits,
+            options: {
+                floor: 1,
+                ceil: 25,
+                step: 1,
+                noSwitching: true,
+                translate: function(value, sliderId, label) {
+                    switch (label) {
+                        case 'model':
+                            return '<b>Min:</b> ' + value;
+                        case 'high':
+                            return '<b>Max:</b> ' + value;
+                        default:
+                            return value;
+                    }
+                }
+            }
+        },
+        timeslots: []
+    };
+};
 
 function convertDateToTimeStr(date) {
     var hourIndex = date.toString().indexOf(':');

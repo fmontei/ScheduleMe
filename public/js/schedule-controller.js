@@ -200,5 +200,5 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         } else {
             $scope.previousWorkspacePage = '/#' + newValue;
         }
-    })
+    });
 }]);
