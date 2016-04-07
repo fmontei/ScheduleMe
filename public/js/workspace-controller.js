@@ -19,8 +19,8 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             min: 6,
             max: 15,
             options: {
-                foor: 1,
-                ceil: 21,
+                floor: 1,
+                ceil: 25,
                 step: 1,
                 noSwitching: true,
                 translate: function(value, sliderId, label) {
@@ -163,16 +163,6 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     }, function(newValue, oldValue) {
         $scope.selectedGroups = newValue;
     }, true);
-
-    $scope.$watch(function() {
-        return $location.path();
-    }, function(newValue, oldValue) {
-        if (newValue.indexOf('workspace-new') !== -1) {
-            localStorage.set('scheduleToUpdate', null);
-            localStorage.set('selectedClasses', null);
-            localStorage.set('selectedGroups', null);
-        }
-    });
 }]);
 
 function convertDateToTimeStr(date) {

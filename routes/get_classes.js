@@ -1,6 +1,6 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
-var async = require('async');
+var Q = require('q');
 
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
@@ -9,29 +9,31 @@ var db = new sqlite3.Database('scheduleme.db');
  * Get all classes by semester id.
  */
 router.use(function(req, res, next) {
-    var semester_id = req.semester_id;
+    var semester_id = req.semester_id.trim();
+    /* Since this is the first query that is invoked client-side, and since
+     * sqlite3 might still be busy updating data in the database, keep
+     * running this function recursively until success. 
+     */ 
+    runQuery(res, semester_id, 0);
+});
 
-    if (!semester_id) {
-        return res.status(400).send('url request must end with /:semester_id.');
-    }
-
-    async.waterfall([
-        function(callback) {
-            semester_id = semester_id.trim();
-            var query = "SELECT * from class WHERE semester_id = '" + semester_id
-                + "' order by department, class_number;";
-            db.all(query, function(err, rows) {
-                callback(null, rows);
-            });
-        }
-    ], function (err, rows) {
-        if (rows && rows.length > 0) {
-            res.send(rows);
+function runQuery(res, semester_id, errorCount) {
+    var query = "SELECT * from class WHERE semester_id = '" + semester_id + 
+            "' order by department, class_number;";
+    db.all(query, function(err, rows) {
+        if (err) {
+            if (errorCount < 10) {
+                setTimeout(function() {
+                    runQuery(res, semester_id, errorCount + 1);
+                }, 1000);
+            } else {
+                return res.status(500).send(err);
+            }
         } else {
-            res.status(404).send('Class with semester_id: ' + semester_id + ' not found.');
+            return res.status(200).send(rows);
         }
     });
-});
+};
 
 module.exports = router;
 

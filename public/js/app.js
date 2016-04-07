@@ -12,11 +12,8 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     }).when('/index', {
         templateUrl: 'partials/load-data.html',
         controller: 'LoadDataController'
-    }).when('/workspace-new', {
-        templateUrl: 'partials/workspace-new.html',
-        controller: 'WorkspaceController'
-    }).when('/workspace-edit', {
-        templateUrl: 'partials/workspace-edit.html',
+    }).when('/workspace', {
+        templateUrl: 'partials/workspace.html',
         controller: 'WorkspaceController'
     }).when('/schedule', {
         templateUrl: 'partials/schedule.html',
@@ -291,14 +288,11 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         var selectedSemester = localStorage.get('selectedSemester');
         if (!selectedSemester) {
             semesterHttpService.getLatestSemester().then(function(latestSemester) {
-                selectedSemester = latestSemester;
-                localStorage.set('selectedSemester', selectedSemester);
+                localStorage.set('selectedSemester', latestSemester);
                 getClassesWhenReady();
-                deferred.resolve();
             });
         } else {
             getClassesWhenReady();
-            deferred.resolve();
         }
 
         function getClassesWhenReady() {
@@ -309,6 +303,7 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
                     'allDepartments',
                     classHttpService.getDepartments(allClasses)
                 );
+                deferred.resolve();
             });
         };
 
@@ -330,6 +325,8 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         var userID = localStorage.get('user')['user_id'];
 
         serverDataService.getAllSemesters().then(function() {
+            // Keep this function call here -- it specifically runs multiple
+            // times on the server in case there are any SQL_BUSY errors
             return serverDataService.getClassesForSelectedSemester();
         }).then(function() {
             return serverDataService.getScheduleForUser(userID);

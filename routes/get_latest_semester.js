@@ -21,7 +21,7 @@ router.use(function(req, res, next) {
         }
     ], function (err, rows) {
         if (rows && rows.length > 0) {
-            res.send(rows[0]);
+            res.status(200).send(rows[0]);
         } else {
             res.status(404).send('No semesters found.');
         }

@@ -131,7 +131,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         }
         localStorage.set('selectedClasses', scheduleDataToUpdate);
         localStorage.set('scheduleToUpdate', scheduleID);
-        $location.path('workspace-edit');
+        $location.path('workspace');
     };
 
     $scope.updateSchedule = function() {
@@ -144,9 +144,11 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
             }
         }
         scheduleHttpService.updateSchedule(scheduleID, sectionIDs).then(function(result) {
-            console.log(result)
             if (result) {
                 $location.path('/');
+                localStorage.set('scheduleToUpdate', null);
+                localStorage.set('selectedClasses', null);
+                localStorage.set('selectedGroups', null);
             }
         });
     };
@@ -194,7 +196,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         return localStorage.get('previousWorkspacePage');
     }, function(newValue, oldValue) {
         if (!newValue) {
-            $scope.previousWorkspacePage = '/#/workspace-new';
+            $scope.previousWorkspacePage = '/#/workspace';
         } else {
             $scope.previousWorkspacePage = '/#' + newValue;
         }
