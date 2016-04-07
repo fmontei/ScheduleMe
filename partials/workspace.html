@@ -258,8 +258,8 @@
                         <div class="col col-md-8">
                             <select class="form-control"
                                     ng-options="c as (c.class_number + ' - ' + c.class_name) for c in modalData.filteredClasses"
-                                    ng-model="modalData.selectedClass"
-                                    ng-change="updateSelectedClass(); filterSectionsByClass()">
+                                    ng-model="modalData.selectedClass.model"
+                                    ng-change="filterSectionsByClass()">
                             </select>
                         </div>
                     </div> <!--./row-->
@@ -267,32 +267,28 @@
                     <br />
                     <div class="row">
                         <div class="col col-md-4">
-                            <label><u>Section</u></label>
+                            <label><u>Class Section</u></label>
                         </div>
                         <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
                             <button class="btn btn-sm"
-                                    ng-class="[{'btn-primary': modalData.sectionType === 'Any' || !modalData.sectionType},
+                                    ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
                                         {'btn-default': modalData.sectionType !== 'Any'}]"
                                     ng-click="modalData.sectionType = 'Any';
                                         modalData.selectedSection = null;
-                                        updateSelectedClass();">Any</button>
+                                        updateSelectedSection('class');">Any</button>
                             <button class="btn btn-sm"
                                     ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
                                         {'btn-default': modalData.sectionType !== 'Specific'}]"
                                     ng-click="modalData.sectionType = 'Specific'"
                                     ng-show="modalData.filteredSections.length > 0">Specific</button>
-                            <button class="btn btn-sm"
-                                    ng-class="[{'btn-primary': modalData.sectionType === 'Lab'},
-                                        {'btn-default': modalData.sectionType !== 'Lab'}]"
-                                    ng-click="modalData.sectionType = 'Lab'"
-                                    ng-show="modalData.filteredLabSections.length > 0">Lab</button>
                             <div class="list-group"
                                  style="margin-top: 2px"
                                  ng-show="modalData.sectionType === 'Specific'">
-                              <a href="javascript:void(0)" class="list-group-item"
+                              <a href="javascript:void(0)" 
+                                 class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
                                  ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="modalData.selectedSection = section; updateSelectedClass()">
+                                 ng-click="modalData.selectedSection = section; updateSelectedSection('class')">
                                 <small class="list-group-item-heading">
                                     <div>
                                         <label>Section</label> {{section.section_name}} |
@@ -309,13 +305,32 @@
                                 </small>
                               </a>
                             </div>
+                        </div>
+                    </div> <!--./row-->
+                    <br />
+                    <div class="row" ng-show="modalData.filteredLabSections.length > 0">
+                        <div class="col col-md-4">
+                            <label><u>Lab Section</u></label>
+                        </div>
+                        <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
+                            <button class="btn btn-sm"
+                                    ng-class="[{'btn-primary': modalData.labSectionType === 'Any'},
+                                        {'btn-default': modalData.labSectionType !== 'Any'}]"
+                                    ng-click="modalData.labSectionType = 'Any';
+                                        modalData.selectedLabSection = null;
+                                        updateSelectedSection('lab');">Any</button>
+                            <button class="btn btn-sm"
+                                    ng-class="[{'btn-primary': modalData.labSectionType === 'Specific'},
+                                        {'btn-default': modalData.labSectionType !== 'Specific'}]"
+                                    ng-click="modalData.labSectionType = 'Specific'">Specific</button>
                             <div class="list-group"
                                  style="margin-top: 2px"
-                                 ng-show="modalData.sectionType === 'Lab'">
-                              <a href="javascript:void(0)" class="list-group-item"
+                                 ng-show="modalData.labSectionType === 'Specific'">
+                              <a href="javascript:void(0)" 
+                                 class="list-group-item"
                                  ng-repeat="section in modalData.filteredLabSections"
-                                 ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="modalData.selectedSection = section; updateSelectedClass()">
+                                 ng-class="{'active': modalData.selectedLabSection === section}"
+                                 ng-click="modalData.selectedLabSection = section; updateSelectedSection('lab')">
                                 <small class="list-group-item-heading">
                                     <div>
                                         <label>Section</label> {{section.section_name}} |
@@ -412,7 +427,7 @@
                         <div class="col col-md-8">
                             <select class="form-control"
                                     ng-options="c as (c.class_number + ' - ' + c.class_name) for c in modalData.filteredClasses"
-                                    ng-model="modalData.selectedClass"
+                                    ng-model="modalData.selectedClass.model"
                                     ng-change="filterSectionsByClass()">
                             </select>
                         </div>
@@ -421,15 +436,17 @@
                     <br />
                     <div class="row">
                         <div class="col col-md-4">
-                            <label><u>Section</u></label>
+                            <label><u>Class Section</u></label>
                         </div>
                         <div class="col col-md-8" style="max-height: 300px; overflow-y: auto;">
-                            <button class="btn btn-sm btn-default"
+                            <button class="btn btn-sm"
+                                    ng-class="[{'btn-primary': modalData.sectionType === 'Any'},
+                                        {'btn-default': modalData.sectionType !== 'Any'}]"
                                     ng-click="modalData.sectionType = 'Any';
-                                        updateSelectedGroupClasses();">Any</button>
+                                        updateSelectedGroupSections();">Any</button>
                             <button class="btn btn-sm"
                                     ng-class="[{'btn-primary': modalData.sectionType === 'Specific'},
-                                        {'btn-default': modalData.sectionType === 'Any'}]"
+                                        {'btn-default': modalData.sectionType !== 'Specific'}]"
                                     ng-click="modalData.sectionType = 'Specific'"
                                     ng-show="modalData.filteredSections.length > 0">Specific</button>
                             <div class="list-group"
@@ -438,7 +455,7 @@
                               <a href="javascript:void(0)" class="list-group-item"
                                  ng-repeat="section in modalData.filteredSections"
                                  ng-class="{'active': modalData.selectedSection === section}"
-                                 ng-click="modalData.selectedSection = section; updateSelectedGroupClasses()">
+                                 ng-click="modalData.selectedSection = section; updateSelectedGroupSections()">
                                 <small class="list-group-item-heading">
                                     <div>
                                         <label>Section</label> {{section.section_name}} |

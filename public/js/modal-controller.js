@@ -22,7 +22,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         if (!$scope.modalData.selectedClass) {
             return;
         }
-        var classID = $scope.modalData.selectedClass.class_id;
+        var classID = $scope.modalData.selectedClass.model.class_id;
         sectionHttpService.getSectionsForClass(classID, false).then(function(sections) {
             $scope.modalData.filteredSections = sections;
         });
@@ -37,7 +37,12 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         if (!allSelectedClasses) {
             allSelectedClasses = [];
         }
-        allSelectedClasses.push(_class);
+        if (_class.class) {
+            allSelectedClasses.push(_class.class);
+        }
+        if (_class.lab) {
+            allSelectedClasses.push(_class.lab);
+        }
         localStorage.set('selectedClasses', allSelectedClasses);
         $scope.resetModal();
     };
@@ -60,35 +65,53 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.resetModal();
     };
 
-    $scope.updateSelectedClass = function() {
-        var allSelectedClasses = localStorage.get('selectedClasses');
-        var _class = $scope.modalData.selectedClass;
-        var section = $scope.modalData.selectedSection || null;
-        var alreadyExists = isClassInList(_class, allSelectedClasses);
-        if (alreadyExists === false) {
-            _class = combineClassWithSection(_class, section);
-            $scope.modalData.selectedClass = _class;
-        } else {
-            $scope.modalData.selectedClass = null;
+    $scope.updateSelectedSection = function(type) {
+        var allSelectedClasses = localStorage.get('selectedClasses'),
+            _class = angular.copy($scope.modalData.selectedClass),
+            section = null,
+            alreadyExists = false;
+        if (type === 'class') {
+            section = $scope.modalData.selectedSection;
+            alreadyExists = isClassInList(_class, allSelectedClasses);
+            if (alreadyExists == false) {
+                _class.class = combineClassWithSection(_class.model, section);
+            } else {
+                _class.class = null;
+            }
+            $scope.modalData.selectedClass.class = _class.class;
+        } else if (type == 'lab') {
+            section = $scope.modalData.selectedLabSection;
+            alreadyExists = isClassInList(_class, allSelectedClasses);
+            if (alreadyExists == false) {
+                _class.lab = combineClassWithSection(_class.model, section);
+                _class.lab['isLab'] = true;
+            } else {
+                _class.lab = null;
+            }
+            $scope.modalData.selectedClass.lab = _class.lab;
         }
     };
 
-    $scope.updateSelectedGroupClasses = function() {
+    $scope.updateSelectedGroupSections = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
         var _class = angular.copy($scope.modalData.selectedClass);
         var section = $scope.modalData.selectedSection;
         var alreadyExists = isClassInList(_class, $scope.modalData.groupClasses) ||
             isClassInList(_class, allSelectedClasses);
         if (alreadyExists === false) {
-            _class = combineClassWithSection(_class, section);
-            $scope.modalData.groupClasses.push(_class);
+            _class.class = combineClassWithSection(_class.model, section);
+            $scope.modalData.groupClasses.push(_class.class);
         }
         $scope.modalData.selectedDept = null;
-        $scope.modalData.selectedClass = null;
-        $scope.modalData.selectedSection = null;
+        $scope.modalData.selectedClass = {
+            model: null,
+            class: null,
+            lab: null
+        };
         $scope.modalData.filteredClasses = [];
         $scope.modalData.filteredSections = [];
-        $scope.modalData.filteredLabSections = [];
+        $scope.modalData.selectedSection = null;
+        sectionType = '';
         $scope.modalData.groupMessage = 'Repeat the previous steps for all the ' +
             'classes that you want grouped together by degree requirement.';
     };
@@ -100,14 +123,20 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
 
     $scope.resetModal = function() {
         $scope.modalData = {
+            selectedDept: null,
+            selectedClass: {
+                model: null,
+                class: null,
+                lab: null
+            },
             filteredClasses: [],
             filteredSections: [],
             filteredLabSections: [],
-            selectedDept: null,
-            selectedClass: null,
             selectedSection: null,
+            selectedLabSection: null,
+            sectionType: '',
+            labSectionType: '',
             groupClasses: [],
-            sectionType: 'Any',
             groupMessage: "Select a department and class. If you don't mind what " + 
                 "section you're put in, select 'Any' for the section. If the " +
                 "class you've chosen has any available sections and you want to " +
@@ -154,11 +183,8 @@ function combineClassWithSection(_class, section) {
     if (_class) {
         if (section) {
             _class['crn'] = section['crn'];
-            _class['credits'] = section['credits'];
-            _class['isLab'] = parseInt(section['credits']) === 0;
         } else {
             _class['crn'] = 'Any';
-            _class['credits'] = 0;
         }
     }
     return _class;

@@ -115,11 +115,16 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             'criteria': criteria
         };
 
+        $location.path('/loading');
+
         scheduleHttpService.generateSchedule(scheduleInput).then(
-            function(tempScheduleData) {
+            function successCallback(tempScheduleData) {
                 localStorage.set('tempScheduleCount', 0);
                 localStorage.set('tempScheduleData', tempScheduleData);
                 $location.path('/schedule-select');
+            }, 
+            function failCallback() {
+                $location.path('/workspace');
             }
         );
     };
@@ -144,6 +149,9 @@ function init(localStorage, $scope) {
         for (var i = 0; i < selectedClasses.length; i++) {
             var credits = parseInt(selectedClasses[i]['credits']);
             totalCredits += credits;
+        }
+        if (isNaN(totalCredits)) {
+            totalCredits = 15;
         }
     } else {
         totalCredits = 15;

@@ -21,6 +21,8 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     }).when('/schedule-select', {
         templateUrl: 'partials/schedule-select.html',
         controller: 'ScheduleController'
+    }).when('/loading', {
+        templateUrl: 'partials/load-data.html'
     }).when('/courseoff', {
         templateUrl: 'partials/courseoff.html',
         controller: 'CourseOffController'
