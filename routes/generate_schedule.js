@@ -65,8 +65,7 @@ function generateScheduleDataForSchedule(schedule) {
                     groupedRows = [];
                 for (var i = 0; rows && i < rows.length; i++) {
                     rows[i]['isMandatory'] = true;
-                    var val = rows[i]['crn'];
-                    var previouslySeenRow = getRowByVal(groupedRows, 'crn', val);
+                    var previouslySeenRow = getRowByVal(groupedRows, rows[i]);
                     if (previouslySeenRow === null) {
                         var dayOfWeek = rows[i]['day_of_week'];
                         var time = {
@@ -125,9 +124,10 @@ function generateScheduleDataForSchedule(schedule) {
 };
 
 
-function getRowByVal(groupedRows, key, val) {
+function getRowByVal(groupedRows, row) {
     for (var i = 0; i < groupedRows.length; i++) {
-        if (groupedRows[i][key] === val) {
+        if (groupedRows[i]['crn'] === row['crn'] &&
+            groupedRows[i]['credits'] === row['credits']) {
             return groupedRows[i];
         }
     }

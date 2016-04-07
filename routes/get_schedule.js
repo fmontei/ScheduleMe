@@ -45,9 +45,8 @@ router.use(function(req, res, next) {
                         finalRows[semesterIndex]['raw']
                             .push(JSON.parse(JSON.stringify(classData)));
                         classData['isMandatory'] = true;
-                        var val = classData['crn'];
                         var previouslySeenRow = getRowByVal(
-                            finalRows[semesterIndex]['grouped'], 'crn', val
+                            finalRows[semesterIndex]['grouped'], classData
                         );
                         if (previouslySeenRow === null) {
                             var dayOfWeek = classData['day_of_week'];
@@ -101,9 +100,10 @@ router.use(function(req, res, next) {
     });
 });
 
-function getRowByVal(groupedRows, key, val) {
+function getRowByVal(groupedRows, classData) {
     for (var i = 0; i < groupedRows.length; i++) {
-        if (groupedRows[i][key] === val) {
+        if (groupedRows[i]['crn'] === classData['crn'] &&
+            groupedRows[i]['credits'] === classData['credits']) {
             return groupedRows[i];
         }
     }

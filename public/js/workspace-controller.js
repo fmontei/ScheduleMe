@@ -11,8 +11,9 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     };
 
     $scope.updateClassMandatoryStatus = function(_class, listName) {
-        var list = localStorage.get(listName);
-        var index = indexOfClass(_class, list);
+        var list = (listName === 'selectedClasses') ? $scope.selectedClasses : 
+            (listName === 'selectedGroups') ? $scope.selectedGroups : null;
+            index = (list !== null) ? list.indexOf(_class) : -1;
         if (index !== -1) {
             list[index].isMandatory = !list[index].isMandatory;
             localStorage.set(listName, list);
@@ -20,10 +21,13 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     };
 
     $scope.undoSelection = function(_class, listName) {
-        var list = localStorage.get(listName),
-            index = list.indexOf(_class);
-        list.splice(index, 1);
-        localStorage.set(listName, list);
+        var list = (listName === 'selectedClasses') ? $scope.selectedClasses : 
+            (listName === 'selectedGroups') ? $scope.selectedGroups : null;
+            index = (list !== null) ? list.indexOf(_class) : -1;
+        if (index !== -1) {
+            list.splice(index, 1);
+            localStorage.set(listName, list);
+        }
     };
 
     $scope.generateSchedule = function() {
@@ -157,7 +161,7 @@ function init(localStorage, $scope) {
         },
         creditsSlider: {
             min: 6,
-            max: totalCredits,
+            max: Math.max(totalCredits, 6),
             options: {
                 floor: 1,
                 ceil: 25,
