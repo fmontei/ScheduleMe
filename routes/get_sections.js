@@ -1,6 +1,7 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
 var async = require('async');
+var url = require('url');
 
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
@@ -17,16 +18,21 @@ var db = new sqlite3.Database('scheduleme.db');
  * ]
  */
 router.use(function(req, res, next) {
-    var class_id = (req.class_id) ? req.class_id.trim() : null;
-    if (!class_id) {
-        return res.status(400).send('Error: Missing parameter class_id.');
-    }
+    var class_id = (req.class_id) ? req.class_id.trim() : null,
+        url_parts = url.parse(req.url, true);
+        filterByLab = JSON.parse(url_parts.query['lab']);
 
     async.waterfall([
         function(callback) {
             class_id = class_id.trim();
             var query = "SELECT * from section sect inner join timeslot ts on " +
-                "(sect.section_id = ts.section_id) WHERE sect.class_id = '" + class_id + "';";
+                "(sect.section_id = ts.section_id) WHERE sect.class_id = '" + 
+                class_id + "'";
+            if (filterByLab === true) {
+                query += " AND sect.credits = 0;";
+            } else {
+                query += " AND sect.credits <> 0;";
+            }
             db.all(query, function(err, rows) {
                 var formattedSections = [];
                 for (var i = 0; rows && i < rows.length; i++) {

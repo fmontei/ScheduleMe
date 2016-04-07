@@ -250,12 +250,12 @@ scheduleMeApp.factory('SectionHttpService', ['$http', '$q', 'LocalStorage',
      function($http, $q, localStorage) {
     var sectionHttpService = {};
 
-    sectionHttpService.getSectionsForClass = function(classID) {
+    sectionHttpService.getSectionsForClass = function(classID, filterByLab) {
         var deferred = $q.defer();
 
         $http({
             method: 'GET',
-            url: '/sections/' + classID
+            url: '/sections/' + classID + "?lab=" + filterByLab
         }).then(function successCallback(response) {
             deferred.resolve(response['data']);
         }, function errorCallback() {

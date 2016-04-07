@@ -127,7 +127,7 @@ function generateScheduleDataForSchedule(schedule) {
 function getRowByVal(groupedRows, row) {
     for (var i = 0; i < groupedRows.length; i++) {
         if (groupedRows[i]['crn'] === row['crn'] &&
-            groupedRows[i]['credits'] === row['credits']) {
+            groupedRows[i]['section_name'] === row['section_name']) {
             return groupedRows[i];
         }
     }

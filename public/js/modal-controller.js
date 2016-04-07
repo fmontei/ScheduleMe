@@ -23,8 +23,11 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             return;
         }
         var classID = $scope.modalData.selectedClass.class_id;
-        sectionHttpService.getSectionsForClass(classID).then(function(sections) {
+        sectionHttpService.getSectionsForClass(classID, false).then(function(sections) {
             $scope.modalData.filteredSections = sections;
+        });
+        sectionHttpService.getSectionsForClass(classID, true).then(function(labSections) {
+            $scope.modalData.filteredLabSections = labSections;
         });
     };
 
@@ -85,6 +88,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.modalData.selectedSection = null;
         $scope.modalData.filteredClasses = [];
         $scope.modalData.filteredSections = [];
+        $scope.modalData.filteredLabSections = [];
         $scope.modalData.groupMessage = 'Repeat the previous steps for all the ' +
             'classes that you want grouped together by degree requirement.';
     };
@@ -98,6 +102,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.modalData = {
             filteredClasses: [],
             filteredSections: [],
+            filteredLabSections: [],
             selectedDept: null,
             selectedClass: null,
             selectedSection: null,
@@ -149,8 +154,11 @@ function combineClassWithSection(_class, section) {
     if (_class) {
         if (section) {
             _class['crn'] = section['crn'];
+            _class['credits'] = section['credits'];
+            _class['isLab'] = parseInt(section['credits']) === 0;
         } else {
             _class['crn'] = 'Any';
+            _class['credits'] = 0;
         }
     }
     return _class;

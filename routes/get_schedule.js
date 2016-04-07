@@ -103,7 +103,7 @@ router.use(function(req, res, next) {
 function getRowByVal(groupedRows, classData) {
     for (var i = 0; i < groupedRows.length; i++) {
         if (groupedRows[i]['crn'] === classData['crn'] &&
-            groupedRows[i]['credits'] === classData['credits']) {
+            groupedRows[i]['section_name'] === classData['section_name']) {
             return groupedRows[i];
         }
     }
