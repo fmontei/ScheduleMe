@@ -15,20 +15,35 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
                 showSelectionBarEnd: true
             }
         },
-        defaultMinCredits: 6,
-        defaultMaxCredits: 15,
-        timeslots: [],
+        creditsSlider: {
+            min: 6,
+            max: 15,
+            options: {
+                foor: 1,
+                ceil: 21,
+                step: 1,
+                noSwitching: true,
+                translate: function(value, sliderId, label) {
+                    switch (label) {
+                        case 'model':
+                            return '<b>Min:</b> ' + value;
+                        case 'high':
+                            return '<b>Max:</b> ' + value;
+                        default:
+                            return value;
+                    }
+                }
+            }
+        },
+        timeslots: []
     };
 
-    $scope.addTimeslot = function(day, type, start, end) {
+    $scope.addTimeslot = function() {
         $scope.criteria.timeslots.push({});
     };
 
     $scope.updateClassMandatoryStatus = function(_class, listName) {
-        var list = [];
-        if (listName === 'selectedClasses') list = $scope.selectedClasses;
-        else if (listName === 'savedClassData') list = $scope.savedClassData;
-        var selectedClasses = localStorage.get(listName);
+        var list = localStorage.get(listName);
         var index = indexOfClass(_class, list);
         if (index !== -1) {
             list[index].isMandatory = !list[index].isMandatory;
@@ -85,8 +100,8 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         criteria.push({
             'type': 'credits',
             'parameters': [ 
-                $scope.criteria.defaultMinCredits, 
-                $scope.criteria.defaultMaxCredits 
+                $scope.criteria.creditsSlider.min, 
+                $scope.criteria.creditsSlider.max 
             ],
             'priority': 'required'
         });

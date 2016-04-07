@@ -124,18 +124,17 @@
                 </small>
             </h3>
             <small ng-show="showInfo2 === true">
-                <h5>Use this section to modify your preferences!</h5>
+                <h5>
+                    Use this section to modify your preferences. Note that too many
+                    preferences might make finding the perfect schedule impossible.
+                </h5>
             </small>
-            <div style="margin-bottom: 10px;">
-                <label style="display: table-cell; vertical-align: middle;">Number of Credit Hours: </label>
-                <span style="display: table-cell;">
-                    <input style="margin-left: 10px;" 
-                           type="number" 
-                           min="0" 
-                           max="21" 
-                           ng-model="criteria.credit" 
-                           class="form-control" />
-                </span>
+            <div class="well" style="margin-bottom: 5px;">
+                <label>Number of Credit Hours: </label>
+                <rzslider rz-slider-model="criteria.creditsSlider.min"
+                          rz-slider-high="criteria.creditsSlider.max"
+                          rz-slider-options="criteria.creditsSlider.options">
+                </rzslider>
             </div>
             <uib-accordion close-others="true">
                 <uib-accordion-group heading="Time of Day" is-open="true">
@@ -195,29 +194,27 @@
                         </select>
                         <span ng-show="timeslot.type === 'range'">
                             <input id="reserved-time-start-{{$index}}"
-                                   type="time"  
                                    ng-model="timeslot.start"
                                    watch-time other-time="#reserved-time-end-{{$index}}" is-start="true" />
                             to
                             <input id="reserved-time-end-{{$index}}"
-                                   type="time"  
                                    ng-model="timeslot.end"
                                    watch-time other-time="#reserved-time-start-{{$index}}" is-start="false" />
                         </span>
                     </div>
                     <button type="button"
-                        class="btn btn-default"
-                        aria-label="Add Timeslot"
-                        ng-click="addTimeslot(typetimeslot.day, timeslot.type, 
-                            timeslot.start, timeslot.end)">
+                            class="btn btn-default btn-sm"
+                            style="margin-top: 5px"
+                            aria-label="Add Timeslot"
+                            ng-click="addTimeslot()">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Time Slot
                     </button>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Average GPA">
                     Only select sections with professors with prior GPAs greater than:
-                    <rzslider
-                        rz-slider-model="criteria.gpaSlider.value"
-                        rz-slider-options="criteria.gpaSlider.options"></rzslider>
+                    <rzslider rz-slider-model="criteria.gpaSlider.value"
+                              rz-slider-options="criteria.gpaSlider.options">
+                    </rzslider>
                 </uib-accordion-group>
             </uib-accordion>
         </div>
