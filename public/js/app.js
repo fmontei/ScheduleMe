@@ -435,12 +435,6 @@ scheduleMeApp.directive('pngTimeInput', function($compile) {
             }
         });
 
-        var updateModel = function() {
-            var date = new Date('2000-01-01 ' + inputHour + ':' + inputMinute +
-                ' ' + inputMeridian);
-            ngModel.$setViewValue(date);
-        };
-
         var isNavigationKeyCode = function(e) {
             // Allow: backspace, delete, tab, escape, enter and .
             return $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
@@ -448,6 +442,23 @@ scheduleMeApp.directive('pngTimeInput', function($compile) {
                 (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) || 
                  // Allow: home, end, left, right, down, up
                 (e.keyCode >= 35 && e.keyCode <= 40);
+        };
+
+        var updateModel = function() {
+            var date = new Date('2000-01-01 ' + inputHour + ':' + inputMinute +
+                ' ' + inputMeridian);
+            ngModel.$setViewValue(date);
+        };
+
+        var round = function(val) {
+            val = String(val);
+            if (val.length === 1) {
+                val = parseInt(val);
+                return (val < 5) ? '0' : '5';
+            } else if (val.length === 2) {
+                var onesPlace = parseInt(val[1]);
+                return (onesPlace < 5) ? val[0] + '0' : val[0] + '5';
+            }
         };
 
         element.find('input.hour').focus(function(e) {
@@ -519,7 +530,7 @@ scheduleMeApp.directive('pngTimeInput', function($compile) {
                     if (minute <= 6) {
                         return;
                     } else {
-                        $(this).val('0' + val);
+                        $(this).val('0' + round(val));
                         inputMinute = $(this).val();
                         updateModel();
                         element.find('input.meridian').focus();
@@ -533,12 +544,13 @@ scheduleMeApp.directive('pngTimeInput', function($compile) {
                 if (isNaN(val) === false) {
                     var minute = parseInt(val);
                     if (minute <= 60) {
+                        $(this).val(round($(this).val()))
                         inputMinute = $(this).val();
                         updateModel();
                         element.find('input.meridian').focus();
                         minuteKeyPressCount = 0;
                     } else {
-                        $(this).val('0' + val[1]);
+                        $(this).val('0' + round(val[1]));
                         inputMinute = $(this).val();
                         updateModel();
                         element.find('input.meridian').focus();

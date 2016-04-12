@@ -108,12 +108,16 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             }
         }
 
+
         var scheduleInput = {
             'class_groups': classGroups,
             'locked_class_groups': lockedClassGroups,
             'locked_sections': lockedSections,
             'criteria': criteria
         };
+
+
+        console.log(JSON.stringify(scheduleInput));
 
         $location.path('/loading');
 
@@ -192,8 +196,7 @@ function init(localStorage, $scope) {
 };
 
 function convertDateToTimeStr(date) {
-    var hourIndex = date.toString().indexOf(':');
-    var hours = date.substring(hourIndex - 2, hourIndex);
-    var mins = date.substring(hourIndex + 1, hourIndex + 3);
-    return hours + ':' + mins;
+    var hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours(),
+        minutes = (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes();
+    return hours + ':' + minutes;
 };
