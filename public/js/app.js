@@ -406,40 +406,182 @@ scheduleMeApp.directive('watchHeight', function() {
         }
     };
 });
+ 
+scheduleMeApp.directive('pngTimeInput', function($compile) {
+    var TEMPLATE = '<div class="png-time form-control" ng-click="focus()">' +
+    '<input type="text" name="hour" class="hour" maxlength="2" />' +
+    '<span>:</span>' +
+    '<input type="text" name="minute" class="minute" maxlength="2" />' +
+    '<input type="text" name="mode" class="meridian" maxlength="2" />' +
+    '</div>';
 
-scheduleMeApp.directive('watchTime', function() {
-    return {
-        restrict: 'AE',
-        scope: {
-            otherTime: '@otherTime',
-            isStart: '@isStart'
-        },
-        link: function(scope, element, attrs) {
-            var thisID = element.attr('id');
-            scope.$watch(function() {
-                return element.val();
-            }, function(newValue, oldValue) {
-                var isStart = JSON.parse(scope.isStart),
-                    thisTimeHr = parseInt(newValue.substring(0, newValue.indexOf(':'))),
-                    thisTimeMin = parseInt(newValue.substring(newValue.indexOf(':') + 1)),
-                    otherTimeVal = $(scope.otherTime).val(),
-                    otherTimeHr = parseInt(otherTimeVal.substring(0, otherTimeVal.indexOf(':'))),
-                    otherTimeMin = parseInt(otherTimeVal.substring(otherTimeVal.indexOf(':') + 1));
-                if (isStart === true) {
-                    if (isNaN(otherTimeHr) || (thisTimeHr > otherTimeHr) ||
-                        (thisTimeHr === otherTimeHr && thisTimeMin > otherTimeMin)) {
-                        $(scope.otherTime).val(newValue);
+    var timepickerLinkFn = function(scope, element, attrs, ngModel) {
+        element.html(TEMPLATE);
+        $compile(element.contents())(scope);
+
+        var hourKeyPressCount = 0,
+            minuteKeyPressCount = 0,
+            inputHour = '00',
+            inputMinute = '00',
+            inputMeridian = 'AM';
+
+        scope.$watch(function() {
+            return ngModel.$viewValue;
+        }, function(newValue) {
+            if (!newValue) {
+                element.find('.png-time').addClass('ng-invalid');
+            } else {
+                element.find('.png-time').removeClass('ng-invalid');
+            }
+        });
+
+        var updateModel = function() {
+            var date = new Date('2000-01-01 ' + inputHour + ':' + inputMinute +
+                ' ' + inputMeridian);
+            ngModel.$setViewValue(date);
+        };
+
+        var isNavigationKeyCode = function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            return $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) || 
+                 // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40);
+        };
+
+        element.find('input.hour').focus(function(e) {
+            $(this).val('');
+            inputHour = $(this).val();
+        });
+
+        element.find('input.hour').keyup(function(e) {
+            if (isNavigationKeyCode(e)) return;
+            hourKeyPressCount = $(this).val().length;
+            var val = $(this).val();
+            if (hourKeyPressCount === 1) {
+                if (isNaN(val) === false) {
+                    var hour = parseInt(val);
+                    if (hour === 0) {
+                        $(this).val('0');
+                    } else if (hour === 1) {
+                        $(this).val('1');
+                    } else {
+                        $(this).val('0' + val);
+                        inputHour = $(this).val();
+                        updateModel();
+                        element.find('input.minute').focus();
+                        hourKeyPressCount = 0;
                     }
-                } else if (isStart === false) {
-                    if (isNaN(otherTimeHr) || (thisTimeHr < otherTimeHr) ||
-                        (thisTimeHr === otherTimeHr && thisTimeMin < otherTimeMin)) {
-                        $(scope.otherTime).val(newValue);
-                    }
+                } else {
+                    $(this).val('');
+                    inputHour = $(this).val();
+                    updateModel();
+                    hourKeyPressCount = 0;
                 }
-            });
-        }
+            } else if (hourKeyPressCount === 2) {
+                if (isNaN(val) === false) {
+                    var hour = parseInt(val);
+                    if (hour <= 12) {
+                        inputHour = $(this).val();
+                        updateModel();
+                        element.find('input.minute').focus();
+                        hourKeyPressCount = 0;
+                    } else {
+                        $(this).val('0' + val[1]);
+                        inputHour = $(this).val();
+                        updateModel();
+                        element.find('input.minute').focus();
+                        hourKeyPressCount = 0;
+                    }
+                } else {
+                    $(this).val('');
+                    inputHour = $(this).val();
+                    updateModel();
+                    hourKeyPressCount = 0;
+                }
+            }
+        });
+
+        element.find('input.minute').focus(function(e) {
+            $(this).val('');
+            inputMinute = $(this).val();
+            updateModel();
+        });
+
+        element.find('input.minute').keyup(function(e) {
+            if (isNavigationKeyCode(e)) return;
+            minuteKeyPressCount = $(this).val().length;
+            var val = $(this).val();
+            if (minuteKeyPressCount === 1) {
+                if (isNaN(val) === false) {
+                    var minute = parseInt(val);
+                    if (minute <= 6) {
+                        return;
+                    } else {
+                        $(this).val('0' + val);
+                        inputMinute = $(this).val();
+                        updateModel();
+                        element.find('input.meridian').focus();
+                        minuteKeyPressCount = 0;
+                    }
+                } else {
+                    $(this).val('');
+                    minuteKeyPressCount = 0;
+                }
+            } else if (minuteKeyPressCount === 2) {
+                if (isNaN(val) === false) {
+                    var minute = parseInt(val);
+                    if (minute <= 60) {
+                        inputMinute = $(this).val();
+                        updateModel();
+                        element.find('input.meridian').focus();
+                        minuteKeyPressCount = 0;
+                    } else {
+                        $(this).val('0' + val[1]);
+                        inputMinute = $(this).val();
+                        updateModel();
+                        element.find('input.meridian').focus();
+                        minuteKeyPressCount = 0;
+                    }
+                } else {
+                    $(this).val('');
+                    inputMinute = $(this).val();
+                    updateModel();
+                    minuteKeyPressCount = 0;
+                }
+            }
+        });
+
+        element.find('input.meridian').focus(function(e) {
+            $(this).val('AM');
+            inputMeridian = $(this).val();
+            updateModel();
+        });
+
+        element.find('input.meridian').keyup(function(e) {
+            if (e.keyCode === 65) {
+                $(this).val('AM');
+                inputMeridian = $(this).val();
+                updateModel();
+            } else if (e.keyCode === 80) {
+                $(this).val('PM');
+                inputMeridian = $(this).val();
+                updateModel();
+            }
+        });
+    };
+
+    return {
+        restrict: 'E',
+        replace: true,
+        require: 'ngModel',
+        scope: {
+        },
+        link: timepickerLinkFn
     };
 });
+
 
 
 
