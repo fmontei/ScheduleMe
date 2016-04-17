@@ -291,6 +291,7 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         if (!selectedSemester) {
             semesterHttpService.getLatestSemester().then(function(latestSemester) {
                 localStorage.set('selectedSemester', latestSemester);
+                selectedSemester = localStorage.get('selectedSemester');
                 getClassesWhenReady();
             });
         } else {
