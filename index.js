@@ -29,15 +29,7 @@ var delete_schedule = require('./routes/delete_schedule');
 
 var app = express();
 
-hbs = ehb.create({
-    defaultLayout: 'main',
-    extname: '.hbs'
-});
-
-app.engine('hbs', hbs.engine);
-app.set('view engine', 'hbs');
-
-app.use('/static', express.static('public'));
+app.use('/static', express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
