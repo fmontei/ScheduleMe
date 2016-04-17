@@ -30,6 +30,7 @@ var delete_schedule = require('./routes/delete_schedule');
 var app = express();
 
 app.use('/static', express.static(__dirname + '/public'));
+console.log(__dirname + '/public');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
