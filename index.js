@@ -136,6 +136,6 @@ app.delete('/schedule/:schedule_id', function(req, res, next) {
     delete_schedule(req, res, next);
 });
 
-app.listen(3000, function() {
-    console.log("listening on port 3000");
+app.listen(process.env.PORT || 3000, function() {
+    console.log("Listening on port " + (process.env.PORT || 3000));
 });
