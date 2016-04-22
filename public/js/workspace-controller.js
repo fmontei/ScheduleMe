@@ -1,5 +1,9 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
+/*
+ * Controller for validating and responding to user actions on the workspace
+ * screen.
+ */
 scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
     'LocalStorage', 'ClassHttpService', 'SemesterHttpService', 'ScheduleHttpService',
     function($location, $scope, $http, localStorage, classHttpService,

@@ -1,5 +1,10 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
+/*
+ * Controller for class and group modals. This logic is a part of the workspace,
+ * but has been seperated into a sub-controller, so to speak, to better organize
+ * the code.
+ */
 scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStorage',
     'SectionHttpService', function($rootScope, $scope, localStorage,
     sectionHttpService) {
