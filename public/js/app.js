@@ -35,7 +35,10 @@ scheduleMeApp.run(function($rootScope, $location) {
     $rootScope.location = $location;
 });
 
-// Factories
+/* 
+ * Wrapper factory for localStorageService -- responsible for caching data
+ * locally.
+ */
 scheduleMeApp.factory('LocalStorage', ['localStorageService',
     function(localStorageService) {
     var myLocalStorage = {};
@@ -55,6 +58,9 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
     return myLocalStorage;
 }]);
 
+/* 
+ * Service for creating or retrieving user accounts.
+ */
 scheduleMeApp.factory('UserHttpService', ['$http', '$q', function($http, $q) {
     var userHttpService = {};
 
@@ -90,6 +96,9 @@ scheduleMeApp.factory('UserHttpService', ['$http', '$q', function($http, $q) {
     return userHttpService;
 }]);
 
+/* 
+ * Service for retrieving semesters.
+ */
 scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q) {
     var semesterHttpService = {};
 
@@ -128,6 +137,9 @@ scheduleMeApp.factory('SemesterHttpService', ['$http', '$q', function($http, $q)
     return semesterHttpService;
 }]);
 
+/* 
+ * Service for retrieving classes. 
+ */
 scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
     var classHttpService = {};
 
@@ -161,6 +173,10 @@ scheduleMeApp.factory('ClassHttpService', ['$http', '$q', function($http, $q) {
     return classHttpService;
 }]);
 
+/* 
+ * REST service for schedules. Also contains function for generating possible
+ * schedules.
+ */
 scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
      function($http, $q, localStorage) {
     var scheduleHttpService = {};
@@ -248,6 +264,9 @@ scheduleMeApp.factory('ScheduleHttpService', ['$http', '$q', 'LocalStorage',
     return scheduleHttpService;
 }]);
 
+/* 
+ * REST service for sections.
+ */
 scheduleMeApp.factory('SectionHttpService', ['$http', '$q', 'LocalStorage',
      function($http, $q, localStorage) {
     var sectionHttpService = {};
@@ -271,6 +290,10 @@ scheduleMeApp.factory('SectionHttpService', ['$http', '$q', 'LocalStorage',
     return sectionHttpService;
 }]);
 
+/* 
+ * Service for retrieving all user data needed by the application following
+ * a successful login. 
+ */
 scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpService',
     'SemesterHttpService', 'ScheduleHttpService', function($q, localStorage,
     classHttpService, semesterHttpService, scheduleHttpService) {
@@ -288,6 +311,10 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
     serverDataService.getClassesForSelectedSemester = function() {
         var deferred = $q.defer();
         var selectedSemester = localStorage.get('selectedSemester');
+        // If the user never specified a semester for which to retrieve classes,
+        // then retrieve the latest (current) semester from the server, and
+        // retrieve classes for it. Otherwise, get classes for the user-selected
+        // semester.
         if (!selectedSemester) {
             semesterHttpService.getLatestSemester().then(function(latestSemester) {
                 localStorage.set('selectedSemester', latestSemester);
@@ -323,13 +350,14 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         return deferred.promise;
     };
 
+    // Main function used for retrieving all user data.
     serverDataService.getServerData = function() {
         var deferred = $q.defer();
         var userID = localStorage.get('user')['user_id'];
 
         serverDataService.getAllSemesters().then(function() {
             // Keep this function call here -- it specifically runs multiple
-            // times on the server in case there are any SQL_BUSY errors
+            // times on the server in case there are any SQL_BUSY errors.
             return serverDataService.getClassesForSelectedSemester();
         }).then(function() {
             return serverDataService.getScheduleForUser(userID);
@@ -343,7 +371,10 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
     return serverDataService;
 }]);
 
-// Directives
+/*
+ * Directive for closing a Bootstrap modal and for calling a function
+ * (such as a clean-up function) afterward.
+ */
 scheduleMeApp.directive('closeModal', function() {
     return {
         restrict: 'AE',
@@ -368,7 +399,9 @@ scheduleMeApp.directive('closeModal', function() {
     };
 });
 
-
+/*
+ * Directive for closing a Boostrap modal, if the specified condition is true.
+ */
 scheduleMeApp.directive('hide', function() {
     return {
         restrict: 'AE',
@@ -383,6 +416,16 @@ scheduleMeApp.directive('hide', function() {
     };
 });
 
+/*
+ * Directive for resizing a table cell in a schedule. On occassion, a table row
+ * may be increased in height by a table cell that contains two classes (since
+ * it is possible for two classes to be contained during the same hour-long
+ * time slot, i.e. class A ends at 10:30am and class B begins at 10:45am). Meanwhile,
+ * an adjacent table cell (a table cell in the same row) may only contain one class.
+ * This results in a table cell that is shorter than the table row. This directive
+ * resizes "shorter" one-class table cells to be the same height as the two-class
+ * table cells within the same row.
+ */
 scheduleMeApp.directive('watchHeight', function() {
     return {
         restrict: 'AE',
@@ -407,7 +450,11 @@ scheduleMeApp.directive('watchHeight', function() {
         }
     };
 });
- 
+
+/*
+ * Directive for implementing a custom time input (since FireFox does not natively
+ * have a type="time" input type, for example).
+ */
 scheduleMeApp.directive('pngTimeInput', function($compile) {
     var TEMPLATE = '<div class="png-time form-control" ng-click="focus()">' +
     '<input type="text" name="hour" class="hour" maxlength="2" />' +

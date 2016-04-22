@@ -1,10 +1,15 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
+/*
+ * Controller for re-organizing schedule data so that it can be properly
+ * displayed. Also, implement controller for REST functionality for schedule.
+ */
 scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
     'LocalStorage', 'ScheduleHttpService', function($location, $scope, $http,
         localStorage, scheduleHttpService) {
     $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
 
+    // Technically, this logic could be moved to server, but laziness...
     $scope.getTimeSlots = function(scheduleData) {
         var timeSlots = [];
         for (var i = 7; i <= 19; i++) {

@@ -1,5 +1,9 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
+/*
+ * Controller for updating the display of the navigation bar at the top of
+ * the application.
+ */
 scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
     'LocalStorage', 'SemesterHttpService', function($scope, $http, $location, 
         localStorage, semesterHttpService) {

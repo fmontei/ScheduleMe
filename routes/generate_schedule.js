@@ -6,7 +6,7 @@ var Q = require('q');
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
-var schedule_generator = require('./generate_schedule_algorithm');
+var schedule_generator = require('../scripts/generate_schedule_algorithm');
 
 router.use(function(req, res, next) {
     schedule_generator.find_best_schedules(

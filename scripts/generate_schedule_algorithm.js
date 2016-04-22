@@ -150,6 +150,76 @@ function get_all_class_data(input, callback) {
         callback);
 }
 
+// class Graph {
+//     constructor() {
+//         this.nodes = new Map();
+//         this.weights = new Map();
+//     }
+
+//     add_node(id, weight) {
+//         console.assert(!nodes.has(id) && !weights.has(id),
+//                 "duplicate id '%s' in graph", id);
+
+//         nodes.set(id, new Set());
+//         weights.set(id, weight);
+//     }
+
+//     remove_node(id) {
+//         console.assert(nodes.has(id) && weights.has(id),
+//                 "tried to remove nonexistent id '%s'", id);
+
+//         nodes.get(id).forEach(function(value1, value2, set) {
+//             remove_edge(id, value1);
+//         });
+
+//         nodes.delete(id);
+//         weights.delete(id);
+//     }
+
+//     contains_node(id) {
+//         return nodes.has(id);
+//     }
+
+//     // get_weight(id) {
+//     //     if (nodes)
+//     // }
+
+//     get_neighbors(id) {
+//         console.assert(nodes.has(id),
+//                 "tried to get_neighbors nonexistent id '%s'", id);
+
+//         return nodes.get(id);
+//     }
+
+//     add_edge(id1, id2) {
+//         console.assert(id1 !== id2, "tried to add_edge self edge '%s'", id1);
+//         console.assert(nodes.has(id1),
+//                 "tried to add_edge nonexistent id '%s'", id1);
+//         console.assert(nodes.has(id2),
+//                 "tried to add_edge nonexistent id '%s'", id2);
+//         console.assert(!nodes.get(id1).contains(id2) && !nodes.get(id2).contains(id1),
+//                 "already existing edge between '%s' and '%s'", id1, id2);
+        
+//         nodes.get(id1).add(id2);
+//         nodes.get(id2).add(id1);
+//     }
+
+//     remove_edge(id1, id2) {
+//         console.assert(nodes.has(id1) && nodes.has(id2)
+//                 && nodes.get(id1).contains(id2)
+//                 && nodes.get(id2).contains(id1),
+//                 "no edge between '%s' and '%s'", id1, id2);
+
+//         nodes.get(id1).delete(id2);
+//         nodes.get(id2).delete(id1);
+//     }
+
+//     contains_edge(id1, id2) {
+//         return nodes.contains(id1) && nodes.get(id1).has(id2)
+//             && nodes.contains(id2) && nodes.get(id2).has(id1);
+//     }
+// }
+
 let days_map = new Map([
     [ 'M', 0 ],
     [ 'T', 1 ],

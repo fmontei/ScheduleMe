@@ -1,5 +1,8 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
+/*
+ * Controller for /courseoff screen -- used strictly for testing purposes.
+ */
 scheduleMeApp.controller('CourseOffController', ['$rootScope', '$scope', '$http',
     'LocalStorage', 'ScheduleHttpService', function($rootScope, $scope, $http,
         localStorage, scheduleHttpService) {

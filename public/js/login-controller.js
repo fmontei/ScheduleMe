@@ -1,5 +1,9 @@
 var scheduleMeApp = angular.module('ScheduleMeApp');
 
+/*
+ * Controller for logging in and checking current login status to avoid
+ * repeated logins.
+ */
 scheduleMeApp.controller('LoginController', ['$scope', '$http', '$location',
     'LocalStorage', 'UserHttpService', function($scope, $http, $location, 
         localStorage, userHttpService) {
