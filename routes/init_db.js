@@ -1,6 +1,7 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
 var request = require('request');
+var http = require('https');
 var Q = require('q');
 
 var router = express.Router();
@@ -65,8 +66,9 @@ router.use(function(req, res, next) {
     var courses = [];
     var sections = [];
     var timeslots = [];
+    var CURRENT_TERM = "201601";
 
-    getSemesters(true).then(function(semestersResponse) {
+    getSemesters(CURRENT_TERM).then(function(semestersResponse) {
         semesters = semestersResponse;
         console.log('Retrieved semesters.');
         getCourses(semesters).then(function(coursesResponse) {
@@ -300,11 +302,10 @@ function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
     return deferred.promise;
 };
 
-function getSemesters(useCurrentTerm) {
-	var CURRENT_TERM = "201601";
-	var url = "https://soc.courseoff.com/gatech/terms/";
-	if (useCurrentTerm) {
-		url += CURRENT_TERM;
+function getSemesters(term) {
+	var url = "/gatech/terms/";
+	if (term) {
+		url += term;
 	}
 
     var deferred = Q.defer();
@@ -491,7 +492,7 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
  */
 function getMajorsByTerm(term) {
     var deferred = Q.defer();
-	var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors/";
+	var url = "/gatech/terms/" + term + "/majors/";
 
     httpGet(url).then(function(jsonResponse) {
         var majors = [];
@@ -513,7 +514,7 @@ function getMajorsByTerm(term) {
  */
 function getCoursesByTermAndMajor(term, major) {
     var deferred = Q.defer();
-	var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors/"
+	var url = "/gatech/terms/" + term + "/majors/"
 		+ major + "/courses";
     var courses = [];
 
@@ -538,7 +539,7 @@ function getCourseSectionsForCourse(term, course) {
     var deferred = Q.defer();
     var major = course['department'];
     var number = course['class_number'];
-    var url = "https://soc.courseoff.com/gatech/terms/" + term +
+    var url = "/gatech/terms/" + term +
         "/majors/" + major + "/courses/" + number + "/sections";
     var sections = [];
 
@@ -602,12 +603,26 @@ function formatTime(time) {
     return formatted;
 };
 
-function httpGet(theUrl) {
+function httpGet(path) {
     var deferred = Q.defer();
 
-    request(theUrl, function(error, response, body) {
-        deferred.resolve(JSON.parse(body));
-    });
+    var options = {
+        host: 'soc.courseoff.com',
+        path: path,
+        method: 'GET'
+    };
+
+    http.get(options, function(res){
+        var body = '';
+
+        res.on('data', function (chunk) {
+               body += chunk;
+         });
+
+        res.on('end', function () {
+            deferred.resolve(JSON.parse(body));
+        });
+  });
 
     return deferred.promise;
 };

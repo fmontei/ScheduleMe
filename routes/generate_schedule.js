@@ -32,10 +32,9 @@ function generateScheduleDataForSchedules(schedules) {
     var promises = [];
 
     for (var i = 0; i < Math.min(10, schedules.length); i++) {
-        var promise = generateScheduleDataForSchedule(schedules[i]).then(function(data) {
-            if (data) {
-                tempScheduleData.push(data);
-            }
+        var promise = generateScheduleDataForSchedule(schedules[i])
+            .then(function(data) {
+            tempScheduleData.push(data);
         });
         promises.push(promise);
     }

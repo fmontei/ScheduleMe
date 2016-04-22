@@ -88,8 +88,9 @@ function execute(transaction, section_id, schedule_id) {
         function insertAllIntoDB(haveConflict, timeslots, callback) {
             var promises = [];
             for (var i = 0; i < timeslots.length; i++) {
-                promises.push(insertSingleIntoDB(
-                    transaction, schedule_id, section_id, timeslots[i]['timeslot_id'])
+                promises.push(
+                    insertSingleIntoDB(transaction, schedule_id, section_id, 
+                        timeslots[i]['timeslot_id'])
                 );
             }
             Q.all(promises).then(function() {
