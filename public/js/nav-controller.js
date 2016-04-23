@@ -24,7 +24,7 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
         return $location.path();
     }, function(newValue, oldValue) {
         if (!localStorage.get('user')) {
-            $location.path('/');
+            $location.path('/login');
         }
     });
 
