@@ -368,7 +368,8 @@
                     <button type="button"
                             class="btn btn-primary"
                             ng-disabled="!modalData.selectedDept || !modalData.selectedClass ||
-                                (modalData.sectionType === 'Specific' && !modalData.selectedSection)"
+                                (modalData.sectionType === 'Specific' && !modalData.selectedSection) || 
+                                !modalData.sectionType"
                             close-modal modal-to-close="#class-modal" 
                             function-to-call="selectClass()"
                             only-when-true="{{classModalCheckbox}}">

@@ -12,7 +12,23 @@
                 Manually delete the DB and click 'Scrape data' to get most
                 up-to-date data.
                 <br /><br />
-                <a class="btn btn-primary" id="scrape-data-btn" href="javascript:void(0)">Scrape data</a>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="scrape-data-term"
+                                        class="form-control">
+                                    <option data-term="201601">Spring 2016</option>
+                                    <option data-term="201605">Summer 2016</option>
+                                    <option data-term="201608">Fall 2016</option>
+                                </select>
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" id="scrape-data-btn" href="javascript:void(0)">Scrape data</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             
             <h3>Add/Remove Section to/from Schedule</h3>
@@ -96,12 +112,14 @@
             $('#select-timeslot-btn'), $('#custom-select-btn')];
 
         $('#scrape-data-btn').click(function() {
+            var term = $('#scrape-data-term option:selected').attr('data-term').trim();
+            if (!term) return;
             $.each(allBtns, function(i, btn) {
                btn.attr('disabled', true);
             });
             $(this).attr('disabled', true);
             $.ajax({
-                url: '/init'
+                url: '/init/' + term 
             }).success(function(data) {
                 alert('Finished scraping data.');
             }).done(function(data) {

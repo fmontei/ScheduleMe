@@ -59,7 +59,10 @@ app.get('/partials/:partial_name', function(req, res) {
 });
 
 // Init database
-app.use('/init', init_db);
+app.use('/init/:term', function(req, res, next) {
+    req.term = req.params.term;
+    init_db(req, res, next);
+});
 
 // Test database
 app.use('/select', select_db);

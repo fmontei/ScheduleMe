@@ -7,6 +7,10 @@ var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
 router.use(function(req, res, next) {
+    var CURRENT_TERM = req.term.trim();
+    if (!CURRENT_TERM) res.status(400).send('Must provide term, i.e. 201601');
+    console.log(CURRENT_TERM);
+
     db.serialize(function() {
         db.run("CREATE TABLE if not exists USER(" +
             "user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
@@ -66,7 +70,7 @@ router.use(function(req, res, next) {
     var sections = [];
     var timeslots = [];
 
-    getSemesters(true).then(function(semestersResponse) {
+    getSemesters(CURRENT_TERM).then(function(semestersResponse) {
         semesters = semestersResponse;
         console.log('Retrieved semesters.');
         getCourses(semesters).then(function(coursesResponse) {
@@ -300,11 +304,10 @@ function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
     return deferred.promise;
 };
 
-function getSemesters(useCurrentTerm) {
-	var CURRENT_TERM = "201601";
+function getSemesters(term) {
 	var url = "https://soc.courseoff.com/gatech/terms/";
-	if (useCurrentTerm) {
-		url += CURRENT_TERM;
+	if (term) {
+		url += term;
 	}
 
     var deferred = Q.defer();
