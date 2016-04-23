@@ -1,12 +1,19 @@
 <div class="container">
     <div class="row">
+        <div class="col col-md-5">
+            <h3>
+                <u>Login</u>
+            </h3>
+        </div>
+    </div>
+    <div class="row">
         <div class="col col-md-6">
             <div class="input-group">
                 <div class="input-group">
-                    <input type="text" 
-                           class="form-control" 
-                           placeholder="Username"
-                           ng-model="username" />
+                    <select class="form-control" 
+                            ng-model="username">
+                        <option>fmonteiro6</option>
+                    </select>
                     <span class="input-group-btn">
                         <button class="btn btn-default" 
                                 type="button"
@@ -16,16 +23,6 @@
                     </span>
                 </div> 
             </div> <!-- /input-group -->
-        </div>
-    </div> <br />
-    <div class="row">
-        <div class="col col-md-6">
-            <div class="well">
-                <p>
-                    This page is bypassed if you login using CAS. It's here
-                    to make development easier.
-                </p>
-            </div>
         </div>
     </div>
 </div>

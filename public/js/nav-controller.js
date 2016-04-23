@@ -24,14 +24,13 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
         return $location.path();
     }, function(newValue, oldValue) {
         if (!localStorage.get('user')) {
-            $location.path('/');
+            $location.path('/login');
         }
     });
 
     $scope.$watch(function() {
         return localStorage.get('selectedSemester');
     }, function(newValue, oldValue) {
-        console.log(newValue);
         $scope.selectedSemester = newValue;
     }, true);
 
