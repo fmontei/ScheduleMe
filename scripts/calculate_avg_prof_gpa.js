@@ -16,33 +16,29 @@ function run() {
         {file: dir + '201308_201402_201405.csv', gpaPosFromEnd: 2, includeFirstLine: false}
     ];
 
-    async.waterfall([
-        function parseFirstFile(callback) {
-            parseFile(files_to_parse[0], callback);
-        }, 
-        function parseSecondFile(callback) {
-            parseFile(files_to_parse[1], callback);
-        },
-        function parseThirdFile(callback) {
-            parseFile(files_to_parse[2], callback);
-        }
-    ], function(err) {
+    parseFile(files_to_parse[0]).then(function() {
+        return parseFile(files_to_parse[1]);
+    }).then(function() {
+        return parseFile(files_to_parse[2]);
+    }).then(function() {
         for (var key in gpa_by_prof) {
             var prof = gpa_by_prof[key];
             prof.gpa = (prof.freq === 0) ? 0 : prof.gpa_sum / prof.freq;
         }
         deferred.resolve(gpa_by_prof);
     });
+
     return deferred.promise;
 };
 
 
-function parseFile(file_to_parse, callback) {
-    var lineCount = 0;
+function parseFile(file_to_parse) {
+    var deferred = Q.defer();
+    var firstLine = true;
     var rd = readline.createInterface({
         input: fs.createReadStream(file_to_parse.file)
     }).on('line', function(line) {
-        if (true === file_to_parse.includeFirstLine || lineCount > 0) {
+        if (true === file_to_parse.includeFirstLine || false === firstLine) {
             var gpa = getGPAFromLine(line, file_to_parse.gpaPosFromEnd),
                 prof = getProfFromLine(line);
             if (undefined === gpa_by_prof[prof]) {
@@ -51,10 +47,11 @@ function parseFile(file_to_parse, callback) {
             gpa_by_prof[prof].gpa_sum += gpa;
             gpa_by_prof[prof].freq += 1;
         }
-        lineCount++;
+        firstLine = false;
     }).on('close', function() {
-        callback(null);
-    })
+        deferred.resolve();
+    });
+    return deferred.promise;
 };
 
 function getGPAFromLine(line, pos) {

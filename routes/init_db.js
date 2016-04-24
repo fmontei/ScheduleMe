@@ -44,6 +44,7 @@ router.use(function(req, res, next) {
             "UNIQUE(name) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+            "professor_id INTEGER NOT NULL," +
             "crn INTEGER NOT NULL," +
             "section_name VARCHAR(5) NOT NULL," +
             "credits INTEGER NOT NULL," +
@@ -77,20 +78,25 @@ router.use(function(req, res, next) {
     var courses = [];
     var sections = [];
     var timeslots = [];
+    var professors = [];
 
-    getSemesters(CURRENT_TERM).then(function(semestersResponse) {
-        semesters = semestersResponse;
-        console.log('Retrieved semesters.');
-        getCourses(semesters).then(function(coursesResponse) {
-            courses = coursesResponse;
-            console.log('Retrieved courses.');
-            var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
-            console.log('Retrieved sections/timeslots.');
-            sections = sectionsAndTimeslots[0];
-            timeslots = sectionsAndTimeslots[1];
-            insertIntoDB(semesters, courses, sections, timeslots).then(function() {
-                console.log('Done');
-                res.status(200).send('Done running script. Check DB for data.');
+    calculate_avg_prof_gpa.run().then(function(gpaByProfessor) {
+        getSemesters(CURRENT_TERM).then(function(semestersResponse) {
+            semesters = semestersResponse;
+            console.log('Retrieved semesters.');
+            getCourses(semesters).then(function(coursesResponse) {
+                courses = coursesResponse;
+                console.log('Retrieved courses.');
+                var extraData = extractSectionsTimeslotsAndProfessorsFromCourses(courses);
+                sections = extraData[0];
+                timeslots = extraData[1];
+                professors = extraData[2];
+                console.log('Retrieved sections/timeslots/professors.');
+                insertIntoDB(semesters, courses, sections, timeslots, professors, gpaByProfessor)
+                    .then(function() {
+                    console.log('Done');
+                    res.status(200).send('Done running script. Check DB for data.');
+                });
             });
         });
     });
@@ -98,7 +104,7 @@ router.use(function(req, res, next) {
 
 module.exports = router;
 
-function insertIntoDB(semesters, courses, sections, timeslots) {
+function insertIntoDB(semesters, courses, sections, timeslots, professors, gpaByProfessor) {
     var mainDefer = Q.defer();
 
     db.parallelize(function() {
@@ -106,6 +112,9 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
         saveSemesters(semesters).then(function() {
             console.log('Done inserting semesters into DB.');
+            return saveProfessors(professors, gpaByProfessor);
+        }).then(function() {
+            console.log('Done inserting professors into DB.');
             return getFKsForCourses(courses);
         }).then(function(finalCourses) {
             return saveCourses(finalCourses);
@@ -131,6 +140,26 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         } else {
             setTimeout(waitForAllRecordsToSave, 100, deferred);
         }
+    };
+
+    function saveProfessors(professors, gpaByProfessor) {
+        var deferred = Q.defer();
+        var query = db.prepare("INSERT INTO professor(name, avg_gpa) values(?, ?);");
+        deferredCount = professors.length;
+
+        for (var i = 0; i < professors.length; i++) {
+            var professor = professors[i].replace(', ', ','),
+                avgGPA = (gpaByProfessor[professor] !== undefined) ? 
+                    gpaByProfessor[professor].gpa : 0;
+            query.run([
+                professor, avgGPA
+            ], function(error) {
+                deferredCount -= 1;
+            });
+        }
+
+        waitForAllRecordsToSave(deferred);
+        return deferred.promise;
     };
 
     function saveSemesters(semesters) {
@@ -199,17 +228,24 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         var deferred = Q.defer();
         var sectionsWithClassIDs = [];
         var sectionPromises = [];
+        var promise;
 
         for (var i = 0; i < sections.length; i++) {
             var section = sections[i];
-            var innerQuery = "SELECT class_id FROM class where class_number = '" +
+            var innerQuery1 = "SELECT class_id FROM class where class_number = '" +
                 section['class_number'] + "' AND department = '" + section['department'] +
                 "' LIMIT 1;";
-            var promise = executeInnerQuery(innerQuery, section, 'class_id',
-                'class_number', true).then(function(finalSection) {
-                sectionsWithClassIDs.push(finalSection);
+            var innerQuery2 = "SELECT professor_id FROM professor where name = '" +
+                section['professor'] + "' LIMIT 1;";
+            executeInnerQuery(innerQuery1, section, 'class_id', 'class_number', true)
+                .then(function(tempSection) {
+                promise = executeInnerQuery(innerQuery2, tempSection, 'professor_id',
+                    'name', true).then(function(finalSection) {
+                    console.log(JSON.stringify(finalSection));
+                    finalSections.push(finalSection);
+                }); 
+                sectionPromises.push(promise);       
             });
-            sectionPromises.push(promise);
         }
 
         Q.all(sectionPromises).then(function() {
@@ -465,7 +501,7 @@ function getCourses(semesters) {
     return deferred.promise;
 };
 
-function extractSectionsAndTimeslotsFromCourses(courses) {
+function extractSectionsTimeslotsAndProfessorsFromCourses(courses) {
     var finalSections = [];
     var finalTimeslots = [];
     var finalProfessors = [];
@@ -483,8 +519,9 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
     }
 
     for (var i = 0; i < finalSections.length; i++) {
-        if (finalProfessors.indexOf(finalSections[i]['professor']) === -1) {
-            finalProfessors.push(finalSections[i]['professor']);
+        var professor = finalSections[i]['professor'];
+        if (professor && finalProfessors.indexOf(professor) === -1) {
+            finalProfessors.push(professor);
         }
         var timeslots = finalSections[i]['timeslots'];
         for (var j = 0; j < timeslots.length; j++) {
@@ -497,9 +534,7 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
         delete finalSections[i]['timeslots'];
     }
 
-    console.log(JSON.stringify(finalProfessors));
-
-    return [finalSections, finalTimeslots];
+    return [finalSections, finalTimeslots, finalProfessors];
 };
 
 /* Helper function for getSemesters().
@@ -508,7 +543,7 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
  */
 function getMajorsByTerm(term) {
     var deferred = Q.defer();
-	var url = "/gatech/terms/" + term + "/majors/";
+    var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors";
 
     httpGet(url).then(function(jsonResponse) {
         var majors = [];
@@ -530,7 +565,7 @@ function getMajorsByTerm(term) {
  */
 function getCoursesByTermAndMajor(term, major) {
     var deferred = Q.defer();
-	var url = "/gatech/terms/" + term + "/majors/"
+	var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors/"
 		+ major + "/courses";
     var courses = [];
 
@@ -555,7 +590,7 @@ function getCourseSectionsForCourse(term, course) {
     var deferred = Q.defer();
     var major = course['department'];
     var number = course['class_number'];
-    var url = "/gatech/terms/" + term +
+    var url = "https://soc.courseoff.com/gatech/terms/" + term +
         "/majors/" + major + "/courses/" + number + "/sections";
     var sections = [];
 

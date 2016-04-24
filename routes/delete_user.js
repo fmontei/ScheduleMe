@@ -19,7 +19,7 @@ router.use(function(req, res, next) {
                 callback(err);
             });
         },
-        function(err, callback) {
+        function(callback) {
             if (err) {
                 return res.status(500).send(err);
             }
@@ -29,7 +29,7 @@ router.use(function(req, res, next) {
                 callback(err);
             });
         },
-        function(err, callback) {
+        function(callback) {
             if (err) {
                 return res.status(500).send(err);
             }

@@ -104,7 +104,7 @@ function to_map(array, key) {
  * retrieve class data, sections, timeslots
  */
 function get_all_class_data(input, callback) {
-    async.map(
+/*    async.map(
         input.class_groups,
         function(class_group, class_group_callback) {
             async.map(
@@ -166,6 +166,7 @@ function get_all_class_data(input, callback) {
                 });
         },
         callback);
+    */
 }
 
 // class Graph {
