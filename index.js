@@ -7,6 +7,7 @@ var cas = require('./routes/cas');
 
 var init_db = require('./routes/init_db');
 var select_db = require('./routes/select_db');
+var add_avg_prof_gpa_to_db = require('./routes/add_avg_prof_gpa_to_db');
 
 var get_user = require('./routes/get_user');
 var get_schedule = require('./routes/get_schedule');
@@ -57,6 +58,8 @@ app.use('/init/:term', function(req, res, next) {
     req.term = req.params.term;
     init_db(req, res, next);
 });
+
+app.get('/gpa', add_avg_prof_gpa_to_db);
 
 // Test database
 app.use('/select', select_db);

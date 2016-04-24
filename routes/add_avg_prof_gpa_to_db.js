@@ -1,11 +1,43 @@
+var express = require('express');
+var sqlite3 = require('sqlite3').verbose();
+var http = require('https');
 var async = require('async');
 var Q = require('q');
 var fs = require('fs');
 var readline = require('readline');
 
-var gpa_by_prof = {};
+var router = express.Router();
+var db = new sqlite3.Database('scheduleme.db');
 
-function run() {
+var gpa_by_prof = {};
+var professor_names = {};
+
+router.use(function(req, res, next) {
+    db.run("CREATE TABLE if not exists PROFESSOR(" + 
+           "professor_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + 
+           "name VARCHAR(255) NOT NULL," +
+           "avg_gpa REAL NOT NULL," +
+           "UNIQUE(name) ON CONFLICT IGNORE);");
+
+    async.waterfall([
+        function parseFiles(callback) {
+            readAndParseFiles().then(function() {
+                callback(null);
+            });
+        },
+        function getProfessorNamesFromDB(callback) {
+            db.all("SELECT section_id, professor FROM SECTION;", function(err, rows) {
+                if (err) callback(err);
+                console.log(JSON.stringify(rows));
+            });
+        },
+
+    ], function(err) {
+        
+    });
+});
+
+function readAndParseFiles() {
     var deferred = Q.defer();
     var dir = __dirname;
     dir = dir.substring(0, dir.lastIndexOf('/')) + '/gpa_data/';
@@ -75,4 +107,4 @@ function getProfFromLine(line) {
     return line.substring(line.indexOf('"') + 1, line.lastIndexOf('"'));
 };
 
-module.exports.run = run;
+module.exports = router;
