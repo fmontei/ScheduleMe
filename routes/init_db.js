@@ -7,7 +7,13 @@ var Q = require('q');
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
+var calculate_avg_prof_gpa = require('../scripts/calculate_avg_prof_gpa');
+
 router.use(function(req, res, next) {
+    var CURRENT_TERM = req.term.trim();
+    if (!CURRENT_TERM) res.status(400).send('Must provide term, i.e. 201601');
+    console.log('Scraping data for semester: ' + CURRENT_TERM + ".");
+
     db.serialize(function() {
         db.run("CREATE TABLE if not exists USER(" +
             "user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
@@ -31,17 +37,22 @@ router.use(function(req, res, next) {
             "semester_id INTEGER NOT NULL," +
             "foreign key (semester_id) references SEMESTER(semeter_id)," +
             "UNIQUE(department, class_number) ON CONFLICT IGNORE);")
+          .run("CREATE TABLE if not exists PROFESSOR(" + 
+            "professor_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + 
+            "name VARCHAR(255) NOT NULL," +
+            "avg_gpa REAL NOT NULL," +
+            "UNIQUE(name) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "crn INTEGER NOT NULL," +
             "section_name VARCHAR(5) NOT NULL," +
             "credits INTEGER NOT NULL," +
-            "professor VARCHAR(255)," +
             "seat_capacity INTEGER," +
             "seat_actual INTEGER," +
             "seat_remaining INTEGER," +
             "class_id INTEGER NOT NULL," +
             "foreign key (class_id) references CLASS(class_id)," +
+            "foreign key (professor_id) references PROFESSOR(professor_id)," +
             "UNIQUE (class_id, crn) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists TIMESLOT(" +
             "timeslot_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
@@ -66,7 +77,6 @@ router.use(function(req, res, next) {
     var courses = [];
     var sections = [];
     var timeslots = [];
-    var CURRENT_TERM = "201601";
 
     getSemesters(CURRENT_TERM).then(function(semestersResponse) {
         semesters = semestersResponse;
@@ -458,6 +468,7 @@ function getCourses(semesters) {
 function extractSectionsAndTimeslotsFromCourses(courses) {
     var finalSections = [];
     var finalTimeslots = [];
+    var finalProfessors = [];
 
     for (var i = 0; i < courses.length; i++) {
         var sections = courses[i]['sections'];
@@ -472,6 +483,9 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
     }
 
     for (var i = 0; i < finalSections.length; i++) {
+        if (finalProfessors.indexOf(finalSections[i]['professor']) === -1) {
+            finalProfessors.push(finalSections[i]['professor']);
+        }
         var timeslots = finalSections[i]['timeslots'];
         for (var j = 0; j < timeslots.length; j++) {
             var timeslot = timeslots[j];
@@ -482,6 +496,8 @@ function extractSectionsAndTimeslotsFromCourses(courses) {
         }
         delete finalSections[i]['timeslots'];
     }
+
+    console.log(JSON.stringify(finalProfessors));
 
     return [finalSections, finalTimeslots];
 };
@@ -603,25 +619,11 @@ function formatTime(time) {
     return formatted;
 };
 
-function httpGet(path) {
+function httpGet(theUrl) {
     var deferred = Q.defer();
 
-    var options = {
-        host: 'soc.courseoff.com',
-        path: path,
-        method: 'GET'
-    };
-
-    http.get(options, function(res){
-        var body = '';
-
-        res.on('data', function (chunk) {
-               body += chunk;
-         });
-
-        res.on('end', function () {
-            deferred.resolve(JSON.parse(body));
-        });
+    request(theUrl, function(error, response, body) {
+        deferred.resolve(JSON.parse(body));
     });
 
     return deferred.promise;

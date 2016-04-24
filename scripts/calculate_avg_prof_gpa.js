@@ -1,15 +1,12 @@
-var express = require('express');
-var sqlite3 = require('sqlite3').verbose();
 var async = require('async');
 var Q = require('q');
 var fs = require('fs');
 var readline = require('readline');
 
-var router = express.Router();
-
 var gpa_by_prof = {};
 
-router.use(function(req, res, next) {
+function run() {
+    var deferred = Q.defer();
     var dir = __dirname;
     dir = dir.substring(0, dir.lastIndexOf('/')) + '/gpa_data/';
 
@@ -34,9 +31,11 @@ router.use(function(req, res, next) {
             var prof = gpa_by_prof[key];
             prof.gpa = (prof.freq === 0) ? 0 : prof.gpa_sum / prof.freq;
         }
-        console.log(JSON.stringify(gpa_by_prof));
+        deferred.resolve(gpa_by_prof);
     });
-});
+    return deferred.promise;
+};
+
 
 function parseFile(file_to_parse, callback) {
     var lineCount = 0;
@@ -79,4 +78,4 @@ function getProfFromLine(line) {
     return line.substring(line.indexOf('"') + 1, line.lastIndexOf('"'));
 };
 
-module.exports = router;
+module.exports.run = run;
