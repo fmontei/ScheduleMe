@@ -6,6 +6,7 @@ var path = require('path');
 var cas = require('./routes/cas');
 
 var init_db = require('./routes/init_db');
+var calculate_avg_prof_gpa = require('./routes/calculate_avg_prof_gpa');
 var select_db = require('./routes/select_db');
 
 var get_user = require('./routes/get_user');
@@ -54,6 +55,9 @@ app.get('/partials/:partial_name', function(req, res) {
 
 // Init database
 app.use('/init', init_db);
+
+// Calc avg gpa per professor
+app.use('/gpa', calculate_avg_prof_gpa);
 
 // Test database
 app.use('/select', select_db);

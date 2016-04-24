@@ -622,7 +622,7 @@ function httpGet(path) {
         res.on('end', function () {
             deferred.resolve(JSON.parse(body));
         });
-  });
+    });
 
     return deferred.promise;
 };
