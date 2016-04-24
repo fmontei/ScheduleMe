@@ -55,6 +55,13 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
         localStorageService.clearAll();
     };
 
+    myLocalStorage.clearAllExceptUser = function() {
+        var user = localStorageService.get('user');
+        var newLocalStorage = {'user': user};
+        angular.copy(localStorageService, newLocalStorage);
+        myLocalStorage = newLocalStorage;
+    };
+
     return myLocalStorage;
 }]);
 
@@ -355,6 +362,7 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         var deferred = $q.defer();
         var userID = localStorage.get('user')['user_id'];
 
+        localStorage.clearAllExceptUser();
         serverDataService.getAllSemesters().then(function() {
             // Keep this function call here -- it specifically runs multiple
             // times on the server in case there are any SQL_BUSY errors.

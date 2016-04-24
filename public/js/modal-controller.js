@@ -42,12 +42,14 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         if (!allSelectedClasses) {
             allSelectedClasses = [];
         }
-        if (_class.class) {
-            allSelectedClasses.push(_class.class);
+        if (_class.course) {
+            allSelectedClasses.push(_class.course);
         }
         if (_class.lab) {
             allSelectedClasses.push(_class.lab);
         }
+
+        console.log(JSON.stringify(_class));
         localStorage.set('selectedClasses', allSelectedClasses);
         $scope.resetModal();
     };
@@ -79,11 +81,11 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             section = $scope.modalData.selectedSection;
             alreadyExists = isClassInList(_class, allSelectedClasses);
             if (alreadyExists == false) {
-                _class.class = combineClassWithSection(_class.model, section);
+                _class.course = combineClassWithSection(_class.model, section);
             } else {
-                _class.class = null;
+                _class.course = null;
             }
-            $scope.modalData.selectedClass.class = _class.class;
+            $scope.modalData.selectedClass.course = _class.course;
         } else if (type == 'lab') {
             section = $scope.modalData.selectedLabSection;
             alreadyExists = isClassInList(_class, allSelectedClasses);
@@ -104,13 +106,13 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         var alreadyExists = isClassInList(_class, $scope.modalData.groupClasses) ||
             isClassInList(_class, allSelectedClasses);
         if (alreadyExists === false) {
-            _class.class = combineClassWithSection(_class.model, section);
-            $scope.modalData.groupClasses.push(_class.class);
+            _class.course = combineClassWithSection(_class.model, section);
+            $scope.modalData.groupClasses.push(_class.course);
         }
         $scope.modalData.selectedDept = null;
         $scope.modalData.selectedClass = {
             model: null,
-            class: null,
+            course: null,
             lab: null
         };
         $scope.modalData.filteredClasses = [];
@@ -131,7 +133,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             selectedDept: null,
             selectedClass: {
                 model: null,
-                class: null,
+                course: null,
                 lab: null
             },
             filteredClasses: [],
@@ -139,7 +141,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             filteredLabSections: [],
             selectedSection: null,
             selectedLabSection: null,
-            sectionType: '',
+            sectionType: null,
             labSectionType: '',
             groupClasses: [],
             groupMessage: "Select a department and class. If you don't mind what " + 

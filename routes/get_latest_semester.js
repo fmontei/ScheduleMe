@@ -9,12 +9,14 @@ var db = new sqlite3.Database('scheduleme.db');
  * Get latest semester.
  */
 router.use(function(req, res, next) {
+    var thisMonth = new Date().getMonth() + 1,
+        thisSemester = (thisMonth >= 1 && thisMonth < 5) ? 'Spring' :
+            (thisMonth >= 5 && thisMonth < 8) ? 'Summer' :
+            'Fall',
+        query = "SELECT * FROM semester WHERE term = '" + thisSemester + "';";
+
     async.waterfall([
         function(callback) {
-            var query = "SELECT * FROM semester ORDER BY year, CASE term " +
-                "WHEN 'Spring' THEN 1 " +
-                "WHEN 'Summer' THEN 2 " +
-                "WHEN 'Fall' THEN 3 END DESC LIMIT 1;"; 
             db.all(query, function(err, rows) {
                 callback(null, rows);
             });
@@ -29,4 +31,3 @@ router.use(function(req, res, next) {
 });
 
 module.exports = router;
-

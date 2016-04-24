@@ -313,7 +313,7 @@ function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
 };
 
 function getSemesters(term) {
-	var url = "/gatech/terms/";
+	var url = "https://soc.courseoff.com/gatech/terms/";
 	if (term) {
 		url += term;
 	}

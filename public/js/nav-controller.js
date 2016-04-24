@@ -7,8 +7,9 @@ var scheduleMeApp = angular.module('ScheduleMeApp');
 scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
     'LocalStorage', 'SemesterHttpService', function($scope, $http, $location, 
         localStorage, semesterHttpService) {
-    $scope.changeSemester = function() {
-        localStorage.set('selectedSemester', $scope.selectedSemester);
+    $scope.changeSemester = function(semester) {
+        localStorage.set('selectedSemester', semester);
+        $location.path('/login');
     };
 
     $scope.logout = function() {
@@ -23,9 +24,16 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
         return $location.path();
     }, function(newValue, oldValue) {
         if (!localStorage.get('user')) {
-            $location.path('/');
+            $location.path('/login');
         }
     });
+
+    $scope.$watch(function() {
+        return localStorage.get('selectedSemester');
+    }, function(newValue, oldValue) {
+        console.log(newValue);
+        $scope.selectedSemester = newValue;
+    }, true);
 
     $scope.$watch(function() {
         return localStorage.get('allSemesters');
