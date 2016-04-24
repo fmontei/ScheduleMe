@@ -1,7 +1,6 @@
 var express = require('express');
 var sqlite3 = require('sqlite3').verbose();
 var request = require('request');
-var http = require('https');
 var Q = require('q');
 
 var router = express.Router();
@@ -10,7 +9,7 @@ var db = new sqlite3.Database('scheduleme.db');
 router.use(function(req, res, next) {
     var CURRENT_TERM = req.term.trim();
     if (!CURRENT_TERM) res.status(400).send('Must provide term, i.e. 201601');
-    console.log('Scraping data for semester: ' + CURRENT_TERM + ".");
+    console.log(CURRENT_TERM);
 
     db.serialize(function() {
         db.run("CREATE TABLE if not exists USER(" +
@@ -35,23 +34,17 @@ router.use(function(req, res, next) {
             "semester_id INTEGER NOT NULL," +
             "foreign key (semester_id) references SEMESTER(semeter_id)," +
             "UNIQUE(department, class_number) ON CONFLICT IGNORE);")
-          .run("CREATE TABLE if not exists PROFESSOR(" + 
-            "professor_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + 
-            "name VARCHAR(255) NOT NULL," +
-            "avg_gpa REAL NOT NULL," +
-            "UNIQUE(name) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists SECTION(" +
             "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-            "professor_id INTEGER NOT NULL," +
             "crn INTEGER NOT NULL," +
             "section_name VARCHAR(5) NOT NULL," +
             "credits INTEGER NOT NULL," +
+            "professor VARCHAR(255)," +
             "seat_capacity INTEGER," +
             "seat_actual INTEGER," +
             "seat_remaining INTEGER," +
             "class_id INTEGER NOT NULL," +
             "foreign key (class_id) references CLASS(class_id)," +
-            "foreign key (professor_id) references PROFESSOR(professor_id)," +
             "UNIQUE (class_id, crn) ON CONFLICT IGNORE);")
           .run("CREATE TABLE if not exists TIMESLOT(" +
             "timeslot_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
@@ -76,7 +69,6 @@ router.use(function(req, res, next) {
     var courses = [];
     var sections = [];
     var timeslots = [];
-    var professors = [];
 
     getSemesters(CURRENT_TERM).then(function(semestersResponse) {
         semesters = semestersResponse;
@@ -84,13 +76,11 @@ router.use(function(req, res, next) {
         getCourses(semesters).then(function(coursesResponse) {
             courses = coursesResponse;
             console.log('Retrieved courses.');
-            var extraData = extractSectionsTimeslotsAndProfessorsFromCourses(courses);
-            sections = extraData[0];
-            timeslots = extraData[1];
-            professors = extraData[2];
-            console.log('Retrieved sections/timeslots/professors.');
-            insertIntoDB(semesters, courses, sections, timeslots)
-                .then(function() {
+            var sectionsAndTimeslots = extractSectionsAndTimeslotsFromCourses(courses);
+            console.log('Retrieved sections/timeslots.');
+            sections = sectionsAndTimeslots[0];
+            timeslots = sectionsAndTimeslots[1];
+            insertIntoDB(semesters, courses, sections, timeslots).then(function() {
                 console.log('Done');
                 res.status(200).send('Done running script. Check DB for data.');
             });
@@ -201,24 +191,17 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         var deferred = Q.defer();
         var sectionsWithClassIDs = [];
         var sectionPromises = [];
-        var promise;
 
         for (var i = 0; i < sections.length; i++) {
             var section = sections[i];
-            var innerQuery1 = "SELECT class_id FROM class where class_number = '" +
+            var innerQuery = "SELECT class_id FROM class where class_number = '" +
                 section['class_number'] + "' AND department = '" + section['department'] +
                 "' LIMIT 1;";
-            var innerQuery2 = "SELECT professor_id FROM professor where name = '" +
-                section['professor'] + "' LIMIT 1;";
-            executeInnerQuery(innerQuery1, section, 'class_id', 'class_number', true)
-                .then(function(tempSection) {
-                promise = executeInnerQuery(innerQuery2, tempSection, 'professor_id',
-                    'professor', true).then(function(finalSection) {
-                    console.log(JSON.stringify(finalSection));
-                    finalSections.push(finalSection);
-                }); 
-                sectionPromises.push(promise);       
+            var promise = executeInnerQuery(innerQuery, section, 'class_id',
+                'class_number', true).then(function(finalSection) {
+                sectionsWithClassIDs.push(finalSection);
             });
+            sectionPromises.push(promise);
         }
 
         Q.all(sectionPromises).then(function() {
@@ -230,14 +213,14 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
 
     function saveSections(finalSections) {
         var deferred = Q.defer();
-        var query = db.prepare("INSERT INTO section(crn, credits, professor_id, section_name, class_id, " +
+        var query = db.prepare("INSERT INTO section(crn, credits, professor, section_name, class_id, " +
             "seat_capacity, seat_actual, seat_remaining) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
         deferredCount = finalSections.length;
 
         for (var i = 0; i < finalSections.length; i++) {
             var section = finalSections[i];
             query.run([
-                section['crn'], section['credits'], section['professor_id'],
+                section['crn'], section['credits'], section['professor'],
                 section['section_name'], section['class_id'], section['seat_capacity'],
                 section['seat_actual'], section['seat_remaining']
             ], function(error) {
@@ -322,10 +305,10 @@ function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
 };
 
 function getSemesters(term) {
-	var url = "https://soc.courseoff.com/gatech/terms/";
-	if (term) {
-		url += term;
-	}
+    var url = "https://soc.courseoff.com/gatech/terms/";
+    if (term) {
+        url += term;
+    }
 
     var deferred = Q.defer();
     var finalSemesters = [];
@@ -474,10 +457,9 @@ function getCourses(semesters) {
     return deferred.promise;
 };
 
-function extractSectionsTimeslotsAndProfessorsFromCourses(courses) {
+function extractSectionsAndTimeslotsFromCourses(courses) {
     var finalSections = [];
     var finalTimeslots = [];
-    var finalProfessors = [];
 
     for (var i = 0; i < courses.length; i++) {
         var sections = courses[i]['sections'];
@@ -492,10 +474,6 @@ function extractSectionsTimeslotsAndProfessorsFromCourses(courses) {
     }
 
     for (var i = 0; i < finalSections.length; i++) {
-        var professor = finalSections[i]['professor'];
-        if (professor && finalProfessors.indexOf(professor) === -1) {
-            finalProfessors.push(professor);
-        }
         var timeslots = finalSections[i]['timeslots'];
         for (var j = 0; j < timeslots.length; j++) {
             var timeslot = timeslots[j];
@@ -507,7 +485,7 @@ function extractSectionsTimeslotsAndProfessorsFromCourses(courses) {
         delete finalSections[i]['timeslots'];
     }
 
-    return [finalSections, finalTimeslots, finalProfessors];
+    return [finalSections, finalTimeslots];
 };
 
 /* Helper function for getSemesters().
@@ -516,7 +494,7 @@ function extractSectionsTimeslotsAndProfessorsFromCourses(courses) {
  */
 function getMajorsByTerm(term) {
     var deferred = Q.defer();
-    var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors";
+    var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors/";
 
     httpGet(url).then(function(jsonResponse) {
         var majors = [];
@@ -538,8 +516,8 @@ function getMajorsByTerm(term) {
  */
 function getCoursesByTermAndMajor(term, major) {
     var deferred = Q.defer();
-	var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors/"
-		+ major + "/courses";
+    var url = "https://soc.courseoff.com/gatech/terms/" + term + "/majors/"
+        + major + "/courses";
     var courses = [];
 
     httpGet(url).then(function(jsonResponse) {

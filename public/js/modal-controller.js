@@ -49,7 +49,6 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
             allSelectedClasses.push(_class.lab);
         }
 
-        console.log(JSON.stringify(_class));
         localStorage.set('selectedClasses', allSelectedClasses);
         $scope.resetModal();
     };

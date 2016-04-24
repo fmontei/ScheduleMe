@@ -83,6 +83,10 @@
                     href="javascript:void(0)" data-query="select * from timeslot order by section_id;">
                     Select all timeslots
                 </a>
+                <a class="btn btn-default" id="select-professor-btn"
+                    href="javascript:void(0)" data-query="select * from professor;">
+                    Select all timeslots
+                </a>
             </div>
 
             <h3>Custom query</h3>
@@ -105,11 +109,16 @@
 
 <script>
     $(document).ready(function() {
-        var definedSelectBtns = [$('#select-semester-btn'), $('#select-class-btn'),
-            $('#select-section-btn'), $('#select-timeslot-btn')];
-        var allBtns = [$('#scrape-data-btn'), $('#select-semester-btn'),
-            $('#select-class-btn'), $('#select-section-btn'),
-            $('#select-timeslot-btn'), $('#custom-select-btn')];
+        var definedSelectBtns = [
+            $('#select-semester-btn'), $('#select-class-btn'),
+            $('#select-section-btn'), $('#select-timeslot-btn'), 
+            $('#select-professor-btn')
+        ];
+        var allBtns = [
+            $('#select-semester-btn'), $('#select-class-btn'),
+            $('#select-section-btn'), $('#select-timeslot-btn'), 
+            $('#select-professor-btn'), $('#custom-select-btn')
+        ];
 
         $('#scrape-data-btn').click(function() {
             var term = $('#scrape-data-term option:selected').attr('data-term').trim();

@@ -31,7 +31,6 @@ scheduleMeApp.controller('NavController', ['$scope', '$http', '$location',
     $scope.$watch(function() {
         return localStorage.get('selectedSemester');
     }, function(newValue, oldValue) {
-        console.log(newValue);
         $scope.selectedSemester = newValue;
     }, true);
 
