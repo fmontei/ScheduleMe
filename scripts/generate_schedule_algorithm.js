@@ -281,6 +281,9 @@ function print_packed_timeslots(pts) {
     }
 }
 
+/*
+ * Determines whether two packed timeslots conflict.
+ */
 function do_packed_timeslots_conflict(pt1, pt2) {
     for (let i = 0; i < 14; i++) {
         if ((pt1[i] & pt2[i]) != 0)  {
@@ -291,6 +294,10 @@ function do_packed_timeslots_conflict(pt1, pt2) {
     return false;
 }
 
+/*
+ * Takes a list of class groups and returns a map of section id to
+ * class group, class, and section.
+ */
 function create_section_map(class_groups) {
     let map = new Map();
     class_groups.forEach(function(class_group) {
@@ -304,6 +311,10 @@ function create_section_map(class_groups) {
     return map;
 }
 
+/*
+ * Creates a set of timeslots for every day of the week,
+ * between start_time and end_time
+ */
 function create_daily_range_timeslots(start_time, end_time) {
     let timeslots = new Array();
     for (let day of days_map.keys()) {
@@ -317,6 +328,9 @@ function create_daily_range_timeslots(start_time, end_time) {
     return timeslots;
 }
 
+/*
+ * Inverts the time ranges specified by a packed timeslots.
+ */
 function invert_packed_timeslots(pts) {
     let arr = new Uint32Array(14);
     for (let i = 0; i < 14; i += 2) {
@@ -327,6 +341,9 @@ function invert_packed_timeslots(pts) {
     return arr;
 }
 
+/*
+ * Merges two packed timeslots objects.
+ */
 function merge_packed_timeslots(pts1, pts2) {
     let arr = new Uint32Array(14);
     for (let i = 0; i < 14; i++) {
@@ -408,6 +425,8 @@ function calculate_local_criteria_weight(section, criteria) {
         }
     }
 
+    if (count === 0) return 0;
+
     let final_score = total_score / count;
     console.assert(!Number.isNaN(total_score));
     console.assert(!Number.isNaN(final_score));
@@ -465,6 +484,7 @@ function calculate_global_criteria_weight(schedule, criteria) {
         }
     }
 
+    if (count === 0) return 0;
     let final_score = total_score / count;
     console.assert(!Number.isNaN(total_score));
     console.assert(!Number.isNaN(final_score));
