@@ -82,3 +82,11 @@ td.schedule-table-cell {
 .ng-invalid{
     border: 1px solid red;
 }
+
+.glyph-gray {
+    color: #ddd !important;
+}
+
+.glyph-gray:hover {
+    color: #aaa !important;
+}

@@ -11,8 +11,8 @@
                </small>
             </h3>
             <small ng-show="showInfo === true">
-                <span class="glyphicon glyphicon-star"></span> = mandatory |
-                <span class="glyphicon glyphicon-star-empty"></span> = optional |
+                <span class="glyphicon glyphicon-lock"></span> = mandatory |
+                <span class="glyphicon glyphicon-lock glyph-gray"></span> = optional |
                 <span class="glyphicon glyphicon-th-large"></span> = pick one from group
             </small>
 
@@ -42,8 +42,8 @@
                            ng-click="undoSelection(class, 'selectedClasses')">
                         </a>
                         <a  href="javascript:void(0)"
-                            ng-class="{'glyphicon glyphicon-star no-link pull-right': class.isMandatory === true,
-                                       'glyphicon glyphicon-star-empty no-link pull-right': !class.isMandatory}"
+                            ng-class="{'glyphicon glyphicon-lock no-link pull-right': class.isMandatory === true,
+                                       'glyphicon glyphicon-lock glyph-gray no-link pull-right': !class.isMandatory}"
                             ng-click="updateClassMandatoryStatus(class, 'selectedClasses')">
                         </a>
                     </small>
@@ -229,7 +229,7 @@
                       </select>
                     </form>
                 </uib-accordion-group>
-                <uib-accordion-group heading="Reserved Time">
+                <uib-accordion-group heading="Excluded Times">
                     <div>No classes on:</div>
                     <div ng-repeat="timeslot in criteria.timeslots">
                         <select ng-model="timeslot.day">
