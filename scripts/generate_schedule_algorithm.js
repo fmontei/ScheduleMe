@@ -78,11 +78,11 @@ let sample_input = {
             'parameters': { 'condition': 'at_least',  'value': 3 },
             'priority': 'high'
         },
-        // {
-        //     'type': 'avggpa',
-        //     'parameters': 3.0,
-        //     'priority': 'low'
-        // },
+        {
+            'type': 'avggpa',
+            'parameters': 3.0,
+            'priority': 'low'
+        },
         // {
         //     'type': 'distance',
         //     'parameters': 10, // minutes at avg walking speed
@@ -119,7 +119,7 @@ function get_all_class_data(input, callback) {
                         },
                         function(class_data, section_data_callback) {
                             db.all(
-                                'SELECT * FROM SECTION WHERE class_id = ?',
+                                'SELECT * FROM SECTION LEFT OUTER JOIN PROFESSOR USING (PROFESSOR_ID) WHERE class_id = ?',
                                 [ class_data.class_id ],
                                 function(err, sections) {
                                     if (err != null) {
@@ -168,76 +168,9 @@ function get_all_class_data(input, callback) {
         callback);
 }
 
-// class Graph {
-//     constructor() {
-//         this.nodes = new Map();
-//         this.weights = new Map();
-//     }
-
-//     add_node(id, weight) {
-//         console.assert(!nodes.has(id) && !weights.has(id),
-//                 "duplicate id '%s' in graph", id);
-
-//         nodes.set(id, new Set());
-//         weights.set(id, weight);
-//     }
-
-//     remove_node(id) {
-//         console.assert(nodes.has(id) && weights.has(id),
-//                 "tried to remove nonexistent id '%s'", id);
-
-//         nodes.get(id).forEach(function(value1, value2, set) {
-//             remove_edge(id, value1);
-//         });
-
-//         nodes.delete(id);
-//         weights.delete(id);
-//     }
-
-//     contains_node(id) {
-//         return nodes.has(id);
-//     }
-
-//     // get_weight(id) {
-//     //     if (nodes)
-//     // }
-
-//     get_neighbors(id) {
-//         console.assert(nodes.has(id),
-//                 "tried to get_neighbors nonexistent id '%s'", id);
-
-//         return nodes.get(id);
-//     }
-
-//     add_edge(id1, id2) {
-//         console.assert(id1 !== id2, "tried to add_edge self edge '%s'", id1);
-//         console.assert(nodes.has(id1),
-//                 "tried to add_edge nonexistent id '%s'", id1);
-//         console.assert(nodes.has(id2),
-//                 "tried to add_edge nonexistent id '%s'", id2);
-//         console.assert(!nodes.get(id1).contains(id2) && !nodes.get(id2).contains(id1),
-//                 "already existing edge between '%s' and '%s'", id1, id2);
-        
-//         nodes.get(id1).add(id2);
-//         nodes.get(id2).add(id1);
-//     }
-
-//     remove_edge(id1, id2) {
-//         console.assert(nodes.has(id1) && nodes.has(id2)
-//                 && nodes.get(id1).contains(id2)
-//                 && nodes.get(id2).contains(id1),
-//                 "no edge between '%s' and '%s'", id1, id2);
-
-//         nodes.get(id1).delete(id2);
-//         nodes.get(id2).delete(id1);
-//     }
-
-//     contains_edge(id1, id2) {
-//         return nodes.contains(id1) && nodes.get(id1).has(id2)
-//             && nodes.contains(id2) && nodes.get(id2).has(id1);
-//     }
-// }
-
+/*
+ * Assigns a numerical value to each day of the week.
+ */
 let days_map = new Map([
     [ 'M', 0 ],
     [ 'T', 1 ],
@@ -248,6 +181,10 @@ let days_map = new Map([
     [ 'U', 6 ]
 ]);
 
+/*
+ * Stores the half-hour adjustment given the minute part of the time, when
+ * computing time slots.
+ */
 let time_adjust_map = {
     // start minutes
     '05': +0,
@@ -270,6 +207,14 @@ function time_to_slot_num(time) {
     let base = Number.parseInt(time.substring(0, 2), 10) * 2;
     let off = time_adjust_map[time.substring(3, 5)];
     console.assert(!Number.isNaN(base + off), 'bad time_to_slot %s', time);
+    return base + off;
+}
+
+function time_to_slot_num_lenient(time) {
+    let base = Number.parseInt(time.substring(0, 2), 10) * 2;
+    let min = Number.parseInt(time.substring(3, 5), 10);
+    let off = Math.round(min / 60);
+
     return base + off;
 }
 
@@ -297,8 +242,8 @@ function create_packed_timeslots(timeslots) {
     timeslots.forEach(function(timeslot) {
         console.assert(timeslot.start_time !== undefined, "undef " + util.inspect(timeslot));
         let idx = 2 * days_map.get(timeslot.day_of_week);
-        let start_slot = time_to_slot_num(timeslot.start_time)
-        let end_slot = time_to_slot_num(timeslot.end_time);
+        let start_slot = time_to_slot_num_lenient(timeslot.start_time)
+        let end_slot = time_to_slot_num_lenient(timeslot.end_time);
         if (start_slot > 31) {
             // entirely in upper slots
             arr[idx + 1] |= bit_range(start_slot - 32, end_slot - 32);
@@ -493,8 +438,7 @@ function satisfies_local_criterion(section, criterion) {
 
             return !do_packed_timeslots_conflict(criterion.packed_timeslots, section.packed_timeslots);
         case 'avggpa':
-            // TODO: course critque data
-            return true;
+            return section.avg_gpa >= criterion.parameters
         default:
             throw 'criterion does not exist: ' + criterion.type;
     }
@@ -720,11 +664,6 @@ function find_best_schedules(input, count, callback) {
                         return locked_sections_set.has(section.section_id);
                     });
 
-                    // let locked_sections = all_sections.filter(function(section) {
-                    //     return section_map.has(section.section_id)
-                    //         && locked_sections_set.has(section.section_id);
-                    // });
-                    
                     if (locked_class_group_set.has(class_group.class_group_id) && locked_sections.length > 0) {
                         callback('Cannot lock both class and section', null);
                         return;
@@ -765,7 +704,6 @@ function find_best_schedules(input, count, callback) {
 
                 let top_n = sched_heap.toArray().reverse();
 
-                // callback(null, top_n.map(function(sched) { return sched.sections.map(function(sec) { return sec.section_id; }); }));
                 callback(null, top_n);
             } catch (e) {
                 throw e;
@@ -824,13 +762,13 @@ function* find_schedules_within_credit_range(section_buckets, lock_count, start_
 }
 
 // This should be commented out so it doesn't run every time you run node
-find_best_schedules(sample_input, 5, function(err, schedules) {
-    if (err != null) {
-        console.dir(err, { depth: null, colors: true });
-    } else {
-        //console.log(JSON.stringify(schedules, null, 2));
-        console.dir(schedules, { depth: null, colors: true });
-    }
-});
+// find_best_schedules(sample_input, 5, function(err, schedules) {
+//     if (err != null) {
+//         console.dir(err, { depth: null, colors: true });
+//     } else {
+//         //console.log(JSON.stringify(schedules, null, 2));
+//         console.dir(schedules, { depth: null, colors: true });
+//     }
+// });
 
 module.exports.find_best_schedules = find_best_schedules;
