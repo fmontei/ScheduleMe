@@ -91,7 +91,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
                     'start_time': startTime, 
                     'end_time': endTime
                 },
-                'priority': 'required'
+                'priority': $scope.criteria.timeofday.priority
             });
         }
 
@@ -192,7 +192,19 @@ function init(localStorage, $scope) {
                 }
             }
         },
-        timeslots: []
+        timeslots: [],
+        timeofday: {
+            priority: 'required'
+        },
+        timebetween: {
+            priority: 'required'
+        },
+        avggpa: {
+            priority: 'required'
+        },
+        distance: {
+            priority: 'required'
+        }
     };
 };
 

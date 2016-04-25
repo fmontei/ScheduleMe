@@ -139,6 +139,24 @@
             </div>
             <uib-accordion close-others="true">
                 <uib-accordion-group heading="Time of Day" is-open="true">
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm" uib-tooltip="Require that this criterion be true."
+                            ng-model="criteria.timeofday.priority" uib-btn-radio="'required'">
+                            <span class="glyphicon glyphicon-lock"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a high priority."
+                            ng-model="criteria.timeofday.priority" uib-btn-radio="'high'">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a medium priority."
+                            ng-model="criteria.timeofday.priority" uib-btn-radio="'medium'">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a low priority."
+                            ng-model="criteria.timeofday.priority" uib-btn-radio="'low'">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                    </div>
                     <div class="row">
                         <div class="col col-md-6">
                             <label>Earliest Class: </label><p>(start time)</p>
@@ -153,6 +171,24 @@
                     </div>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Time Between Classes">
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm" uib-tooltip="Require that this criterion be true."
+                            ng-model="criteria.timebetween.priority" uib-btn-radio="'required'">
+                            <span class="glyphicon glyphicon-lock"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a high priority."
+                            ng-model="criteria.timebetween.priority" uib-btn-radio="'high'">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a medium priority."
+                            ng-model="criteria.timebetween.priority" uib-btn-radio="'medium'">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a low priority."
+                            ng-model="criteria.timebetween.priority" uib-btn-radio="'low'">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                    </div>
                     <form name="betweenClass">
                         <label style="margin-right: 10px;">Time (hrs):</label>
                         <select name="between" ng-model="criteria.betweenDistance">
@@ -165,6 +201,24 @@
                     </form>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Distance Between Classes">
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm" uib-tooltip="Require that this criterion be true."
+                            ng-model="criteria.distance.priority" uib-btn-radio="'required'">
+                            <span class="glyphicon glyphicon-lock"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a high priority."
+                            ng-model="criteria.distance.priority" uib-btn-radio="'high'">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a medium priority."
+                            ng-model="criteria.distance.priority" uib-btn-radio="'medium'">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a low priority."
+                            ng-model="criteria.distance.priority" uib-btn-radio="'low'">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                    </div>
                     <form name="distance">
                         <label style="margin-right: 10px;">Walking Distance (mins):</label>
                         <select name="distance" ng-model="criteria.walkingDistance">
@@ -208,6 +262,24 @@
                     </button>
                 </uib-accordion-group>
                 <uib-accordion-group heading="Average GPA">
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-sm" uib-tooltip="Require that this criterion be true."
+                            ng-model="criteria.avggpa.priority" uib-btn-radio="'required'">
+                            <span class="glyphicon glyphicon-lock"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a high priority."
+                            ng-model="criteria.avggpa.priority" uib-btn-radio="'high'">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a medium priority."
+                            ng-model="criteria.avggpa.priority" uib-btn-radio="'medium'">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                        <button class="btn btn-default btn-sm" uib-tooltip="Give this criterion a low priority."
+                            ng-model="criteria.avggpa.priority" uib-btn-radio="'low'">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                    </div>
                     Only select sections with professors with prior GPAs greater than:
                     <rzslider rz-slider-model="criteria.gpaSlider.value"
                               rz-slider-options="criteria.gpaSlider.options">
