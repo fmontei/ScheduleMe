@@ -7,6 +7,10 @@ let Heap = require('heap');
 
 let db = new sqlite3.Database('scheduleme.db');
 
+/*
+ * This variable exemplifies the format of the input to the
+ * scheduling algorithm.
+ */
 let sample_input = {
     'class_groups': [
         {
@@ -101,7 +105,7 @@ function to_map(array, key) {
 }
 
 /*
- * retrieve class data, sections, timeslots
+ * retrieve class data, sections, timeslots for algorithm input
  */
 function get_all_class_data(input, callback) {
     async.map(
@@ -463,6 +467,13 @@ function satisfies_local_criterion(section, criterion) {
     }
 }
 
+/*
+ * Returns the weight of the given schedule with respect to the global
+ * criteria in the criteria list provided (does not need to be filtered
+ * beforehand). This is the average of weights of the individual global
+ * criteria. Returns -1 if the schedule fails to satisfy a required
+ * criterion, or some non-negative number representing the weight.
+ */
 function calculate_global_criteria_weight(schedule, criteria) {
     let total_score = 0;
     let count = 0;
@@ -492,6 +503,10 @@ function calculate_global_criteria_weight(schedule, criteria) {
     return final_score;
 }
 
+/*
+ * Returns the weight of a schedule with respect to the given global
+ * criterion.
+ */
 function calculate_global_criterion_weight(schedule, criterion) {
     switch (criterion.type) {
         case 'timebetween':
@@ -625,6 +640,12 @@ function calculate_total_schedule_score(schedule, criteria) {
     return (global + local) / 2;
 }
 
+/*
+ * Given a selection of classes and criteria, in the structure exemplified
+ * in the sample_input variable above, and a count, provides the given callback
+ * with a list of the `count` best schedules that can be made of the sections
+ * provided, with respect to the given criteria and locks.
+ */
 function find_best_schedules(input, count, callback) {
     get_all_class_data(input,
         function(err, class_groups) {
@@ -732,6 +753,19 @@ function find_best_schedules(input, count, callback) {
         });
 }
 
+/*
+ * Given a list of lists of sections section_buckets, finds a set of
+ * non-time-conflicting sections within the given range of credit hours.
+ * Groups of sections that are locked - i.e., must always be chosen - are
+ * expected to appear at the front of the list of buckets, and the count
+ * of these is to be specified by lock_count.
+ *
+ * Also keeps track of the total score of all the sections in each
+ * generated schedule.
+ *
+ * This function is a generator, so it returns an iterator over the
+ * different schedules it finds.
+ */
 function* find_schedules_within_credit_range(section_buckets, lock_count, start_ind, packed_timeslots, credit_min, credit_max) {
     if (start_ind == section_buckets.length
             || credit_max <= 0) {
@@ -781,7 +815,10 @@ function* find_schedules_within_credit_range(section_buckets, lock_count, start_
     }
 }
 
-// This should be commented out so it doesn't run every time you run node
+/*
+ * Runs the scheduling algorithm on sample_input. Comment out when not
+ * testing so it doesn't get executed within the application.
+ */
 // find_best_schedules(sample_input, 5, function(err, schedules) {
 //     if (err != null) {
 //         console.dir(err, { depth: null, colors: true });
