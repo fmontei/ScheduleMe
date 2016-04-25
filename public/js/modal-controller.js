@@ -12,6 +12,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
     $scope.filterClassesByDept = function() {
         $scope.modalData.filteredClasses = [];
         $scope.modalData.filteredSections = [];
+        $scope.modalData.selectedClass = null;
         var filteredClasses = [];
         for (var i = 0; i < $scope.allClasses.length; i++) {
             var _class = $scope.allClasses[i];

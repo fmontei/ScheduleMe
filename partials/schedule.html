@@ -155,7 +155,8 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <label>Prof:</label> {{class.professor_name}}<br />
+                                    <label>Prof:</label> {{class.professor_id | toProfessorName}}<br />
+                                    <label>GPA:</label> {{class.professor_id | toProfessorGPA}}<br />
                                     <label>Loc:</label> {{class.location}}
                                 </div>
                             </div>

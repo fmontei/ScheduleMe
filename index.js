@@ -16,6 +16,7 @@ var get_semesters = require('./routes/get_semesters');
 var get_classes = require('./routes/get_classes');
 var get_sections = require('./routes/get_sections');
 var get_timeslots = require('./routes/get_timeslots');
+var get_professor_dict = require('./routes/get_professor_dict');
 
 var get_or_create_user = require('./routes/get_or_create_user');
 var generate_schedule = require('./routes/generate_schedule');
@@ -103,6 +104,9 @@ app.get('/timeslots/:section_id', function(req, res, next) {
     req.section_id = req.params.section_id;
     get_timeslots(req, res, next);
 });
+
+// Get dict of professors
+app.get('/professors', get_professor_dict);
 
 // Get user by username if exists, else create user with username
 app.post('/get_or_create_user', get_or_create_user);

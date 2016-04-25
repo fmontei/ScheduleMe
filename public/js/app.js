@@ -298,12 +298,39 @@ scheduleMeApp.factory('SectionHttpService', ['$http', '$q', 'LocalStorage',
 }]);
 
 /* 
+ * REST service for professors.
+ */
+scheduleMeApp.factory('ProfessorHttpService', ['$http', '$q', 'LocalStorage',
+     function($http, $q, localStorage) {
+    var professorHttpService = {};
+
+    professorHttpService.getProfessorDict = function(classID, filterByLab) {
+        var deferred = $q.defer();
+
+        $http({
+            method: 'GET',
+            url: '/professors/'
+        }).then(function successCallback(response) {
+            deferred.resolve(response['data']);
+        }, function errorCallback() {
+            deferred.resolve(null);
+        });
+
+        return deferred.promise;
+    };
+
+    return professorHttpService;
+}]);
+
+
+/* 
  * Service for retrieving all user data needed by the application following
  * a successful login. 
  */
 scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpService',
-    'SemesterHttpService', 'ScheduleHttpService', function($q, localStorage,
-    classHttpService, semesterHttpService, scheduleHttpService) {
+    'SemesterHttpService', 'ScheduleHttpService', 'ProfessorHttpService',
+    function($q, localStorage, classHttpService, semesterHttpService, 
+        scheduleHttpService, professorHttpService) {
     var serverDataService = {};
 
     serverDataService.getAllSemesters = function() {
@@ -370,6 +397,9 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         }).then(function() {
             return serverDataService.getScheduleForUser(userID);
         }).then(function() {
+            return professorHttpService.getProfessorDict();
+        }).then(function(profDict) {
+            localStorage.set('profDict', profDict);
             deferred.resolve();
         });
 
@@ -650,8 +680,27 @@ scheduleMeApp.directive('pngTimeInput', function($compile) {
     };
 });
 
+scheduleMeApp.filter('toProfessorName', ['LocalStorage', function(localStorage) {
+    return function(input) {
+        var profDict = localStorage.get('profDict');
+        if (profDict && input) {
+            return (profDict[input] !== undefined) ? 
+                profDict[input]['name'].replace(',', ', ') : 'Unknown';
+        }
+        return 'Unknown';
+    };
+}]);
 
-
+scheduleMeApp.filter('toProfessorGPA', ['LocalStorage', function(localStorage) {
+    return function(input) {
+        var profDict = localStorage.get('profDict');
+        if (profDict && input) {
+            return (profDict[input] !== undefined) ? 
+                profDict[input]['gpa'].toString().substring(0, 5) : 'Unknown';
+        }
+        return 'Unknown';
+    };
+}]);
 
 
 
