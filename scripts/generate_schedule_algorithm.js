@@ -3,6 +3,7 @@
 let sqlite3 = require('sqlite3').verbose();
 let async = require('async');
 let util = require('util');
+let Heap = require('heap');
 
 let db = new sqlite3.Database('scheduleme.db');
 
@@ -67,9 +68,26 @@ let sample_input = {
         },
         {
             'type': 'timeofday',
-            'parameters': { 'start_time': '09:35', 'end_time': '17:55' },
-            'priority': 'required'
-        }
+            'parameters': { 'start_time': '11:35', 'end_time': '17:55' },
+            'priority': 'medium'
+        },
+        {
+            // IF there is a gap, how long?
+            'type': 'timebetween',
+            // at_least x, no_more_than x
+            'parameters': { 'condition': 'at_least',  'value': 3 },
+            'priority': 'high'
+        },
+        // {
+        //     'type': 'avggpa',
+        //     'parameters': 3.0,
+        //     'priority': 'low'
+        // },
+        // {
+        //     'type': 'distance',
+        //     'parameters': 10, // minutes at avg walking speed
+        //     'priority': 'medium'
+        // }
     ]
 };
 
@@ -374,39 +392,273 @@ function merge_packed_timeslots(pts1, pts2) {
 }
 
 /*
- * Returns value between 0-1, or -1 if section should be disqualified
+ * Returns the weight that should be given to a satisfied criterion according
+ * to its priority, on the scale [0, 1.0].
  */
-function calculate_criteria_weight(section, criteria) {
+function get_priority_weight(criterion) {
+    switch (criterion.priority) {
+        case 'required': throw 'don\'t weight required criteria';
+        // TODO: linear or geometric-ish scale?
+        case 'high':   return 1.0;
+        case 'medium': return 0.6;
+        case 'low':    return 0.3;
+        default: throw 'invalid priority ' + pri;
+    }
+}
+
+/*
+ * Types of criteria:
+ *
+ * |---------------+-------------+-----------|
+ * |               | Global      | Local     |
+ * |---------------+-------------+-----------|
+ * | Required      | credits     | timeslot  |
+ * |---------------+-------------+-----------|
+ * | Prioritizable | timebetween | timeofday |
+ * |               | distance    | avggpa    |
+ * |---------------+-------------+-----------|
+ *
+ * Local criteria are applicable to specific class sections.
+ * Global criteria are only applicable to a schedule as a whole.
+ *
+ * Required criteria may only have their priority set as 'required'.
+ * Prioritizable criteria may have 'low', 'medium', 'high', or 'required' priority.
+ *
+ */
+function is_local_criterion(criterion) {
+    switch (criterion.type) {
+        case 'credits':
+        case 'timebetween':
+        case 'distance':
+            return false;
+        case 'timeslot':
+        case 'timeofday':
+        case 'avggpa':
+            return true;
+        default:
+            throw 'invalid criterion type ' + criterion.type;
+    }
+}
+
+/*
+ * Calculates criteria weights for individual sections.
+ * Returns a score for the section, or -1 if section should be disqualified.
+ */
+function calculate_local_criteria_weight(section, criteria) {
+    let total_score = 0;
+    let count = 0;
+
     for (let criterion of criteria) {
-        // TODO: support priorities...
-        console.assert(criterion.priority === 'required', 'criterion priorities not yet supported');
-        switch (criterion.type) {
-            case 'timeslot':
-                if (!criterion.hasOwnProperty('packed_timeslots')) {
-                    criterion.packed_timeslots = create_packed_timeslots([criterion.parameters]);
-                }
+        if (!is_local_criterion(criterion)) continue;
 
-                if (do_packed_timeslots_conflict(criterion.packed_timeslots, section.packed_timeslots)) {
-                    return -1;
-                }
-                break;
-            case 'timeofday':
-                if (!criterion.hasOwnProperty('packed_timeslots')) {
-                    let daily_range = create_daily_range_timeslots(
-                        criterion.parameters.start_time,
-                        criterion.parameters.end_time);
-                    let daily_packed = create_packed_timeslots(daily_range);
-                    criterion.packed_timeslots = invert_packed_timeslots(daily_packed);
-                }
-
-                if (do_packed_timeslots_conflict(criterion.packed_timeslots, section.packed_timeslots)) {
-                    return -1;
-                }
-                break;
+        count += 1;
+        let satisfies = satisfies_local_criterion(section, criterion);
+        if (criterion.priority === 'required') {
+            if (!satisfies) {
+                return -1;
+            }
+        } else if (satisfies) {
+            // TODO: combine scores differently than by summation?
+            total_score += get_priority_weight(criterion);
         }
     }
 
-    return 1;
+    let final_score = total_score / count;
+    console.assert(!Number.isNaN(total_score));
+    console.assert(!Number.isNaN(final_score));
+
+    return final_score;
+}
+
+/*
+ * Returns whether the given section satisfies the given criterion.
+ * Should only be called with locally-weightable criteria.
+ */
+function satisfies_local_criterion(section, criterion) {
+    switch (criterion.type) {
+        case 'timeslot':
+            if (!criterion.hasOwnProperty('packed_timeslots')) {
+                criterion.packed_timeslots = create_packed_timeslots([criterion.parameters]);
+            }
+
+            return !do_packed_timeslots_conflict(criterion.packed_timeslots, section.packed_timeslots);
+        case 'timeofday':
+            if (!criterion.hasOwnProperty('packed_timeslots')) {
+                let daily_range = create_daily_range_timeslots(
+                    criterion.parameters.start_time,
+                    criterion.parameters.end_time);
+                let daily_packed = create_packed_timeslots(daily_range);
+                criterion.packed_timeslots = invert_packed_timeslots(daily_packed);
+            }
+
+            return !do_packed_timeslots_conflict(criterion.packed_timeslots, section.packed_timeslots);
+        case 'avggpa':
+            // TODO: course critque data
+            return true;
+        default:
+            throw 'criterion does not exist: ' + criterion.type;
+    }
+}
+
+function calculate_global_criteria_weight(schedule, criteria) {
+    let total_score = 0;
+    let count = 0;
+
+    for (let criterion of criteria) {
+        if (is_local_criterion(criterion)) continue;
+        // credits is special
+        if (criterion.type === 'credits') continue;
+
+        count += 1;
+        let score = calculate_global_criterion_weight(schedule, criterion);
+        if (criterion.priority === 'required') {
+            if (score === -1) {
+                return -1;
+            }
+        } else {
+            // TODO: combine scores differently than by summation?
+            total_score += get_priority_weight(criterion) * score;
+        }
+    }
+
+    let final_score = total_score / count;
+    console.assert(!Number.isNaN(total_score));
+    console.assert(!Number.isNaN(final_score));
+
+    return final_score;
+}
+
+function calculate_global_criterion_weight(schedule, criterion) {
+    switch (criterion.type) {
+        case 'timebetween':
+            return calculate_timebetween_weight(schedule, criterion);
+        case 'distance':
+            // TODO: gtplaces data
+            return 0;
+        default:
+            throw 'criterion does not exist: ' + criterion.type;
+    }
+}
+
+/*
+ * Given array of packed timeslots, determines whether a class occupies
+ * the given timeslot on the given day.
+ */
+function is_timeslot_occupied(packed_timeslots, day, slot) {
+    console.assert(0 <= day && day <= 7, 'invalid day number ' + day);
+    console.assert(0 <= slot && slot < 48, 'invalid slot number ' + slot);
+
+    if (slot < 32) {
+        return (packed_timeslots[2 * day] & (1 << slot)) != 0;
+    } else {
+        return (packed_timeslots[2 * day + 1] & (1 << (slot - 32))) != 0;
+    }
+}
+
+/*
+ * Calulates a weight for a schedule as a function of the gaps between classes,
+ * using the formula:
+ *
+ * Product over non-acceptable gaps of:
+ *    1 - 0.1 * (absolute difference in slots of gap vs. acceptable cutoff)
+ *
+ * Further user studies would be needed to determine whether anyone actually
+ * wants to distinguish between the quantity and length of gaps.
+ *
+ * Another factor that would need to be considered in the future would be to
+ * exclude scheduled exam periods (and possibly labs) from this calcluation.
+ */
+function calculate_timebetween_weight(schedule, timebetween) {
+    console.assert(timebetween.type === 'timebetween');
+
+    let timeslots = schedule.packed_timeslots;
+    let is_acceptable_gap = get_timebetween_satisfies_function(timebetween);
+
+    // in half hours
+    let gap_lengths = [];
+
+    for (let day = 0; day < 7; day++) {
+
+        let before_class_start = true;
+        let in_gap = false;
+        let current_gap = 0;
+
+        for (let slot = 0; slot < 48; slot++) {
+            let occupied = is_timeslot_occupied(timeslots, day, slot);
+            if (occupied) {
+                if (in_gap) {
+                    gap_lengths.push(current_gap);
+                    in_gap = false;
+                    current_gap = 0;
+                }
+
+                if (before_class_start) {
+                    before_class_start = false;
+                }
+            } else {
+                if (!before_class_start) {
+                    if (!in_gap) {
+                        in_gap = true;
+                    }
+
+                    current_gap += 1;
+                }
+            }
+        }
+    }
+
+    let good_length = timebetween.parameters.value * 2;
+    let length_factor = 1;
+    for (let i = 0; i < gap_lengths.length; i++) {
+        if (!is_acceptable_gap(gap_lengths[i])) {
+            if (timebetween.priority === 'required') return -1
+            let difference = Math.abs(good_length - gap_lengths[i]);
+            length_factor *= Math.max(0, 1 - difference * 0.1);
+        }
+    }
+
+    return length_factor;
+}
+
+/*
+ * Returns a function for the given timebetween that takes a gap length
+ * (in half hours) and returns a boolean value indicating whether that gap
+ * length satisfies the timebetween criterion.
+ */
+function get_timebetween_satisfies_function(timebetween) {
+    switch (timebetween.parameters.condition) {
+        case 'at_least':
+            // 'gap' is in timeslots (half hours), but timebetween value is in hours
+            return function(gap) {
+                return gap >= 2 * timebetween.parameters.value;
+            };
+        case 'no_more_than':
+            return function(gap) {
+                return gap <= 2 * timebetween.parameters.value;
+            };
+        default:
+            throw 'invalid timebetween condition ' + timebetween.parameters.condition;
+    }
+}
+
+/*
+ * Calculates the final score of a schedule, based on the global schedule score
+ * and the indvidual scores of the sections in the schedule (as aggregated in
+ * find_schedules_in_credit_range). An average between the global score and the
+ * average section score (subject to change).
+ */
+function calculate_total_schedule_score(schedule, criteria) {
+    let global = 0;
+    if (schedule.hasOwnProperty('global')) {
+        global = schedule.global;
+    } else {
+        global = schedule.global = calculate_global_criteria_weight(schedule, criteria);
+    }
+
+    let local = schedule.score / schedule.sections.length;
+
+    // dividing by two is unnecessary but yields a nice normalized value
+    return (global + local) / 2;
 }
 
 function find_best_schedules(input, count, callback) {
@@ -427,7 +679,7 @@ function find_best_schedules(input, count, callback) {
                 for (let entry of section_map) {
                     let section_id = entry[0];
                     let val = entry[1];
-                    let weight = calculate_criteria_weight(val.section, input.criteria);
+                    let weight = calculate_local_criteria_weight(val.section, input.criteria);
                     if (weight === -1) {
                         section_map.delete(section_id);
                     } else {
@@ -457,12 +709,21 @@ function find_best_schedules(input, count, callback) {
                 for (let class_group of class_groups) {
                     let all_sections = class_group.classes
                         .map(function(clazz) { return clazz.sections; })
-                        .reduce(function(acc, sections) { return acc.concat(sections); });
+                        .reduce(function(acc, sections) { return acc.concat(sections); })
+                        .filter(function(section) {
+                            if (!section_map.has(section.section_id)) return false;
+                            section.score = section_map.get(section.section_id).score;
+                            return true;
+                        });
 
                     let locked_sections = all_sections.filter(function(section) {
-                        return section_map.has(section.section_id)
-                            && locked_sections_set.has(section.section_id);
+                        return locked_sections_set.has(section.section_id);
                     });
+
+                    // let locked_sections = all_sections.filter(function(section) {
+                    //     return section_map.has(section.section_id)
+                    //         && locked_sections_set.has(section.section_id);
+                    // });
                     
                     if (locked_class_group_set.has(class_group.class_group_id) && locked_sections.length > 0) {
                         callback('Cannot lock both class and section', null);
@@ -491,12 +752,21 @@ function find_best_schedules(input, count, callback) {
                         section_buckets, lock_count, 0,
                         new Uint32Array(14), credits[0], credits[1]);
 
-                // let top_n = Array.from(all_schedules).sort(function(sched1, sched2) {
-                //     // sort descending by score
-                //     return sched2.score - sched2.score;
-                // }).splice(0, count);
+                let sched_heap = new Heap(function(a, b) {
+                    // min heap, so we can pop lowest score to insert higher scores
+                    return a.total_score - b.total_score;
+                });
 
-                callback(null, Array.from(all_schedules).map(function(sched) { return sched.sections.map(function(sec) { return sec.section_id; }); }));
+                for (let schedule of all_schedules) {
+                    schedule.total_score = calculate_total_schedule_score(schedule, input.criteria);
+                    sched_heap.push(schedule);
+                    if (sched_heap.size() > count) sched_heap.pop();
+                }
+
+                let top_n = sched_heap.toArray().reverse();
+
+                // callback(null, top_n.map(function(sched) { return sched.sections.map(function(sec) { return sec.section_id; }); }));
+                callback(null, top_n);
             } catch (e) {
                 throw e;
                 callback(e, null);
@@ -507,7 +777,12 @@ function find_best_schedules(input, count, callback) {
 function* find_schedules_within_credit_range(section_buckets, lock_count, start_ind, packed_timeslots, credit_min, credit_max) {
     if (start_ind == section_buckets.length
             || credit_max <= 0) {
-        yield { 'credits': 0, 'score': 0, 'sections': [] };
+        yield {
+            'credits': 0,
+            'score': 0,
+            'sections': [],
+            'packed_timeslots': packed_timeslots
+        };
         return;
     }
 
@@ -526,29 +801,36 @@ function* find_schedules_within_credit_range(section_buckets, lock_count, start_
         if (section.credits > credit_max) continue;
         if (do_packed_timeslots_conflict(packed_timeslots, section.packed_timeslots)) continue;
 
+        let merged_timeslots = merge_packed_timeslots(packed_timeslots, section.packed_timeslots);
+
         let with_take = find_schedules_within_credit_range(
                 section_buckets, lock_count - 1, start_ind + 1,
-                merge_packed_timeslots(packed_timeslots, section.packed_timeslots),
+                merged_timeslots,
                 credit_min - section.credits, credit_max - section.credits);
         for (let schedule of with_take) {
             let total_credits = schedule.credits + section.credits;
-            // TODO: better combining function than +
+            // TODO: better combining function than +?
             let total_score = schedule.score + section.score;
             if (total_credits >= credit_min && total_credits <= credit_max) {
-                yield { 'credits': total_credits, 'score': total_score, 'sections': [section].concat(schedule.sections) };
+                yield {
+                    'credits': total_credits,
+                    'score': total_score,
+                    'sections': [section].concat(schedule.sections),
+                    'packed_timeslots': schedule.packed_timeslots
+                };
             }
         }
     }
 }
 
 // This should be commented out so it doesn't run every time you run node
-/*find_best_schedules(sample_input, 5, function(err, schedules) {
+find_best_schedules(sample_input, 5, function(err, schedules) {
     if (err != null) {
         console.dir(err, { depth: null, colors: true });
     } else {
         //console.log(JSON.stringify(schedules, null, 2));
         console.dir(schedules, { depth: null, colors: true });
     }
-});*/
+});
 
 module.exports.find_best_schedules = find_best_schedules;
