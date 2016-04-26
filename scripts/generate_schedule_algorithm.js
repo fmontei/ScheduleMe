@@ -744,8 +744,6 @@ function find_best_schedules(input, count, callback) {
                     if (sched_heap.size() > count) sched_heap.pop();
                 }
 
-                callback(null, Array.from(all_schedules));
-
                 let top_n = sched_heap.toArray().reverse();
 
                 let section_ids = top_n.map(function(sched) { return sched.sections.map(function(sec) { return sec.section_id; }); });
