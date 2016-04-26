@@ -11,7 +11,7 @@ var schedule_generator = require('../scripts/generate_schedule_algorithm');
 router.use(function(req, res, next) {
     schedule_generator.find_best_schedules(
         req.body.scheduleInput,
-        req.body.scheduleInput['locked_class_groups'].length,
+        10,
         function(err, schedules) {
             console.log(JSON.stringify(err));
             console.log(JSON.stringify(schedules));
