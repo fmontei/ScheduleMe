@@ -12,17 +12,17 @@ router.use(function(req, res, next) {
     if (!schedule_id) {
         return res.status(400).send('Missing required parameter schedule_id.');
     }
-    
+
+    // Delete the section_schedules before the schedule itself, because
+    // the former rely on the latter via foreign keys.
     async.waterfall([
-        // Delete the section_schedules before the schedule itself, because
-        // the former rely on the latter via foreign keys.
         function(callback) {
             db.run('delete from sectionschedule where schedule_id = $schedule_id;', {
                 $schedule_id: schedule_id,
             }, function(err) {
                 callback(err);
             });
-        }
+        },
         function(callback) {
             db.run('delete from schedule where schedule_id = $schedule_id;', {
                 $schedule_id: schedule_id,

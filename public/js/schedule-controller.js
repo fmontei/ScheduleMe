@@ -135,7 +135,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
     $scope.saveSchedule = function() {
         var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
         var sectionIDs = [];
-        console.log(JSON.stringify(schedule));
+        
         for (var i = 0; i < schedule.length; i++) {
             if (sectionIDs.indexOf(schedule[i]['section_id']) === -1) {
                 sectionIDs.push(schedule[i]['section_id']);

@@ -128,8 +128,6 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             'criteria': criteria
         };
 
-        console.log(JSON.stringify(scheduleInput));
-
         $location.path('/loading');
 
         scheduleHttpService.generateSchedule(scheduleInput).then(
