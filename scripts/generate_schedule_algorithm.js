@@ -461,6 +461,7 @@ function satisfies_local_criterion(section, criterion) {
 
             return !do_packed_timeslots_conflict(criterion.packed_timeslots, section.packed_timeslots);
         case 'avggpa':
+            if (section.avg_gpa == null) return true;
             return section.avg_gpa >= criterion.parameters
         default:
             throw 'criterion does not exist: ' + criterion.type;
@@ -743,9 +744,13 @@ function find_best_schedules(input, count, callback) {
                     if (sched_heap.size() > count) sched_heap.pop();
                 }
 
+                callback(null, Array.from(all_schedules));
+
                 let top_n = sched_heap.toArray().reverse();
 
-                callback(null, top_n);
+                let section_ids = top_n.map(function(sched) { return sched.sections.map(function(sec) { return sec.section_id; }); });
+
+                callback(null, section_ids);
             } catch (e) {
                 throw e;
                 callback(e, null);
