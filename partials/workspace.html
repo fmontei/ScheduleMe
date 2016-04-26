@@ -365,8 +365,8 @@
                                     </div>
                                 </small>
                                 <small class="list-group-item-text">
-                                    <div><label>Professor</label> {{section.professor_id | toProfessorName}}</div>
-                                    <div><label>GPA</label> {{section.professor_id | toProfessorGPA}}</div>
+                                    <div><label>Professor</label> {{section | toProfessorName}}</div>
+                                    <div><label>GPA</label> {{section | toProfessorGPA}}</div>
                                     <div ng-repeat="ts in section.timeslots">
                                         <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
                                     </div>
@@ -408,8 +408,8 @@
                                     </div>
                                 </small>
                                 <small class="list-group-item-text">
-                                    <div><label>Professor</label> {{section.professor_id | toProfessorName}}</div>
-                                    <div><label>GPA</label> {{section.professor_id | toProfessorGPA}}</div>
+                                    <div><label>Professor</label> {{section | toProfessorName}}</div>
+                                    <div><label>GPA</label> {{section | toProfessorGPA}}</div>
                                     <div ng-repeat="ts in section.timeslots">
                                         <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
                                     </div>
@@ -535,8 +535,8 @@
                                     </div>
                                 </small>
                                 <small class="list-group-item-text">
-                                    <div><label>Professor</label> {{section.professor_id | toProfessorName}}</div>
-                                    <div><label>GPA</label> {{section.professor_id | toProfessorGPA}}</div>
+                                    <div><label>Professor</label> {{section | toProfessorName}}</div>
+                                    <div><label>GPA</label> {{section | toProfessorGPA}}</div>
                                     <div ng-repeat="ts in section.timeslots">
                                         <label>{{ts.day_of_week}}</label> {{ts.start_time}} - {{ts.end_time}}
                                     </div>

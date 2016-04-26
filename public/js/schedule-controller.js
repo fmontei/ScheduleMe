@@ -34,7 +34,8 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         for (var i = 0; i < timeSlots.length; i++) {
             for (var j = 0; j < scheduleData.length; j++) {
                 var classStartTime = scheduleData[j]['start_time'];
-                var classEndTime = scheduleData[j]['end_time']
+                var classEndTime = scheduleData[j]['end_time'];
+                if (!classStartTime || !classEndTime) continue;
                 var delimStartTime = classStartTime.indexOf(':');
                 var delimEndTime = classEndTime.indexOf(':');
                 var classStartHours = parseInt(
@@ -83,6 +84,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
 
     // Converts 24-hour time to 12-hour time.
     $scope.formatTime = function(time) {
+        if (!time) return '';
         var hours = parseInt(time.substring(0, time.indexOf(':'))),
             mins = time.substring(time.indexOf(':') + 1),
             meridian = 'am';

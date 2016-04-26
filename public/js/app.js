@@ -690,22 +690,23 @@ scheduleMeApp.directive('pngTimeInput', function($compile) {
 });
 
 scheduleMeApp.filter('toProfessorName', ['LocalStorage', function(localStorage) {
-    return function(input) {
+    return function(_class) {
         var profDict = localStorage.get('profDict');
-        if (profDict && input) {
-            return (profDict[input] !== undefined) ? 
-                profDict[input]['name'].replace(',', ', ') : 'Unknown';
+        if (profDict && _class.professor_id) {
+            return (profDict[_class.professor_id] !== undefined) ? 
+                profDict[_class.professor_id]['name'].replace(',', ', ') : 
+                _class['professor'];
         }
-        return 'Unknown';
+        return _class['professor'];
     };
 }]);
 
 scheduleMeApp.filter('toProfessorGPA', ['LocalStorage', function(localStorage) {
-    return function(input) {
+    return function(_class) {
         var profDict = localStorage.get('profDict');
-        if (profDict && input) {
-            return (profDict[input] !== undefined) ? 
-                profDict[input]['gpa'].toString().substring(0, 5) : 'Unknown';
+        if (profDict && _class.professor_id) {
+            return (profDict[_class.professor_id] !== undefined) ? 
+                profDict[_class.professor_id]['gpa'].toString().substring(0, 5) : 'Unknown';
         }
         return 'Unknown';
     };

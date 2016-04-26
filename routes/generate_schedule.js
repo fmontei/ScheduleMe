@@ -13,8 +13,6 @@ router.use(function(req, res, next) {
         req.body.scheduleInput,
         10,
         function(err, schedules) {
-            console.log(JSON.stringify(err));
-            console.log(JSON.stringify(schedules));
             if (err !== null) {
                 return res.status(200).send(err);
             } else {
@@ -57,9 +55,9 @@ function generateScheduleDataForSchedule(schedule) {
             var section_ids = JSON.stringify(schedule)
                 .replace('[', '(')
                 .replace(']', ')');
-            var query = "select * from section sect left outer join " +
+            var query = "select * from section sect inner join " +
                 "class cls on cls.class_id = sect.class_id " +
-                "inner join timeslot ts on ts.section_id = sect.section_id " +
+                "left outer join timeslot ts on ts.section_id = sect.section_id " +
                 "where sect.section_id in " + section_ids + 
                 " order by sect.section_id, ts.timeslot_id asc;";
             db.all(query, function(err, rows) {
