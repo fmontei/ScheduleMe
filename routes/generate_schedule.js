@@ -13,6 +13,8 @@ router.use(function(req, res, next) {
         req.body.scheduleInput,
         req.body.scheduleInput['locked_class_groups'].length,
         function(err, schedules) {
+            console.log(JSON.stringify(err));
+            console.log(JSON.stringify(schedules));
             if (err !== null) {
                 return res.status(200).send(err);
             } else {

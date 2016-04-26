@@ -97,43 +97,6 @@ function run() {
                 );
             }
             waitForAllRecordsToSave(callback);
-        },
-        function dropOldColumn(callback) {
-            // sqlite does not support dropping columns -- so the entire table needs
-            // to be copired over to a new table.
-            console.log('Done updating professor_id foreign keys for section table.');
-            var query = 
-                "CREATE TABLE SECTION_BACKUP(" +
-                "section_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                "professor_id INTEGER," +
-                "crn INTEGER NOT NULL," +
-                "section_name VARCHAR(5) NOT NULL," +
-                "credits INTEGER NOT NULL," +
-                "seat_capacity INTEGER," +
-                "seat_actual INTEGER," +
-                "seat_remaining INTEGER," +
-                "class_id INTEGER NOT NULL," +
-                "foreign key (class_id) references CLASS(class_id)," +
-                "foreign key (professor_id) references PROFESSOR(professor_id)," +
-                "UNIQUE (class_id, crn) ON CONFLICT IGNORE);";
-            db.run(query, function(err) {
-                if (err) callback(err);
-                query = "INSERT INTO section_backup SELECT section_id, professor_id, crn, section_name, " +
-                "credits, seat_capacity, seat_actual, seat_remaining, class_id FROM section;";
-                db.run(query, function(err) {
-                    if (err) callback(err);
-                    query = "DROP TABLE section;";
-                    db.run(query, function(err) {
-                        if (err) callback(err);
-                        query = "ALTER TABLE section_backup RENAME TO section;";
-                        db.run(query, function(err) {
-                            if (err) callback(err);
-                            console.log("Done dropping old column professor from section table.");
-                            callback(err);
-                        });
-                    });
-                }); 
-            });
         }
     ], function(err) {
         if (err) {
