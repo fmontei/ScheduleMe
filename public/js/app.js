@@ -1,3 +1,4 @@
+// Declaration of AngularJS module.
 var scheduleMeApp = angular.module('ScheduleMeApp', [
     'ngRoute',
     'ui.bootstrap',
@@ -5,6 +6,8 @@ var scheduleMeApp = angular.module('ScheduleMeApp', [
     'rzModule'
 ]);
 
+
+// Route definition for application.
 scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/login', {
         templateUrl: 'partials/login.html',
@@ -31,6 +34,10 @@ scheduleMeApp.config(['$routeProvider', function($routeProvider) {
     });
 }]);
 
+
+// Used for determining which page the application is on
+// across the entire application. $rootScope's variables
+// are universally accessible unlike $scope.
 scheduleMeApp.run(function($rootScope, $location) {
     $rootScope.location = $location;
 });
@@ -384,7 +391,9 @@ scheduleMeApp.factory('ServerDataService', ['$q', 'LocalStorage', 'ClassHttpServ
         return deferred.promise;
     };
 
-    // Main function used for retrieving all user data.
+    // Main function used for retrieving all user data. This function also
+    // retrieves class and section information for the currently selected
+    // semester.
     serverDataService.getServerData = function() {
         var deferred = $q.defer();
         var userID = localStorage.get('user')['user_id'];

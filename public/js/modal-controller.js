@@ -9,6 +9,9 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
     'SectionHttpService', function($rootScope, $scope, localStorage,
     sectionHttpService) {
 
+    // When the user selects a major (or "department"), filter the classes shown
+    // by the selected major. For example, if CPSC is selected from the list of majors,
+    // only show classes whose department is CPSC.
     $scope.filterClassesByDept = function() {
         $scope.modalData.filteredClasses = [];
         $scope.modalData.filteredSections = [];
@@ -23,6 +26,8 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.modalData.filteredClasses = filteredClasses;
     };
 
+    // When the user selects a class, only show sections that belong to the user-selected
+    // class.
     $scope.filterSectionsByClass = function() {
         $scope.modalData.filteredSections = [];
         if (!$scope.modalData.selectedClass) {
@@ -37,6 +42,8 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         });
     };
 
+    // This method is invoked when a user clicks on "Add Class" 
+    // from within the modal.
     $scope.selectClass = function() {
         var allSelectedClasses = localStorage.get('selectedClasses');
         var _class = $scope.modalData.selectedClass;
@@ -54,6 +61,8 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.resetModal();
     };
 
+    // This method is invoked when a user clicks on "Add Group"
+    // from within the modal. 
     $scope.selectGroup = function() {
         var allSelectedGroups = localStorage.get('selectedGroups');
         var allSelectedClasses = localStorage.get('selectedClasses');
@@ -89,6 +98,8 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         } else if (type == 'lab') {
             section = $scope.modalData.selectedLabSection;
             alreadyExists = isClassInList(_class, allSelectedClasses);
+            // Prevent redundant classes from being added to the list of 
+            // selected classes.
             if (alreadyExists == false) {
                 _class.lab = combineClassWithSection(_class.model, section);
                 _class.lab['isLab'] = true;
@@ -128,6 +139,7 @@ scheduleMeApp.controller('ModalController', ['$rootScope', '$scope', 'LocalStora
         $scope.modalData.groupClasses.splice(index, 1);
     };
 
+    // Invoked whenever a user effectively closes a modal.
     $scope.resetModal = function() {
         $scope.modalData = {
             selectedDept: null,

@@ -14,6 +14,10 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         $scope.criteria.timeslots.push({});
     };
 
+
+    // Click on the lock (or star) symbol, tags that respective class as
+    // mandatory -- meaning that it must appear within the list of
+    // generated schedules.
     $scope.updateClassMandatoryStatus = function(_class, listName) {
         var list = (listName === 'selectedClasses') ? $scope.selectedClasses : 
             (listName === 'selectedGroups') ? $scope.selectedGroups : null;
@@ -24,6 +28,7 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         }
     };
 
+    // Clicking on the "x" removes the class from the list of selected classes.
     $scope.undoSelection = function(_class, listName) {
         var list = (listName === 'selectedClasses') ? $scope.selectedClasses : 
             (listName === 'selectedGroups') ? $scope.selectedGroups : null;
@@ -34,6 +39,9 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
         }
     };
 
+    // This function might be long but is fairly self-explanatory: it converts
+    // the criteria the user set up into a format that is accepted by 
+    // generate_schedule_algorithm.js -- i.e. the ScheduleMe algorithm.
     $scope.generateSchedule = function() {
         localStorage.set('previousWorkspacePage', $location.path());
         var classGroups = [];
@@ -119,6 +127,8 @@ scheduleMeApp.controller('WorkspaceController', ['$location', '$scope', '$http',
             'locked_sections': lockedSections,
             'criteria': criteria
         };
+
+        console.log(JSON.stringify(scheduleInput));
 
         $location.path('/loading');
 

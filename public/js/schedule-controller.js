@@ -9,7 +9,8 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         localStorage, scheduleHttpService) {
     $scope.weekDays = ['M', 'T', 'W', 'R', 'F'];
 
-    // Technically, this logic could be moved to server, but laziness...
+    // This function is used for determing whether a class should be shown
+    // for a given time slot in the schedule. 
     $scope.getTimeSlots = function(scheduleData) {
         var timeSlots = [];
         for (var i = 7; i <= 19; i++) {
@@ -50,10 +51,18 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
                 );
                 var roundedStartMins = classStartMins - (classStartMins % 60);
                 var roundedEndMins = classEndMins - (classEndMins % 60);
+                // If the class is contained within the current timeslot, add it
+                // to the current timeslot.
                 if (classStartHours === timeSlots[i]['hours'] &&
                     roundedStartMins === timeSlots[i]['minutes']) {
                     timeSlots[i].classes.push(scheduleData[j]);
                 }
+                // If the class was added to the anterior time slot and the class
+                // has not yet ended (meaning it streches out into the current time slot).
+                // then also add it to the current time slot. This enables a class to
+                // appear across multiple time slots. For example, if a class lasts for
+                // 5 hours, then it will be contained vertically across 5 different
+                // time slots.
                 if (i > 0 &&
                     timeSlots[i - 1].classes.indexOf(scheduleData[j]) !== -1 &&
                     timeSlots[i]['hours'] <= classEndHours &&
@@ -72,6 +81,7 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
          });
     };
 
+    // Converts 24-hour time to 12-hour time.
     $scope.formatTime = function(time) {
         var hours = parseInt(time.substring(0, time.indexOf(':'))),
             mins = time.substring(time.indexOf(':') + 1),
@@ -83,6 +93,9 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         return hours + ':' + mins + ' ' + meridian;
     };
 
+    // Whenever one of the arrows are clicked to cycle through the list of
+    // temporarily generated schedules by the schedule me algorithm,
+    // this function is called.
     $scope.getTempSchedule = function(count) {
         if (count === 'prev') {
             count = $scope.tempScheduleCount - 1;
@@ -97,6 +110,9 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         } 
     };
 
+    // Whenever one of the arrow sare clicked to cycle through the list of a 
+    // user's permanently saved schedules, this function is called. It switches
+    // over to the next schedule, in effect. 
     $scope.getSavedSchedule = function(count) {
         if (count === 'prev') {
             count = $scope.savedScheduleCount - 1;
@@ -111,6 +127,9 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         } 
     };
 
+    // Once a user has selected a schedule that they want to save, this function is called.
+    // It adds this schedule to the user's current list of permanent schedules for the
+    // currently selected semester.
     $scope.saveSchedule = function() {
         var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
         var sectionIDs = [];
@@ -126,6 +145,12 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         });
     };
 
+    // This function is called when a user clicks on "Update schedule". 
+    // Certain variables are saved so that they can be passed along to 
+    // workspace.js for further editing. In effect, the current
+    // schedule is deconstructed into a list of required classes that
+    // are shown in the workspace screen. There, these classes
+    // can be added or dropped. 
     $scope.prepareScheduleForUpdate = function() {
         var scheduleDataToUpdate = $scope.savedScheduleData
                 [$scope.savedScheduleCount]['grouped'];
@@ -139,6 +164,10 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         $location.path('workspace');
     };
 
+    // If the user chose to update a schedule, the user will be given
+    // the option of "updating" rather than "saving" the schedule they
+    // chose to update. The schedule they chose to update is deleted and
+    // replaced with one of the schedules they generated.
     $scope.updateSchedule = function() {
         var scheduleID = localStorage.get('scheduleToUpdate');
         var schedule = $scope.tempScheduleData[$scope.tempScheduleCount]['raw'];
@@ -158,9 +187,12 @@ scheduleMeApp.controller('ScheduleController', ['$location', '$scope', '$http',
         });
     };
 
+    // Deletes a schedule. The route on the server is called to delete the schedule
+    // permanently.
     $scope.deleteSchedule = function() {
         var schedule = $scope.savedScheduleData[$scope.savedScheduleCount]['raw'],
             scheduleID = schedule[0]['schedule_id'];
+        // Prompt the user to make sure they really want to delete the schedule.
         var certain = confirm('Are you sure you want to delete the ' +
             'current schedule?');
         if (certain === true) {
