@@ -17,8 +17,8 @@ router.use(function(req, res, next) {
             var query = "select * from schedule sch " +
                 "inner join sectionschedule ss on ss.schedule_id = sch.schedule_id " +
                 "inner join section sect on sect.section_id = ss.section_id " +
-                "left outer join class cls on cls.class_id = sect.class_id " +
-                "inner join timeslot ts on ts.timeslot_id = ss.timeslot_id " +
+                "inner join class cls on cls.class_id = sect.class_id " +
+                "left outer join timeslot ts on ts.timeslot_id = ss.timeslot_id " +
                 "where sch.user_id = '" + user_id + "' and sch.semester_id = '" +
                 semester_id + "' order by ss.schedule_id, ss.section_id, ss.timeslot_id asc;";
             db.all(query, function(err, rows) {

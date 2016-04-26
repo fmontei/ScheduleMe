@@ -15,6 +15,10 @@ router.use(function(req, res, next) {
         user_id = req.body.userID,
         semester_id = req.body.semesterID,
         errors = [];
+
+    
+    // Create a new schedule in the database and for each section_id that
+    // is a part of the schedule, create a new section_schedule.    
     db.beginTransaction(function(err, transaction) {
         async.waterfall([
             function(callback) {

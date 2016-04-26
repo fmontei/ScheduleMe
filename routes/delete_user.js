@@ -12,6 +12,9 @@ router.use(function(req, res, next) {
     
     async.waterfall([
         function(callback) {
+            // Because the database schema does not allow deletions to "cascade"
+            // to foreign key relationships, delete all of these relationships
+            // manually, in reverse order.
             db.run('delete from sectionschedule where schedule_id in (' + 
                 'select schedule_id from schedule where user_id = $user_id);', {
                 $user_id: req.user_id.trim(),

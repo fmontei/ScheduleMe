@@ -6,12 +6,26 @@ var Q = require('q');
 var router = express.Router();
 var db = new sqlite3.Database('scheduleme.db');
 
+/* 
+ * This script can be run from /#/courseoff
+ * This script is incredibly hacky. As of current testing, it can only be
+ * run within Linux (not a Linux virtual OS -- Linux itself) with a moderate
+ * rate of success, since CourseOff resets the connection due to thousands
+ * of GET requests being sent to their server. The script, in theory, works.
+ * This is the most roundabout, inefficient way of re-creating the data 
+ * within a databse. Ideally, we should be using a database dump file of
+ * Georgia Tech's registration data or we should be given access to GT's
+ * registration API via RNOC. This is a last resort solution that is a lot
+ * more complicated than necessary just to get the data that we need.
+ */
 router.use(function(req, res, next) {
     var CURRENT_TERM = req.term.trim();
     if (!CURRENT_TERM) res.status(400).send('Must provide term, i.e. 201601');
     console.log(CURRENT_TERM);
 
     db.serialize(function() {
+        // Create the database tables that our application requires if the
+        // tables have not yet been created.
         db.run("CREATE TABLE if not exists USER(" +
             "user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             "username VARCHAR(30) NOT NULL UNIQUE ON CONFLICT IGNORE);")
@@ -70,6 +84,8 @@ router.use(function(req, res, next) {
     var sections = [];
     var timeslots = [];
 
+    // Only gets data for one term or semester at a time -- trust me, it takes
+    // long enough to run this script as is (~2 - 5 minutes).
     getSemesters(CURRENT_TERM).then(function(semestersResponse) {
         semesters = semestersResponse;
         console.log('Retrieved semesters.');
@@ -117,6 +133,12 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         });
     });
 
+    // This entire script is an async nightmare. When sqlite3 is saving records,
+    // it's basically busy. It doesn't matter if node.js is ready to do other things:
+    // if sqlite3 is busy, it'll throw an error. This function basically keeps asking
+    // the question to sqlite3: "Are you done saving the several thousand records
+    // that I asked you to save?" It asks this question every 100ms, until the answer
+    // is "Yes". At that point, the next bulk of records may be saved.
     function waitForAllRecordsToSave(deferred) {
         if (deferredCount === 0) {
             deferred.resolve();
@@ -143,6 +165,8 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
         return deferred.promise;
     };
 
+    // These "getFKs" functions are required because nested select statements
+    // aren't supported by sqlite3 or simply don't work with node-sqlite3. 
     function getFKsForCourses(courses) {
         var deferred = Q.defer();
         var coursesWithSemesterIDs = [];
@@ -282,6 +306,9 @@ function insertIntoDB(semesters, courses, sections, timeslots) {
     return mainDefer.promise;
 };
 
+// Used to essentially execute queries that would otherwise be injected into
+// an inner select statement inside a nested select statement. Stuff like this
+// isn't needed by most languages, but we're talking about node.js here...
 function executeInnerQuery(innerQuery, obj, key, deleteKey, print) {
     var deferred = Q.defer();
     var finalObj = JSON.parse(JSON.stringify(obj));
