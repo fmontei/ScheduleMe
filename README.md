@@ -1,19 +1,19 @@
 # ScheduleMe
 
-## Before cloning the repo:
+## Linux Installation Instructions:
 
 * To install sqlite3, open a terminal and type the following command:
-* sudo apt-get install sqlite3
+* `sudo apt-get install sqlite3`
 
 * To install Node.js, open a terminal and type the following command:	
-* sudo apt-get install nodejs
+* `sudo apt-get install nodejs`
 
 * Then install the node package manager, npm:	
-* sudo apt-get install npm
+* `sudo apt-get install npm`
 
 * Create a symbolic link for node, as many Node.js tools use this name to execute.
 (Failing to execute this step may result in node-sqlite3 installation errors.)
-* sudo ln -s /usr/bin/nodejs /usr/bin/node
+* `sudo ln -s /usr/bin/nodejs /usr/bin/node`
 
 * Install Node.js https://nodejs.org
 * `npm install -g bower grunt-cli`
@@ -23,6 +23,11 @@
 * `npm install`
 * `bower install`
 * `grunt` (TODO: use `grunt` to execute the previous two commands as well)
+
+## Running
+
+ScheduleMe can be started using `node index.js` or `npm start` (both are
+equivalent). 
 
 ## Structure
 
@@ -55,11 +60,11 @@ in `index.js`.
 CAS code is adapted from https://github.gatech.edu/gtjourney/express-casify.
 
 ## Misc
-* Do not delete the database (scheduleme.db). It is not easy to repopulate the database
-(because in Windows, etc. CourseOff will reset the connection). The only way to get around
-that is to run the init_db.js script from within Linux OS (a virtual OS does not work).
-Not to mention that there is so much registration data that it takes several minutes
-to complete the process.
+* Do not delete the database (scheduleme.db). It is not easy to repopulate the
+  database (because in Windows, etc. CourseOff will reset the connection). The
+  only way to get around that is to run the init_db.js script from within Linux
+  OS (a virtual OS does not work). Not to mention that there is so much
+  registration data that it takes several minutes to complete the process.
 
 ### Adding packages
 
