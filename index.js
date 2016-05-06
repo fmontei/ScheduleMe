@@ -54,10 +54,7 @@ app.get('/partials/:partial_name', function(req, res) {
 });
 
 // Init database
-app.use('/init/:term', function(req, res, next) {
-    req.term = req.params.term;
-    init_db(req, res, next);
-});
+app.use('/init', init_db);
 
 // Test database
 app.use('/select', select_db);
@@ -105,7 +102,7 @@ app.get('/timeslots/:section_id', function(req, res, next) {
     get_timeslots(req, res, next);
 });
 
-// Get dict of professors
+// Get dictionary of professors
 app.get('/professors', get_professor_dict);
 
 // Get user by username if exists, else create user with username
@@ -119,10 +116,10 @@ app.post('/schedule', create_schedule);
 
 // Update schedule
 app.put('/schedule/:schedule_id/', 
-	function(req, res, next) {
-		req.schedule_id = req.params.schedule_id.trim();
-		update_schedule(req, res, next);
-	}
+    function(req, res, next) {
+        req.schedule_id = req.params.schedule_id.trim();
+        update_schedule(req, res, next);
+    }
 );
 
 // Delete specified user

@@ -695,9 +695,9 @@ scheduleMeApp.filter('toProfessorName', ['LocalStorage', function(localStorage) 
         if (profDict && _class.professor_id) {
             return (profDict[_class.professor_id] !== undefined) ? 
                 profDict[_class.professor_id]['name'].replace(',', ', ') : 
-                _class['professor'];
+                _class['professor'] ? _class['professor'] : 'N/A';
         }
-        return _class['professor'];
+        return _class['professor'] ? _class['professor'] : 'N/A';
     };
 }]);
 
@@ -706,9 +706,9 @@ scheduleMeApp.filter('toProfessorGPA', ['LocalStorage', function(localStorage) {
         var profDict = localStorage.get('profDict');
         if (profDict && _class.professor_id) {
             return (profDict[_class.professor_id] !== undefined) ? 
-                profDict[_class.professor_id]['gpa'].toString().substring(0, 5) : 'Unknown';
+                profDict[_class.professor_id]['gpa'].toString().substring(0, 5) : 'N/A';
         }
-        return 'Unknown';
+        return 'N/A';
     };
 }]);
 
