@@ -10,9 +10,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.gatech.edu:swilliams302/ScheduleMe.git"
+    "url": "git@github.com:fmontei/ScheduleMe.git"
   },
-  "author": "",
+  "author": "Felipe Monteiro",
   "license": "ISC",
   "dependencies": {
     "async": "^1.0.0",

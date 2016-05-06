@@ -64,9 +64,10 @@ scheduleMeApp.factory('LocalStorage', ['localStorageService',
 
     myLocalStorage.clearAllExceptUser = function() {
         var user = localStorageService.get('user');
-        var newLocalStorage = {'user': user};
-        angular.copy(localStorageService, newLocalStorage);
-        myLocalStorage = newLocalStorage;
+        var semester = localStorageService.get('selectedSemester');
+        localStorageService.clearAll();
+        localStorageService.set('user', user);
+        localStorageService.set('selectedSemester', semester);
     };
 
     return myLocalStorage;

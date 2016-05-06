@@ -8,7 +8,7 @@ scheduleMeApp.controller('LoginController', ['$scope', '$http', '$location',
     'LocalStorage', 'UserHttpService', function($scope, $http, $location, 
         localStorage, userHttpService) {
     $scope.loginError = false;
-
+    
     $scope.checkLoginStatus = function() {
         var queryString = $location.search();
         if (queryString && queryString['bypass'] === true) {
